@@ -1,0 +1,18 @@
+{
+  "upstream": "https://github.com/lojjic/bidi-js",
+  "upstreamCommit": "8ab3197c9b0b6562b669aafedadb1a2581b4e8fc",
+  "upstreamVersion": "1.0.3",
+  "unicodeVersion": "17.0.0",
+  "files": [
+    {
+      "path": "bidi.mjs",
+      "bytes": 45242,
+      "sha256": "4d0e3c6460d08f053cf1c430cef67166f4f5322f1d0c1be455d97934061ff4c8"
+    },
+    {
+      "path": "LICENSE.txt",
+      "bytes": 1072,
+      "sha256": "664d5782e6bfd275fec01e28d432c6a6cddbe3835f025673ef960ac02212af21"
+    }
+  ]
+}

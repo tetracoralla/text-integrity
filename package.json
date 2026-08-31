@@ -1,0 +1,64 @@
+{
+  "name": "text-integrity",
+  "version": "1.0.0",
+  "description": "Deterministic Unicode 17 text integrity, coordinate, security, source-diagnostic, and protocol-string operations.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "openAdam"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tetracoralla/text-integrity.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tetracoralla/text-integrity/issues"
+  },
+  "homepage": "https://github.com/tetracoralla/text-integrity#readme",
+  "keywords": [
+    "unicode",
+    "normalization",
+    "collation",
+    "transcode",
+    "confusable",
+    "identifier",
+    "idna",
+    "precis",
+    "text",
+    "mcp"
+  ],
+  "bin": {
+    "text-integrity": "bin/text-integrity.js",
+    "text-integrity-mcp": "bin/text-integrity-mcp.js"
+  },
+  "exports": {
+    ".": "./src/library.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "vendor/bidi-js-unicode17",
+    "vendor/unicode/17.0.0/compact",
+    "vendor/unicode/17.0.0/license",
+    "vendor/unicode/17.0.0/MANIFEST.json",
+    ".codex-plugin",
+    ".mcp.json",
+    "NOTICE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "scripts": {
+    "check": "node scripts/check.mjs",
+    "test": "node --test",
+    "build:unicode": "node scripts/build-unicode-data.mjs",
+    "bench": "node scripts/bench.mjs",
+    "cli": "node bin/text-integrity.js",
+    "mcp": "node bin/text-integrity-mcp.js",
+    "ui": "node src/ui/server.js"
+  },
+  "engines": {
+    "node": ">=22.22.1 <23 || >=24.20.0 <25 || >=26.8.1 <27"
+  },
+  "dependencies": {
+    "tr46": "6.0.0"
+  }
+}

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Text Integrity</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Text Integrity</h1>
+        <select id="operation" aria-label="Operation">
+          <option value="inspect">Inspect</option>
+          <option value="explain_difference">Explain difference</option>
+          <option value="normalize">Normalize</option>
+          <option value="compare">Compare</option>
+          <option value="index">Index &amp; chunk</option>
+          <option value="security">Security observations</option>
+          <option value="protocol_profile">Protocol string</option>
+          <option value="transcode">Transcode</option>
+        </select>
+      </header>
+
+      <form id="task-form">
+        <label id="primary-label" for="primary">Text</label>
+        <textarea id="primary" rows="7" placeholder="Paste text"></textarea>
+
+        <section id="normalize-fields" hidden>
+          <label for="normalization-form">Form</label>
+          <select id="normalization-form">
+            <option>NFC</option>
+            <option>NFD</option>
+            <option>NFKC</option>
+            <option>NFKD</option>
+          </select>
+        </section>
+
+        <section id="compare-fields" hidden>
+          <label for="secondary">Compare with</label>
+          <textarea id="secondary" rows="5" placeholder="Paste comparison text"></textarea>
+          <div class="grid">
+            <label>Locale<input id="locale" value="en" /></label>
+            <label>Use<select id="usage"><option>sort</option><option>search</option></select></label>
+            <label>Sensitivity<select id="sensitivity"><option>variant</option><option>base</option><option>accent</option><option>case</option></select></label>
+            <label>Case first<select id="case-first"><option>false</option><option>upper</option><option>lower</option></select></label>
+            <label>Locale matching<select id="locale-matcher"><option>best fit</option><option>lookup</option></select></label>
+            <label>Collation<input id="collation" value="default" /></label>
+            <label id="confusable-direction-label" hidden>Direction<select id="confusable-direction"><option>LTR</option><option>RTL</option><option>FS</option></select></label>
+          </div>
+          <div class="checks">
+            <label><input id="ignore-punctuation" type="checkbox" /> Ignore punctuation</label>
+            <label><input id="numeric" type="checkbox" /> Numeric ordering</label>
+          </div>
+        </section>
+
+        <section id="security-fields" hidden>
+          <div class="grid">
+            <label>Scope<select id="security-mode"><option value="free_text">Free text</option><option value="identifier">Identifier</option></select></label>
+            <label id="identifier-profile-label" hidden>Profile<select id="identifier-profile"><option value="uts39_general_security">General security</option><option value="uax31_nfkc_casefold">NFKC casefold</option><option value="uax31_xid">XID</option></select></label>
+            <label id="security-direction-label" hidden>Direction<select id="security-direction"><option>LTR</option><option>RTL</option><option>FS</option></select></label>
+          </div>
+          <label id="security-comparison-label" for="security-comparison" hidden>Compare identifier with
+            <textarea id="security-comparison" rows="4" placeholder="Optional comparison identifier"></textarea>
+          </label>
+        </section>
+
+        <section id="index-fields" hidden>
+          <label>Chunk bytes (optional)<input id="chunk-bytes" inputmode="numeric" placeholder="No chunking" /></label>
+        </section>
+
+        <section id="protocol-fields" hidden>
+          <div class="grid">
+            <label>Profile<select id="protocol-profile"><option value="uts46_domain">Domain (UTS #46)</option><option value="precis_username_case_mapped">Username · case mapped</option><option value="precis_username_case_preserved">Username · case preserved</option><option value="precis_opaque_string">Opaque string</option></select></label>
+            <label>Action<select id="protocol-action"></select></label>
+          </div>
+          <label id="protocol-comparison-label" hidden for="protocol-comparison">Compare with<textarea id="protocol-comparison" rows="4"></textarea></label>
+          <div id="domain-options" class="checks">
+            <label><input id="domain-transitional" type="checkbox" /> Transitional</label>
+            <label><input id="domain-std3" type="checkbox" checked /> STD3 rules</label>
+          </div>
+        </section>
+
+        <section id="transcode-fields" hidden>
+          <div class="grid">
+            <label>Source<select id="source-kind"><option value="text">Text</option><option value="bytes">Bytes</option></select></label>
+            <label id="source-encoding-label" hidden>Source encoding<select id="source-encoding"><option>utf-8</option><option>utf-16le</option></select></label>
+            <label>Target encoding<select id="target-encoding"><option>utf-8</option><option>utf-16le</option></select></label>
+            <label>Byte output<select id="byte-representation"><option value="hex">Hex</option><option value="base64">Base64</option><option value="bytes">Byte list</option></select></label>
+          </div>
+          <label class="loss"><input id="allow-lossy" type="checkbox" /> Allow replacement when input is invalid</label>
+        </section>
+
+        <button type="submit">Run</button>
+      </form>
+
+      <section id="result" aria-live="polite" hidden></section>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

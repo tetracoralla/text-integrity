@@ -1,0 +1,119 @@
+name: Release
+
+# Publishing uses npm trusted publishing (OIDC) with no repository secret.
+# npm requires a package to exist before a trusted publisher can be configured,
+# so a new package name must first be reserved by its owner as documented in
+# CONTRIBUTING.md. Configure github.com/tetracoralla/text-integrity, release.yml,
+# the `npm` environment, and the `npm publish` action before tagging 1.0.0.
+# Provenance binds a publication to source and build; it is not a safety claim.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build, verify, and attest
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - run: npm ci
+      - name: Match package version to tag
+        run: |
+          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+          test "${GITHUB_REF_NAME}" = "v${PACKAGE_VERSION}"
+      - run: npm run check
+      - name: Build package
+        run: npm pack
+      - name: Generate SBOM (CycloneDX)
+        run: npm sbom --sbom-format cyclonedx > text-integrity-sbom.cdx.json
+      - name: Record checksums
+        run: |
+          shasum -a 256 text-integrity-*.tgz text-integrity-sbom.cdx.json > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+      - name: Attest build provenance
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: "${{ github.workspace }}/text-integrity-*.tgz"
+      - name: Attest SBOM
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: "${{ github.workspace }}/text-integrity-*.tgz"
+          sbom-path: "${{ github.workspace }}/text-integrity-sbom.cdx.json"
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: release-artifacts
+          path: |
+            text-integrity-*.tgz
+            text-integrity-sbom.cdx.json
+            SHA256SUMS.txt
+          if-no-files-found: error
+
+  publish:
+    name: publish to npm with provenance
+    needs: build
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+        with:
+          name: release-artifacts
+      - run: npm publish ./text-integrity-*.tgz --access public
+
+  verify:
+    name: re-verify the published artifact
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+        with:
+          name: release-artifacts
+          path: built
+      - name: Download from the registry and compare contents
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          mkdir -p published && cd published
+          npm pack "text-integrity@${VERSION}"
+          cd ..
+          echo "built tarball:     $(shasum -a 256 built/text-integrity-*.tgz)"
+          echo "published tarball: $(shasum -a 256 published/text-integrity-*.tgz)"
+          mkdir -p extracted/built extracted/published
+          tar -xzf built/text-integrity-*.tgz -C extracted/built
+          tar -xzf published/text-integrity-*.tgz -C extracted/published
+          # The raw tarball bytes may differ by publish-time metadata; the
+          # shipped file tree must not.
+          diff -r extracted/built extracted/published
+      - name: Functional smoke on the installed package
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          mkdir -p smoke && cd smoke
+          npm init -y >/dev/null
+          npm install "text-integrity@${VERSION}"
+          node -e "import('text-integrity').then(({ executeOperation, LIBRARY_INFO }) => { \
+            const r = executeOperation('normalize', { text: 'e\u0301', form: 'NFC' }); \
+            if (r.normalized !== 'é') process.exit(1); \
+            console.log('smoke ok', LIBRARY_INFO.version); \
+          });"

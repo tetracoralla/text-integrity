@@ -1,0 +1,18 @@
+{
+  "name": "text-integrity",
+  "version": "1.0.0",
+  "description": "Deterministic Unicode 17 text integrity and protocol-string operations.",
+  "author": {
+    "name": "openAdam"
+  },
+  "interface": {
+    "displayName": "Text Integrity",
+    "shortDescription": "Deterministic Unicode and protocol-string work.",
+    "longDescription": "Inspect, compare, normalize, map, diagnose, and apply named text profiles through eight read-only tools.",
+    "developerName": "openAdam",
+    "category": "Developer Tools",
+    "capabilities": [],
+    "defaultPrompt": "Use one deterministic Text Integrity operation on explicit text or bytes."
+  },
+  "mcpServers": "./.mcp.json"
+}

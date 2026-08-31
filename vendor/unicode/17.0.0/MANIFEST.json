@@ -1,0 +1,111 @@
+{
+  "unicodeVersion": "17.0.0",
+  "uts39Revision": 32,
+  "acquiredAt": "2026-08-31",
+  "sourceRoot": "https://www.unicode.org/Public/17.0.0/",
+  "licenseUrl": "https://www.unicode.org/license.txt",
+  "files": [
+    {
+      "path": "license/LICENSE.txt",
+      "source": "https://www.unicode.org/license.txt",
+      "bytes": 1995,
+      "sha256": "e7a93b009565cfce55919a381437ac4db883e9da2126fa28b91d12732bc53d96"
+    },
+    {
+      "path": "security/IdentifierStatus.txt",
+      "source": "https://www.unicode.org/Public/17.0.0/security/IdentifierStatus.txt",
+      "bytes": 147969,
+      "sha256": "617228a16da13850bf8af28b6cd08f5e9b6595d2eb60404fe6eee2c85b4e4a35"
+    },
+    {
+      "path": "security/IdentifierType.txt",
+      "source": "https://www.unicode.org/Public/17.0.0/security/IdentifierType.txt",
+      "bytes": 527366,
+      "sha256": "924ac63faa97ed73420d6ac48d08279d90968c7da0502ab701e08bfbb9683c22"
+    },
+    {
+      "path": "security/confusables.txt",
+      "source": "https://www.unicode.org/Public/17.0.0/security/confusables.txt",
+      "bytes": 745683,
+      "sha256": "091c7f82fc39ef208faf8f94d29c244de99254675e09de163160c810d13ef22a"
+    },
+    {
+      "path": "ucd/BidiBrackets.txt",
+      "source": "https://www.unicode.org/Public/17.0.0/ucd/BidiBrackets.txt",
+      "bytes": 8891,
+      "sha256": "dadbaf38a0d0246e5b805bf8725cb81b7c621f93d030595635f5ba2c2f179428"
+    },
+    {
+      "path": "ucd/BidiMirroring.txt",
+      "source": "https://www.unicode.org/Public/17.0.0/ucd/BidiMirroring.txt",
+      "bytes": 26827,
+      "sha256": "a2f16fb873ab4fcdf3221cb1a8a85a134ddd6ed03603181823ff5206af3741ce"
+    },
+    {
+      "path": "ucd/DerivedCoreProperties.txt",
+      "source": "https://www.unicode.org/Public/17.0.0/ucd/DerivedCoreProperties.txt",
+      "bytes": 1134783,
+      "sha256": "24c7fed1195c482faaefd5c1e7eb821c5ee1fb6de07ecdbaa64b56a99da22c08"
+    },
+    {
+      "path": "ucd/DerivedNormalizationProps.txt",
+      "source": "https://www.unicode.org/Public/17.0.0/ucd/DerivedNormalizationProps.txt",
+      "bytes": 1377582,
+      "sha256": "71fd6a206a2c0cdd41feb6b7f656aa31091db45e9cedc926985d718397f9e488"
+    },
+    {
+      "path": "ucd/HangulSyllableType.txt",
+      "source": "https://www.unicode.org/Public/17.0.0/ucd/HangulSyllableType.txt",
+      "bytes": 51360,
+      "sha256": "5a57450afde0d082bc5026f7458649eac3b615490cc7e3d916b0367f1593c0e3"
+    },
+    {
+      "path": "ucd/PropList.txt",
+      "source": "https://www.unicode.org/Public/17.0.0/ucd/PropList.txt",
+      "bytes": 145465,
+      "sha256": "130dcddcaadaf071008bdfce1e7743e04fdfbc910886f017d9f9ac931d8c64dd"
+    },
+    {
+      "path": "ucd/PropertyValueAliases.txt",
+      "source": "https://www.unicode.org/Public/17.0.0/ucd/PropertyValueAliases.txt",
+      "bytes": 81858,
+      "sha256": "64e9a5f76f7a1e8b5a47d6a1f9a26522a251208f5276bdfa1559dac7cf2e827a"
+    },
+    {
+      "path": "ucd/ScriptExtensions.txt",
+      "source": "https://www.unicode.org/Public/17.0.0/ucd/ScriptExtensions.txt",
+      "bytes": 20707,
+      "sha256": "ec2107e58825a1586acee8e0911ce18260394ac8b87e535ca325f1ccbeb06bc6"
+    },
+    {
+      "path": "ucd/Scripts.txt",
+      "source": "https://www.unicode.org/Public/17.0.0/ucd/Scripts.txt",
+      "bytes": 192460,
+      "sha256": "9f5e50d3abaee7d6ce09480f325c706f485ae3240912527e651954d2d6b035bf"
+    },
+    {
+      "path": "ucd/UnicodeData.txt",
+      "source": "https://www.unicode.org/Public/17.0.0/ucd/UnicodeData.txt",
+      "bytes": 2198209,
+      "sha256": "2e1efc1dcb59c575eedf5ccae60f95229f706ee6d031835247d843c11d96470c"
+    },
+    {
+      "path": "ucd/extracted/DerivedBidiClass.txt",
+      "source": "https://www.unicode.org/Public/17.0.0/ucd/extracted/DerivedBidiClass.txt",
+      "bytes": 173433,
+      "sha256": "4867b4b7f0731ed1bfcd34cc6251211ff1542541fce0734b6fbda139ee80b3a4"
+    },
+    {
+      "path": "ucd/extracted/DerivedGeneralCategory.txt",
+      "source": "https://www.unicode.org/Public/17.0.0/ucd/extracted/DerivedGeneralCategory.txt",
+      "bytes": 277514,
+      "sha256": "d62e5bab70ca74f099343f71224fa051cb1fdd61a1ab45c0488c44cfc0b6102e"
+    },
+    {
+      "path": "ucd/extracted/DerivedJoiningType.txt",
+      "source": "https://www.unicode.org/Public/17.0.0/ucd/extracted/DerivedJoiningType.txt",
+      "bytes": 40635,
+      "sha256": "f39ebe974825d6736aee15582250307aa532b2cfab3caf3f86bd23fddc9c5c4d"
+    }
+  ]
+}

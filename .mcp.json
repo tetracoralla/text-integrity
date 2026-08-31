@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "text-integrity": {
+      "command": "node",
+      "args": [
+        "./bin/text-integrity-mcp.js"
+      ],
+      "cwd": "."
+    }
+  }
+}
