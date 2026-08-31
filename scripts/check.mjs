@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = new URL("../", import.meta.url);
 const ROOT_PATH = fileURLToPath(ROOT);
+const NPM_EXEC_PATH = process.env.npm_execpath;
 const packageManifest = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 const pluginManifest = JSON.parse(readFileSync(new URL("../.codex-plugin/plugin.json", import.meta.url), "utf8"));
 const mcpManifest = JSON.parse(readFileSync(new URL("../.mcp.json", import.meta.url), "utf8"));
@@ -14,6 +15,18 @@ const unicodeManifest = JSON.parse(readFileSync(new URL("../vendor/unicode/17.0.
 const conformanceManifest = JSON.parse(readFileSync(new URL("../vendor/unicode/17.0.0/CONFORMANCE_MANIFEST.json", import.meta.url), "utf8"));
 const bidiManifest = JSON.parse(readFileSync(new URL("../vendor/bidi-js-unicode17/MANIFEST.json", import.meta.url), "utf8"));
 const { VERSION } = await import("../src/version.js");
+
+function runNpm(args, options) {
+  if (NPM_EXEC_PATH) return spawnSync(process.execPath, [NPM_EXEC_PATH, ...args], options);
+  return spawnSync(process.platform === "win32" ? "npm.cmd" : "npm", args, {
+    ...options,
+    shell: process.platform === "win32"
+  });
+}
+
+function childFailure(result, fallback) {
+  return result.stderr || result.error?.message || `${fallback}\n`;
+}
 
 if (VERSION !== packageManifest.version || pluginManifest.version !== packageManifest.version) {
   process.stderr.write("version drift: package.json, src/version.js, and the plugin manifest must agree\n");
@@ -68,9 +81,9 @@ for (const file of sourceFiles(ROOT_PATH)) {
 const tests = spawnSync(process.execPath, ["--test"], { cwd: ROOT, stdio: "inherit" });
 if (tests.status !== 0) process.exit(tests.status ?? 1);
 
-const pack = spawnSync("npm", ["pack", "--dry-run", "--json"], { cwd: ROOT, encoding: "utf8" });
+const pack = runNpm(["pack", "--dry-run", "--json"], { cwd: ROOT, encoding: "utf8" });
 if (pack.status !== 0) {
-  process.stderr.write(pack.stderr);
+  process.stderr.write(childFailure(pack, "npm pack dry run failed"));
   process.exit(pack.status ?? 1);
 }
 const packageFiles = JSON.parse(pack.stdout)[0].files.map((entry) => entry.path);
@@ -130,12 +143,12 @@ if (packageFiles.some((file) => file.startsWith(".playwright-cli/"))) {
 
 const smokeRoot = mkdtempSync(path.join(tmpdir(), "text-integrity-package-"));
 try {
-  const packed = spawnSync("npm", ["pack", "--json", "--pack-destination", smokeRoot], {
+  const packed = runNpm(["pack", "--json", "--pack-destination", smokeRoot], {
     cwd: ROOT,
     encoding: "utf8"
   });
   if (packed.status !== 0) {
-    process.stderr.write(packed.stderr);
+    process.stderr.write(childFailure(packed, "npm pack failed"));
     process.exit(packed.status ?? 1);
   }
   const filename = JSON.parse(packed.stdout)[0].filename;
@@ -143,12 +156,12 @@ try {
   const project = path.join(smokeRoot, "consumer");
   mkdirSync(project);
   writeFileSync(path.join(project, "package.json"), '{"name":"text-integrity-smoke","private":true,"type":"module"}\n');
-  const installed = spawnSync("npm", ["install", "--ignore-scripts", "--no-audit", "--no-fund", tarball], {
+  const installed = runNpm(["install", "--ignore-scripts", "--no-audit", "--no-fund", tarball], {
     cwd: project,
     encoding: "utf8"
   });
   if (installed.status !== 0) {
-    process.stderr.write(installed.stderr);
+    process.stderr.write(childFailure(installed, "npm install smoke failed"));
     process.exit(installed.status ?? 1);
   }
 

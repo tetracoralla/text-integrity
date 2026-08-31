@@ -50,6 +50,8 @@ release is claimed until the tagged release workflow completes.
   digest-verified source artifacts.
 - Platform-correct repository path conversion in the release checker, including
   Windows drive-letter paths.
+- Cross-platform npm subprocess invocation for package inventory and installed
+  artifact smoke checks on Windows.
 
 ### Changed
 
