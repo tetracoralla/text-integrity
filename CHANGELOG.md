@@ -46,6 +46,8 @@ release is claimed until the tagged release workflow completes.
   npm registry pinning (`.npmrc`, lockfile), CI matrix, CodeQL, Dependabot,
   dependency review, and a release workflow with npm provenance, SBOM,
   checksums, and artifact attestation.
+- Repository-wide LF checkout rules so Windows does not rewrite pinned,
+  digest-verified source artifacts.
 
 ### Changed
 
@@ -58,6 +60,8 @@ release is claimed until the tagged release workflow completes.
 - Node support matrix is `>=22.22.1 <23 || >=24.20.0 <25 || >=26.8.1 <27`
   after running the full
   conformance suite on Node 22.22.1, 24.20.0, and 26.8.1.
+- Cold-start regression headroom now includes the measured public
+  GitHub-hosted Ubuntu runner, while remaining below the pre-1.0 baseline.
 
 ## [0.3.0]
 

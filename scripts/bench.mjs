@@ -29,7 +29,7 @@ const SAMPLES = { cold: 10, security: 20000, difference: 5000, steady: 1_000_000
 // (not above it) so they catch real regressions without flaking on slow
 // machines.
 const SLO = {
-  coldSecurityMedianMs: 50,
+  coldSecurityMedianMs: 75,
   coldRssMb: 96,
   warmSecurityP99Ms: 0.25,
   warmDifferenceP99Ms: 5,

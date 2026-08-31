@@ -53,7 +53,7 @@ search/describe/run indirection.
 
 | Fence | Limit | Baseline | Headroom |
 | --- | --- | --- | --- |
-| Cold first security call median | ≤ 50 ms | 25.1 ms | 2.0× |
+| Cold first security call median | ≤ 75 ms | 25.1 ms | 3.0× |
 | Cold-process RSS median | ≤ 96 MB | 54.1 MB | 1.8× |
 | Warm security identifier p99 | ≤ 0.25 ms | 0.058 ms | 4.3× |
 | Warm explain_difference p99 | ≤ 5 ms | 0.409 ms | 12.2× (collation variability) |
@@ -79,7 +79,11 @@ free_text calls/s on an idle run and 44,964 calls/s immediately after a full
 `npm run check` (thermal/background-load interference), a 3.3× swing with no
 code change. That measurement is why the throughput floor sits at 25,000/s:
 it must fail only on genuine regressions, not on machine load. Latency fences
-showed no comparable swing (warm p99 stayed within a few percent across runs).
+showed no comparable swing locally (warm p99 stayed within a few percent
+across runs). The first public GitHub-hosted Ubuntu run measured a 51.3 ms
+cold median and 64.9 ms p99 with the same source; the 75 ms cold fence includes
+headroom over that slower runner while remaining well below the pre-1.0
+~147 ms observation.
 
 ## Method notes
 
