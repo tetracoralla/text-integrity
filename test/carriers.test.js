@@ -396,14 +396,19 @@ test("a slow consumer cannot force unbounded buffering and the server recovers",
     : Number(spawnSync("ps", ["-o", "rss=", "-p", String(child.pid)], { encoding: "utf8" }).stdout.trim());
   if (rssKb !== null) assert.ok(rssKb < 96 * 1024, `server RSS must stay bounded under a slow consumer, saw ${rssKb} KB`);
   let received = 0;
+  let pending = "";
   child.stdout.on("data", (chunk) => {
-    received += chunk.split("\n").filter((line) => line.trim() !== "").length;
+    pending += chunk;
+    const complete = pending.split("\n");
+    pending = complete.pop();
+    received += complete.filter((line) => line.trim() !== "").length;
   });
   const exited = once(child, "exit");
   child.stdout.resume();
   child.stdin.end();
   const [code] = await exited;
   assert.equal(code, 0);
+  assert.equal(pending.trim(), "", "the server must terminate every response with a newline");
   // every ping must have been answered after the consumer resumed
   assert.equal(received, requestCount);
 });

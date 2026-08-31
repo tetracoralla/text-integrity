@@ -3,8 +3,10 @@ import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const ROOT = new URL("../", import.meta.url);
+const ROOT_PATH = fileURLToPath(ROOT);
 const packageManifest = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 const pluginManifest = JSON.parse(readFileSync(new URL("../.codex-plugin/plugin.json", import.meta.url), "utf8"));
 const mcpManifest = JSON.parse(readFileSync(new URL("../.mcp.json", import.meta.url), "utf8"));
@@ -55,7 +57,7 @@ function sourceFiles(directory) {
   return files;
 }
 
-for (const file of sourceFiles(new URL("../", import.meta.url).pathname)) {
+for (const file of sourceFiles(ROOT_PATH)) {
   const syntax = spawnSync(process.execPath, ["--check", file], { encoding: "utf8" });
   if (syntax.status !== 0) {
     process.stderr.write(syntax.stderr);

@@ -48,6 +48,8 @@ release is claimed until the tagged release workflow completes.
   checksums, and artifact attestation.
 - Repository-wide LF checkout rules so Windows does not rewrite pinned,
   digest-verified source artifacts.
+- Platform-correct repository path conversion in the release checker, including
+  Windows drive-letter paths.
 
 ### Changed
 
@@ -62,6 +64,8 @@ release is claimed until the tagged release workflow completes.
   conformance suite on Node 22.22.1, 24.20.0, and 26.8.1.
 - Cold-start regression headroom now includes the measured public
   GitHub-hosted Ubuntu runner, while remaining below the pre-1.0 baseline.
+- Slow-consumer transport tests now count newline-delimited responses across
+  arbitrary stream chunk boundaries.
 
 ## [0.3.0]
 
