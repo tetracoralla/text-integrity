@@ -1,4 +1,4 @@
-* text=auto eol=lf
-
-*.bin -text
-*.gz -text
+# Preserve byte-identical upstream Unicode sources whose hashes are pinned by
+# vendor/unicode/17.0.0/MANIFEST.json.
+vendor/unicode/17.0.0/ucd/SpecialCasing.txt -whitespace
+vendor/unicode/17.0.0/ucd/emoji/emoji-data.txt -whitespace

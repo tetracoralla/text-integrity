@@ -17,9 +17,12 @@ import {
   requireString
 } from "./validation.js";
 import { TextIntegrityError } from "./errors.js";
+import { normalizeUnicode17 } from "./normalization.js";
+import { buildDifferenceWitness } from "./difference-witness.js";
 
 const FORMS = Object.freeze(["NFC", "NFD", "NFKC", "NFKD"]);
 const DIRECTIONS = Object.freeze(["LTR", "RTL", "FS"]);
+const WITNESS_MODES = Object.freeze(["none", "summary", "full_required"]);
 
 function hash(value) {
   return createHash("sha256").update(value, "utf8").digest("hex");
@@ -31,15 +34,21 @@ function assertWellFormed(value, field) {
   }
 }
 
-function normalizationRelation(left, right, form) {
-  const normalizedLeft = left.normalize(form);
-  const normalizedRight = right.normalize(form);
+function normalizationEvaluation(data, left, right, form, inputLeftSha256, inputRightSha256) {
+  const leftOutput = normalizeUnicode17(left, form, data);
+  const rightOutput = normalizeUnicode17(right, form, data);
   return {
-    equal: normalizedLeft === normalizedRight,
-    leftChanged: normalizedLeft !== left,
-    rightChanged: normalizedRight !== right,
-    leftSha256: hash(normalizedLeft),
-    rightSha256: hash(normalizedRight)
+    inputLeftSha256,
+    inputRightSha256,
+    leftOutput,
+    rightOutput,
+    relation: {
+      equal: leftOutput === rightOutput,
+      leftChanged: leftOutput !== left,
+      rightChanged: rightOutput !== right,
+      leftSha256: hash(leftOutput),
+      rightSha256: hash(rightOutput)
+    }
   };
 }
 
@@ -101,7 +110,7 @@ export function explainDifference(args) {
   requireObject(args);
   assertKeys(
     args,
-    ["left", "right", "locale", "options", "confusableDirection", "detailLimit"],
+    ["left", "right", "locale", "options", "confusableDirection", "detailLimit", "witnessMode"],
     ["left", "right", "locale", "options", "confusableDirection"]
   );
   const left = requireString(args.left, "left");
@@ -115,14 +124,47 @@ export function explainDifference(args) {
   const detailLimit = Object.hasOwn(args, "detailLimit")
     ? requireInteger(args.detailLimit, "detailLimit", 0, LIMITS.maxDetailItems)
     : LIMITS.defaultDetailItems;
+  const witnessMode = Object.hasOwn(args, "witnessMode")
+    ? requireEnum(args.witnessMode, "witnessMode", WITNESS_MODES)
+    : "none";
 
   const data = unicodeSecurityData();
   const leftMap = buildTextMap(left);
   const rightMap = buildTextMap(right);
+  const inputLeftSha256 = hash(left);
+  const inputRightSha256 = hash(right);
+  const normalizationEvaluations = Object.fromEntries(FORMS.map((form) => [
+    form,
+    normalizationEvaluation(data, left, right, form, inputLeftSha256, inputRightSha256)
+  ]));
   const casefoldLeft = nfkcCasefold(data, left);
   const casefoldRight = nfkcCasefold(data, right);
+  const casefoldEvaluation = {
+    leftOutput: casefoldLeft,
+    rightOutput: casefoldRight,
+    relation: {
+      equal: casefoldLeft === casefoldRight,
+      leftChanged: casefoldLeft !== left,
+      rightChanged: casefoldRight !== right,
+      leftSha256: hash(casefoldLeft),
+      rightSha256: hash(casefoldRight)
+    }
+  };
   const collation = compareWithCollator(left, right, args);
   const { status: _status, operation: _operation, runtime: _collationRuntime, ...collationResult } = collation;
+  const confusableResult = compareConfusables(data, left, right, direction);
+  const witness = witnessMode === "none" ? undefined : buildDifferenceWitness({
+    mode: witnessMode,
+    left,
+    right,
+    normalization: normalizationEvaluations,
+    nfkcCasefold: casefoldEvaluation,
+    detailLimit,
+    leftMap,
+    rightMap,
+    collation: collationResult,
+    confusable: confusableResult
+  });
 
   return {
     status: "ok",
@@ -137,14 +179,10 @@ export function explainDifference(args) {
       codePoints: { left: leftMap.codePoints.length, right: rightMap.codePoints.length },
       graphemes: { left: leftMap.graphemes.length, right: rightMap.graphemes.length }
     },
-    normalization: Object.fromEntries(FORMS.map((form) => [form, normalizationRelation(left, right, form)])),
-    nfkcCasefold: {
-      equal: casefoldLeft === casefoldRight,
-      leftChanged: casefoldLeft !== left,
-      rightChanged: casefoldRight !== right,
-      leftSha256: hash(casefoldLeft),
-      rightSha256: hash(casefoldRight)
-    },
+    normalization: Object.fromEntries(
+      Object.entries(normalizationEvaluations).map(([form, evaluation]) => [form, evaluation.relation])
+    ),
+    nfkcCasefold: casefoldEvaluation.relation,
     firstDifference: {
       codePoint: codePointDifference(leftMap, rightMap),
       grapheme: graphemeDifference(leftMap, rightMap)
@@ -158,7 +196,8 @@ export function explainDifference(args) {
       right: lineEndingObservations(right, detailLimit)
     },
     collation: collationResult,
-    identifierConfusableComparison: compareConfusables(data, left, right, direction),
+    identifierConfusableComparison: confusableResult,
+    ...(witness === undefined ? {} : { witness }),
     limitations: [
       "Confusable comparison is an identifier mechanism and is not a font-specific visual judgment.",
       "This operation explains deterministic representation relations; it does not infer author intent."

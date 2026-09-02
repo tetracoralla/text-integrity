@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "openadam.agent-host-tool-integration.v0.2",
+  "displayName": "Text Integrity",
+  "summary": "Deterministic Unicode 17 text, encoding, coordinate, security-observation, and protocol-string operations.",
+  "codex": {
+    "marketplaceRoot": "marketplace",
+    "marketplace": "private-text-integrity",
+    "pluginRoot": "marketplace/plugins/text-integrity",
+    "plugin": "text-integrity",
+    "identityFiles": [
+      ".codex-plugin/plugin.json",
+      ".mcp.json",
+      "skills/text-integrity/SKILL.md"
+    ]
+  },
+  "runtime": {
+    "transport": "mcp-stdio",
+    "executor": "suite-node",
+    "command": "marketplace/plugins/text-integrity/bin/text-integrity-mcp.js",
+    "args": [],
+    "cwd": "marketplace/plugins/text-integrity",
+    "workspaceEnvironment": [],
+    "expectedTools": [
+      "text_inspect",
+      "text_normalize",
+      "text_compare",
+      "text_transcode",
+      "text_security_observe",
+      "text_explain_difference",
+      "text_index_map",
+      "text_protocol_profile"
+    ],
+    "timeoutMs": 30000
+  },
+  "ownership": {
+    "uninstall": "agent-host-created-only"
+  }
+}

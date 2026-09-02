@@ -18,6 +18,8 @@ jobs:
   build:
     name: build, verify, and attest
     runs-on: ubuntu-latest
+    env:
+      RUSTUP_TOOLCHAIN: 1.89.0
     permissions:
       contents: read
       id-token: write
@@ -29,35 +31,46 @@ jobs:
         with:
           node-version: 24
           package-manager-cache: false
+      - run: rustup toolchain install 1.89.0 --profile minimal --component rustfmt --target wasm32-unknown-unknown
       - run: npm ci
       - name: Match package version to tag
         run: |
           PACKAGE_VERSION="$(node -p "require('./package.json').version")"
           test "${GITHUB_REF_NAME}" = "v${PACKAGE_VERSION}"
-      - run: npm run check
+      - name: Verify source, native/WASM parity, performance fences, and SBOM inputs
+        run: npm run release:check
       - name: Build package
         run: npm pack
-      - name: Generate SBOM (CycloneDX)
-        run: npm sbom --sbom-format cyclonedx > text-integrity-sbom.cdx.json
+      - name: Generate npm and Cargo/WASM SBOMs (CycloneDX)
+        run: |
+          npm sbom --sbom-format cyclonedx > text-integrity-npm-sbom.cdx.json
+          npm run --silent sbom:cargo > text-integrity-cargo-wasm-sbom.cdx.json
+          npm run --silent sbom:verify -- text-integrity-npm-sbom.cdx.json text-integrity-cargo-wasm-sbom.cdx.json
       - name: Record checksums
         run: |
-          shasum -a 256 text-integrity-*.tgz text-integrity-sbom.cdx.json > SHA256SUMS.txt
+          shasum -a 256 text-integrity-*.tgz text-integrity-*-sbom.cdx.json > SHA256SUMS.txt
           cat SHA256SUMS.txt
       - name: Attest build provenance
         uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
         with:
           subject-path: "${{ github.workspace }}/text-integrity-*.tgz"
-      - name: Attest SBOM
+      - name: Attest npm SBOM
         uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
         with:
           subject-path: "${{ github.workspace }}/text-integrity-*.tgz"
-          sbom-path: "${{ github.workspace }}/text-integrity-sbom.cdx.json"
+          sbom-path: "${{ github.workspace }}/text-integrity-npm-sbom.cdx.json"
+      - name: Attest Cargo/WASM SBOM
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: "${{ github.workspace }}/text-integrity-*.tgz"
+          sbom-path: "${{ github.workspace }}/text-integrity-cargo-wasm-sbom.cdx.json"
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: release-artifacts
           path: |
             text-integrity-*.tgz
-            text-integrity-sbom.cdx.json
+            text-integrity-npm-sbom.cdx.json
+            text-integrity-cargo-wasm-sbom.cdx.json
             SHA256SUMS.txt
           if-no-files-found: error
 
@@ -112,8 +125,16 @@ jobs:
           mkdir -p smoke && cd smoke
           npm init -y >/dev/null
           npm install "text-integrity@${VERSION}"
-          node -e "import('text-integrity').then(({ executeOperation, LIBRARY_INFO }) => { \
-            const r = executeOperation('normalize', { text: 'e\u0301', form: 'NFC' }); \
-            if (r.normalized !== 'é') process.exit(1); \
-            console.log('smoke ok', LIBRARY_INFO.version); \
-          });"
+          node --input-type=module -e " \
+            import { readFile } from 'node:fs/promises'; \
+            import { executeOperation, LIBRARY_INFO, resultSchemaResourceForOperation } from 'text-integrity'; \
+            import { createReferenceWasmRunner } from 'text-integrity/reference/wasm'; \
+            const direct = executeOperation('normalize', { text: 'e\u0301', form: 'NFC' }); \
+            const moduleUrl = new URL(import.meta.resolve('text-integrity/reference/wasm/module')); \
+            const wasm = await createReferenceWasmRunner(await readFile(moduleUrl)); \
+            const independent = wasm.run({ operation: 'normalize', arguments: { text: 'e\u0301', form: 'NFC' } }); \
+            const schema = resultSchemaResourceForOperation('normalize'); \
+            if (direct.normalized !== 'é' || independent.normalized !== 'é' \
+              || LIBRARY_INFO.publicResultContract !== 'text-integrity.public-result-contract/2' \
+              || schema.schema['x-text-integrity-contract'] !== LIBRARY_INFO.publicResultContract) process.exit(1); \
+            console.log('installed source/WASM/schema smoke ok', LIBRARY_INFO.version);"

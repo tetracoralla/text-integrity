@@ -1,0 +1,645 @@
+{
+  "schemaVersion": "text-integrity.behavior-corpus/1",
+  "cases": [
+    {
+      "id": "inspect-decomposed-family",
+      "operation": "inspect",
+      "arguments": {
+        "text": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "é👨‍👩‍👧‍👦"
+          }
+        },
+        "detailLimit": 16
+      }
+    },
+    {
+      "id": "inspect-unpaired-high-surrogate",
+      "operation": "inspect",
+      "arguments": {
+        "text": {
+          "$text": {
+            "kind": "utf16_code_units",
+            "units": [55296]
+          }
+        },
+        "detailLimit": 4
+      }
+    },
+    {
+      "id": "normalize-canonical-composition",
+      "operation": "normalize",
+      "arguments": {
+        "text": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "é"
+          }
+        },
+        "form": "NFC"
+      }
+    },
+    {
+      "id": "normalize-compatibility-composition",
+      "operation": "normalize",
+      "arguments": {
+        "text": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "①"
+          }
+        },
+        "form": "NFKC"
+      }
+    },
+    {
+      "id": "normalize-compatibility-reorder-full-witness",
+      "operation": "normalize",
+      "arguments": {
+        "text": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "①À̕"
+          }
+        },
+        "form": "NFKC",
+        "witnessMode": "full_required"
+      }
+    },
+    {
+      "id": "compare-explicit-collation",
+      "operation": "compare",
+      "arguments": {
+        "left": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "A"
+          }
+        },
+        "right": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "a"
+          }
+        },
+        "locale": "en",
+        "options": {
+          "usage": "sort",
+          "sensitivity": "variant",
+          "ignorePunctuation": false,
+          "numeric": false,
+          "caseFirst": "false",
+          "localeMatcher": "best fit",
+          "collation": "default"
+        }
+      }
+    },
+    {
+      "id": "transcode-utf8-bom-to-utf16",
+      "operation": "transcode",
+      "arguments": {
+        "sourceKind": "bytes",
+        "bytes": [239, 187, 191, 65],
+        "sourceEncoding": "utf-8",
+        "targetEncoding": "utf-16le",
+        "allowLossy": false,
+        "byteRepresentation": "hex"
+      }
+    },
+    {
+      "id": "transcode-invalid-utf8-lossy",
+      "operation": "transcode",
+      "arguments": {
+        "sourceKind": "bytes",
+        "bytes": [97, 195, 40],
+        "sourceEncoding": "utf-8",
+        "targetEncoding": "utf-8",
+        "allowLossy": true,
+        "byteRepresentation": "bytes"
+      }
+    },
+    {
+      "id": "security-free-text-signals",
+      "operation": "security",
+      "arguments": {
+        "text": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "a‮‍b"
+          }
+        },
+        "mode": "free_text",
+        "detailLimit": 8
+      }
+    },
+    {
+      "id": "security-identifier-confusable",
+      "operation": "security",
+      "arguments": {
+        "text": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "pаypal"
+          }
+        },
+        "mode": "identifier",
+        "profile": "uts39_general_security",
+        "comparison": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "paypal"
+          }
+        },
+        "confusableDirection": "LTR",
+        "detailLimit": 8
+      }
+    },
+    {
+      "id": "security-source-host-spans",
+      "operation": "security",
+      "arguments": {
+        "source": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "let pаypal = paypal;\r‮"
+          }
+        },
+        "mode": "source",
+        "spans": [
+          {
+            "kind": "identifier",
+            "startUtf16": 4,
+            "endUtf16": 10,
+            "scope": "file"
+          },
+          {
+            "kind": "identifier",
+            "startUtf16": 13,
+            "endUtf16": 19,
+            "scope": "file"
+          }
+        ],
+        "confusableDirection": "LTR",
+        "detailLimit": 8
+      }
+    },
+    {
+      "id": "explain-composed-difference",
+      "operation": "explain_difference",
+      "arguments": {
+        "left": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "é\r\npаypal"
+          }
+        },
+        "right": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "é\npaypal"
+          }
+        },
+        "locale": "en",
+        "options": {
+          "usage": "sort",
+          "sensitivity": "variant",
+          "ignorePunctuation": false,
+          "numeric": false,
+          "caseFirst": "false",
+          "localeMatcher": "best fit",
+          "collation": "default"
+        },
+        "confusableDirection": "LTR",
+        "detailLimit": 16,
+        "witnessMode": "full_required"
+      }
+    },
+    {
+      "id": "index-grapheme-lines-and-chunks",
+      "operation": "index",
+      "arguments": {
+        "text": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "A👨‍👩‍👧‍👦\r\nB"
+          }
+        },
+        "detailLimit": 16,
+        "maxChunkUtf8Bytes": 25
+      }
+    },
+    {
+      "id": "protocol-uts46-to-ascii",
+      "operation": "protocol_profile",
+      "arguments": {
+        "profile": "uts46_domain",
+        "action": "to_ascii",
+        "text": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "faß.de"
+          }
+        },
+        "options": {
+          "checkBidi": true,
+          "checkHyphens": true,
+          "checkJoiners": true,
+          "ignoreInvalidPunycode": false,
+          "transitionalProcessing": false,
+          "useSTD3ASCIIRules": true,
+          "verifyDNSLength": true
+        },
+        "witnessMode": "full_required"
+      }
+    },
+    {
+      "id": "protocol-uts46-to-unicode-root",
+      "operation": "protocol_profile",
+      "arguments": {
+        "profile": "uts46_domain",
+        "action": "to_unicode",
+        "text": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "xn--fa-hia.de."
+          }
+        },
+        "options": {
+          "checkBidi": true,
+          "checkHyphens": true,
+          "checkJoiners": true,
+          "ignoreInvalidPunycode": false,
+          "transitionalProcessing": false,
+          "useSTD3ASCIIRules": true
+        },
+        "witnessMode": "summary"
+      }
+    },
+    {
+      "id": "protocol-precis-enforce",
+      "operation": "protocol_profile",
+      "arguments": {
+        "profile": "precis_username_case_mapped",
+        "action": "enforce",
+        "text": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "User"
+          }
+        },
+        "witnessMode": "full_required"
+      }
+    },
+    {
+      "id": "protocol-precis-compare",
+      "operation": "protocol_profile",
+      "arguments": {
+        "profile": "precis_username_case_preserved",
+        "action": "compare",
+        "text": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "User"
+          }
+        },
+        "comparison": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "User"
+          }
+        },
+        "witnessMode": "summary"
+      }
+    },
+    {
+      "id": "namespace-multi-relation-collisions",
+      "operation": "namespace_integrity",
+      "arguments": {
+        "items": [
+          {
+            "id": "user-1",
+            "text": {
+              "$text": {
+                "kind": "unicode_scalar_string",
+                "value": "paypal"
+              }
+            },
+            "scope": "tenant-a"
+          },
+          {
+            "id": "user-2",
+            "text": {
+              "$text": {
+                "kind": "unicode_scalar_string",
+                "value": "pаypal"
+              }
+            },
+            "scope": "tenant-a"
+          },
+          {
+            "id": "user-3",
+            "text": {
+              "$text": {
+                "kind": "unicode_scalar_string",
+                "value": "ＰａｙＰａｌ"
+              }
+            },
+            "scope": "tenant-a"
+          },
+          {
+            "id": "user-4",
+            "text": {
+              "$text": {
+                "kind": "unicode_scalar_string",
+                "value": "paypal"
+              }
+            },
+            "scope": "tenant-b"
+          }
+        ],
+        "relations": ["exact", "nfc", "nfkc", "nfkc_casefold", "uts39_confusable"],
+        "confusableDirection": "LTR"
+      }
+    },
+    {
+      "id": "namespace-protocol-and-declared-collation",
+      "operation": "namespace_integrity",
+      "arguments": {
+        "items": [
+          {
+            "id": "domain-unicode",
+            "text": {
+              "$text": {
+                "kind": "unicode_scalar_string",
+                "value": "faß.de"
+              }
+            },
+            "scope": "domains"
+          },
+          {
+            "id": "domain-ascii",
+            "text": {
+              "$text": {
+                "kind": "unicode_scalar_string",
+                "value": "xn--fa-hia.de"
+              }
+            },
+            "scope": "domains"
+          },
+          {
+            "id": "name-accented",
+            "text": {
+              "$text": {
+                "kind": "unicode_scalar_string",
+                "value": "résumé"
+              }
+            },
+            "scope": "names"
+          },
+          {
+            "id": "name-uppercase",
+            "text": {
+              "$text": {
+                "kind": "unicode_scalar_string",
+                "value": "RESUME"
+              }
+            },
+            "scope": "names"
+          }
+        ],
+        "relations": [
+          {
+            "kind": "protocol",
+            "profile": "uts46_domain",
+            "action": "to_ascii",
+            "options": {
+              "checkBidi": true,
+              "checkHyphens": true,
+              "checkJoiners": true,
+              "ignoreInvalidPunycode": false,
+              "transitionalProcessing": false,
+              "useSTD3ASCIIRules": true,
+              "verifyDNSLength": true
+            }
+          },
+          {
+            "kind": "declared_collation",
+            "locale": "en",
+            "options": {
+              "usage": "sort",
+              "sensitivity": "base",
+              "ignorePunctuation": false,
+              "numeric": false,
+              "caseFirst": "false",
+              "localeMatcher": "best fit",
+              "collation": "default"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "transcode-invalid-utf8-full-witness",
+      "operation": "transcode",
+      "arguments": {
+        "sourceKind": "bytes",
+        "bytes": [97, 225, 128, 65, 128],
+        "sourceEncoding": "utf-8",
+        "targetEncoding": "utf-8",
+        "allowLossy": true,
+        "byteRepresentation": "hex",
+        "witnessMode": "full_required"
+      }
+    },
+    {
+      "id": "inspect-error-request-budget",
+      "operation": "inspect",
+      "arguments": {
+        "text": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        },
+        "detailLimit": 0
+      }
+    },
+    {
+      "id": "normalize-error-invalid-unicode",
+      "operation": "normalize",
+      "arguments": {
+        "text": {
+          "$text": {
+            "kind": "utf16_code_units",
+            "units": [55296]
+          }
+        },
+        "form": "NFC"
+      }
+    },
+    {
+      "id": "compare-error-invalid-locale",
+      "operation": "compare",
+      "arguments": {
+        "left": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "a"
+          }
+        },
+        "right": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "b"
+          }
+        },
+        "locale": "not_a_locale",
+        "options": {
+          "usage": "sort",
+          "sensitivity": "variant",
+          "ignorePunctuation": false,
+          "numeric": false,
+          "caseFirst": "false",
+          "localeMatcher": "best fit",
+          "collation": "default"
+        }
+      }
+    },
+    {
+      "id": "transcode-error-invalid-utf8",
+      "operation": "transcode",
+      "arguments": {
+        "sourceKind": "bytes",
+        "bytes": [97, 195, 40],
+        "sourceEncoding": "utf-8",
+        "targetEncoding": "utf-8",
+        "allowLossy": false,
+        "byteRepresentation": "bytes"
+      }
+    },
+    {
+      "id": "security-error-invalid-span",
+      "operation": "security",
+      "arguments": {
+        "source": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "let a"
+          }
+        },
+        "mode": "source",
+        "spans": [
+          {
+            "kind": "identifier",
+            "startUtf16": 4,
+            "endUtf16": 9,
+            "scope": "file"
+          }
+        ],
+        "confusableDirection": "LTR",
+        "detailLimit": 1
+      }
+    },
+    {
+      "id": "explain-error-invalid-unicode",
+      "operation": "explain_difference",
+      "arguments": {
+        "left": {
+          "$text": {
+            "kind": "utf16_code_units",
+            "units": [55296]
+          }
+        },
+        "right": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "a"
+          }
+        },
+        "locale": "en",
+        "options": {
+          "usage": "sort",
+          "sensitivity": "variant",
+          "ignorePunctuation": false,
+          "numeric": false,
+          "caseFirst": "false",
+          "localeMatcher": "best fit",
+          "collation": "default"
+        },
+        "confusableDirection": "LTR",
+        "detailLimit": 0
+      }
+    },
+    {
+      "id": "index-error-grapheme-too-large",
+      "operation": "index",
+      "arguments": {
+        "text": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "👨‍👩‍👧‍👦"
+          }
+        },
+        "maxChunkUtf8Bytes": 24
+      }
+    },
+    {
+      "id": "protocol-error-disallowed-code-point",
+      "operation": "protocol_profile",
+      "arguments": {
+        "profile": "precis_username_case_mapped",
+        "action": "enforce",
+        "text": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "a b"
+          }
+        }
+      }
+    },
+    {
+      "id": "namespace-error-duplicate-item-id",
+      "operation": "namespace_integrity",
+      "arguments": {
+        "items": [
+          {
+            "id": "same",
+            "text": {
+              "$text": {
+                "kind": "unicode_scalar_string",
+                "value": "a"
+              }
+            },
+            "scope": "x"
+          },
+          {
+            "id": "same",
+            "text": {
+              "$text": {
+                "kind": "unicode_scalar_string",
+                "value": "b"
+              }
+            },
+            "scope": "x"
+          }
+        ],
+        "relations": ["exact"]
+      }
+    },
+    {
+      "id": "normalize-error-result-budget",
+      "operation": "normalize",
+      "arguments": {
+        "text": {
+          "$text": {
+            "kind": "unicode_scalar_string",
+            "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        },
+        "form": "NFC",
+        "witnessMode": "full_required"
+      }
+    }
+  ]
+}

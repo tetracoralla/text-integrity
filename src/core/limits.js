@@ -25,8 +25,15 @@ export const LIMITS = Object.freeze({
   maxSourceSpans: 128,
   maxScopeChars: 64,
   maxChunkBytes: 4096,
-  maxChunks: 128
+  maxChunks: 128,
+  maxNamespaceItems: 512,
+  maxNamespaceRelations: 5,
+  maxNamespaceTextBytes: 65536,
+  maxNamespaceIdChars: 128,
+  maxNamespaceScopeChars: 64
 });
+
+export const RESULT_METADATA_RESERVATION_BYTES = 512;
 
 export function utf8Size(value) {
   return Buffer.byteLength(value, "utf8");
@@ -68,13 +75,81 @@ export function assertCombinedTextBudget(entries, limit = LIMITS.maxCombinedText
   }
 }
 
+function moveProjectionField(source, target, path) {
+  let sourceParent = source;
+  for (const key of path.slice(0, -1)) {
+    if (sourceParent === null || typeof sourceParent !== "object" || !Object.hasOwn(sourceParent, key)) return;
+    sourceParent = sourceParent[key];
+  }
+  const leaf = path.at(-1);
+  if (sourceParent === null || typeof sourceParent !== "object" || !Object.hasOwn(sourceParent, leaf)) return;
+
+  let targetParent = target;
+  for (const key of path.slice(0, -1)) {
+    targetParent[key] ??= {};
+    targetParent = targetParent[key];
+  }
+  targetParent[leaf] = sourceParent[leaf];
+  delete sourceParent[leaf];
+}
+
+// One shared split owns the result-budget and reference-system distinction
+// between measured text semantics and truthful implementation metadata. The
+// input is never mutated: callers may safely retain or serialize the complete
+// result after asking for either projection.
+export function splitResultProjections(value) {
+  const semantic = structuredClone(value);
+  const environment = {};
+  moveProjectionField(semantic, environment, ["runtime"]);
+  if (semantic.operation === "security") {
+    moveProjectionField(semantic, environment, ["confusableComparison", "engine"]);
+  }
+  if (semantic.operation === "explain_difference") {
+    moveProjectionField(semantic, environment, ["identifierConfusableComparison", "engine"]);
+  }
+  if (semantic.operation === "protocol_profile") {
+    moveProjectionField(semantic, environment, ["standards", "engine"]);
+    moveProjectionField(semantic, environment, ["witness", "engine"]);
+  }
+  if (semantic.status === "error" && semantic.error?.code === "RESULT_TOO_LARGE") {
+    moveProjectionField(semantic, environment, ["error", "details", "actualBytes"]);
+    moveProjectionField(semantic, environment, ["error", "details", "metadataBytes"]);
+  }
+  return { semantic, environment };
+}
+
 export function enforceResultBudget(value) {
-  const bytes = Buffer.byteLength(JSON.stringify(value), "utf8");
-  if (bytes > LIMITS.maxResultBytes) {
+  const { semantic, environment } = splitResultProjections(value);
+  const semanticBytes = Buffer.byteLength(JSON.stringify(semantic), "utf8");
+  const metadataEnvelopeBytes = Buffer.byteLength(JSON.stringify(environment), "utf8");
+  if (metadataEnvelopeBytes > RESULT_METADATA_RESERVATION_BYTES) {
+    const actualBytes = Buffer.byteLength(JSON.stringify(value), "utf8");
+    throw new TextIntegrityError(
+      "INTERNAL_ERROR",
+      "Non-semantic result metadata exceeds its reserved byte budget.",
+      {
+        actualBytes,
+        semanticBytes,
+        metadataBytes: actualBytes - semanticBytes,
+        metadataReservationBytes: RESULT_METADATA_RESERVATION_BYTES,
+        limitBytes: LIMITS.maxResultBytes
+      }
+    );
+  }
+  const budgetedBytes = semanticBytes + RESULT_METADATA_RESERVATION_BYTES;
+  if (budgetedBytes > LIMITS.maxResultBytes) {
+    const actualBytes = Buffer.byteLength(JSON.stringify(value), "utf8");
     throw new TextIntegrityError(
       "RESULT_TOO_LARGE",
-      `The complete result exceeds the ${LIMITS.maxResultBytes}-byte limit.`,
-      { actualBytes: bytes, limitBytes: LIMITS.maxResultBytes }
+      `The complete result cannot fit the ${LIMITS.maxResultBytes}-byte budget after reserving ${RESULT_METADATA_RESERVATION_BYTES} bytes for non-semantic metadata.`,
+      {
+        actualBytes,
+        semanticBytes,
+        budgetedBytes,
+        metadataBytes: actualBytes - semanticBytes,
+        metadataReservationBytes: RESULT_METADATA_RESERVATION_BYTES,
+        limitBytes: LIMITS.maxResultBytes
+      }
     );
   }
   return value;

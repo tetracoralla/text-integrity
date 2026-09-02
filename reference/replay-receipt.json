@@ -1,0 +1,264 @@
+{
+  "schemaVersion": "text-integrity.replay-receipt/2",
+  "authority": "reproduction_locator",
+  "scope": "named_replay_inputs_only",
+  "selfCertifying": false,
+  "product": {
+    "name": "text-integrity",
+    "version": "1.0.0"
+  },
+  "contracts": {
+    "taggedRequest": "text-integrity.tagged-request/1",
+    "publicResult": "text-integrity.public-result-contract/2",
+    "measurementRecord": "text-integrity.measurement-record/2",
+    "measurementReplay": "text-integrity.measurement-replay/1",
+    "measurementComparison": "text-integrity.measurement-comparison/1",
+    "semanticProjection": "text-integrity.semantic-projection/1",
+    "environmentProjection": "text-integrity.environment-projection/1",
+    "behaviorCorpus": "text-integrity.behavior-corpus/1",
+    "behaviorManifest": "text-integrity.behavior-manifest/15",
+    "behaviorComparison": "text-integrity.behavior-comparison/12",
+    "collationCalibration": "text-integrity.collation-calibration/1",
+    "collationComparison": "text-integrity.collation-comparison/1",
+    "collationComparisonLimits": {
+      "maxConfigurations": 15,
+      "maxComparisons": 45,
+      "maxIdentifierCodeUnits": 128,
+      "maxRuntimeValueCodeUnits": 128,
+      "maxSerializedBytes": 65536
+    },
+    "packageReplaySidecar": "text-integrity.package-replay-sidecar/1",
+    "packageReplaySidecarByteVerification": "text-integrity.package-replay-sidecar-byte-verification/1",
+    "packageReplaySidecarComparison": "text-integrity.package-replay-sidecar-comparison/1",
+    "propertyVerification": "text-integrity.property-verification/2",
+    "replayReceiptComparison": "text-integrity.replay-receipt-comparison/1",
+    "referenceWasmManifest": "text-integrity.reference-wasm/3"
+  },
+  "artifacts": {
+    "packageManifest": {
+      "path": "package.json",
+      "bytes": 3870,
+      "sha256": "e9d587705e058ead468879f32099ed79a7fb78385e2abbdac2c6362b22363550"
+    },
+    "behaviorCorpus": {
+      "path": "reference/behavior-corpus.json",
+      "bytes": 23989,
+      "sha256": "5d003b17b737c380b2a34dff1ccc5f191d179e5016c7627d7745104bd9109a11",
+      "canonicalSha256": "cc5c61811963c676c984a47ee561e46942de276299a7c1dc049d7674e4acb687",
+      "caseCount": 30
+    },
+    "behaviorManifest": {
+      "path": "reference/behavior-manifest.json",
+      "bytes": 61630,
+      "sha256": "9b8c60a2ec55c79bec389e70f2fab37e75af0b09b9fff2b0a1e54f9c1a8be876",
+      "behaviorRootSha256": "75a8e76a26542ab46c85977deb4eb5a340c9d5a8982a9203e04f6d11fa4fdd4c"
+    },
+    "unicodeSourceManifest": {
+      "path": "vendor/unicode/17.0.0/MANIFEST.json",
+      "bytes": 5134,
+      "sha256": "1e0677ee007d4b9d280c7d65209c13cc5c7ce09443fb05fa7b39cbc6652988cf"
+    },
+    "unicodeCompactManifest": {
+      "path": "vendor/unicode/17.0.0/compact/MANIFEST.json",
+      "bytes": 383,
+      "sha256": "3c8a54c3d74be6b11ac6458c882d86d0564da031640f90b6a6354fef0dd001c0"
+    },
+    "unicodeCompactData": {
+      "path": "vendor/unicode/17.0.0/compact/data.bin",
+      "bytes": 571192,
+      "sha256": "7419b6b6af6f8184dc13c48a5ce5b10c20edd80f977d6769bc71214a9c06b564"
+    },
+    "bidiManifest": {
+      "path": "vendor/bidi-js-unicode17/MANIFEST.json",
+      "bytes": 485,
+      "sha256": "be6873fb653d9f98b2ed73b5a70c0bd4ff15458eae34d96f62c94447fec93e8f"
+    },
+    "bidiRuntime": {
+      "path": "vendor/bidi-js-unicode17/bidi.mjs",
+      "bytes": 45242,
+      "sha256": "4d0e3c6460d08f053cf1c430cef67166f4f5322f1d0c1be455d97934061ff4c8"
+    },
+    "referenceSources": {
+      "algorithm": "ordered_path_nul_bytes_nul_sha256",
+      "sha256": "c15b9b1ab6717e7bb874521be31664788559c593278843e2e58128f6bad26737",
+      "fileCount": 14,
+      "files": [
+        {
+          "path": "src/reference/behavior.js",
+          "bytes": 31461,
+          "sha256": "45695e02103cf47edef7dcc8ad388b8b5d39338c939bac34a3d2ecbfc064d02c"
+        },
+        {
+          "path": "src/reference/canonical.js",
+          "bytes": 1744,
+          "sha256": "376588d925e92241c288c36d0932abe684f5991cb6c57ffe0bb44274b9f055a2"
+        },
+        {
+          "path": "src/reference/collation-calibration.js",
+          "bytes": 4582,
+          "sha256": "0876b4c4ee62c4c639f5476098aceed7b18be4518fb6cbbcf3ad8893a5b81b1f"
+        },
+        {
+          "path": "src/reference/collation-comparison.js",
+          "bytes": 10885,
+          "sha256": "838868ef69a5a9d74e042d6d6a6f95a32deaafa5a6b59e4b42c2693c3e561d3a"
+        },
+        {
+          "path": "src/reference/json-validation.js",
+          "bytes": 10372,
+          "sha256": "5262286350ae1a41c568bd4c1bad8dbcf257e12f2f290123d562bfe746c7ad47"
+        },
+        {
+          "path": "src/reference/measurement-comparison.js",
+          "bytes": 3523,
+          "sha256": "d50f1578a6e1b2513f8dd1e3b013510b3a72b726125445e1e7bfb329df291e5d"
+        },
+        {
+          "path": "src/reference/measurement.js",
+          "bytes": 19384,
+          "sha256": "69a95c1fefdb1a55a85f9cbd2f1d4d098ac9e7d203bba9ee92135d58c32a9452"
+        },
+        {
+          "path": "src/reference/package-replay-sidecar.js",
+          "bytes": 4122,
+          "sha256": "0cca1400b6acd74da096f460c4628f95e11b6de5bcc6febe54b655ff8f1ba03a"
+        },
+        {
+          "path": "src/reference/property-verification.js",
+          "bytes": 19868,
+          "sha256": "d9229c933750419ff1177e894d6e9921735591178ca932657e8195766e0bc5de"
+        },
+        {
+          "path": "src/reference/replay-receipt.js",
+          "bytes": 20896,
+          "sha256": "cfab2baabd2546d9a199dd0cce6fb3500468ac835a8bed23c8dd77aaa5988247"
+        },
+        {
+          "path": "src/reference/replay-comparison.js",
+          "bytes": 9279,
+          "sha256": "1eee8bfc600a385c6bbf9c345e235579383f1c9c8652890f83c524fbb4d01449"
+        },
+        {
+          "path": "src/reference/replay-validation.js",
+          "bytes": 8520,
+          "sha256": "d044039d4b40fddeba058fb0095514f291e5e8dc74bfa0df753893ca5d3844f7"
+        },
+        {
+          "path": "src/reference/versions.js",
+          "bytes": 1505,
+          "sha256": "36aeff8c900d14db3aeb84f2e36ca3eec600774e1b3989f3ff876d68a0d75b52"
+        },
+        {
+          "path": "src/reference/wasm.js",
+          "bytes": 12876,
+          "sha256": "6de1bbbffafef5bc979c3b8316165a963b04ad73347dd83362e699cb67d91d52"
+        }
+      ]
+    },
+    "referenceWasmManifest": {
+      "path": "wasm/MANIFEST.json",
+      "bytes": 2296,
+      "sha256": "b2e62660f8a5690f0926aa5ddb8ca3cd85cc9f1acf9dc9aa8524d3c3fe850140"
+    },
+    "referenceWasmModule": {
+      "path": "wasm/text_integrity_reference.wasm",
+      "bytes": 1623878,
+      "sha256": "82d45bb3c0718f6f0d127895553f723a22cd0433e38134bb8481c68a3bbef23e"
+    },
+    "packageArtifact": null
+  },
+  "engines": {
+    "uts46": {
+      "identity": {
+        "specification": "UTS #46 revision 35",
+        "unicodeVersion": "17.0.0",
+        "package": "tr46",
+        "version": "6.0.0",
+        "packageIntegrity": "sha512-bLVMLPtstlZ4iMQHpFHTR7GAGj2jxi8Dg0s2h2MafAE4uSWF98FC/3MomU51iQAMf8/qDUbKWf5GxuvvVcXEhw==",
+        "runtimeTreeSha256": "a4b97c0735cda47715ec66318e2f8aba66db3427fec8aa8069f87257622fdfc4",
+        "dependency": {
+          "name": "punycode",
+          "version": "2.3.1",
+          "packageIntegrity": "sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg=="
+        },
+        "conformance": {
+          "corpus": "Unicode 17.0.0 IdnaTestV2.txt",
+          "compressedSha256": "9f8a1da3fee709da51a9bb80667db9b1f92df22f4577f8174ac9f1b4fec155c8",
+          "uncompressedSha256": "beb5d0be20e896189b03209a82fdc34f06351502bbd4b8e2523583fc2954d9cf",
+          "wellFormedCaseCount": 6389,
+          "rerunCommand": "npm run check"
+        }
+      },
+      "installedRuntime": {
+        "algorithm": "ordered_path_nul_bytes_nul_sha256",
+        "sha256": "a4b97c0735cda47715ec66318e2f8aba66db3427fec8aa8069f87257622fdfc4",
+        "fileCount": 7,
+        "files": [
+          {
+            "path": "tr46/index.js",
+            "bytes": 8590,
+            "sha256": "dd2eae4174a287b5a081feba8c41dd85d713d8b5185b5e98313c7ffe83834646"
+          },
+          {
+            "path": "tr46/lib/mappingTable.json",
+            "bytes": 142911,
+            "sha256": "c45bd284e01f0845bc3c3b1d7594cd7b9ee8b955ddc850882b8e1dc5d0cba95d"
+          },
+          {
+            "path": "tr46/lib/regexes.js",
+            "bytes": 72462,
+            "sha256": "3f43551d5109e5a300b29d5a9c261adf2bfd1621ffc086909f8ebf40835fc70f"
+          },
+          {
+            "path": "tr46/lib/statusMapping.js",
+            "bytes": 123,
+            "sha256": "ab7f706a1e3e74f4efd276560bb50e15f71dd0b20f85e87e21d1c18259420064"
+          },
+          {
+            "path": "tr46/package.json",
+            "bytes": 1054,
+            "sha256": "3cc81081409bea2f0fd4ec18d64c542a18e0ac6f7f970c7f7be4139aaa8d140f"
+          },
+          {
+            "path": "punycode/punycode.js",
+            "bytes": 12711,
+            "sha256": "6052a80eac47e46bd4de17ae0095e0192c336d3d7c387d292ad2176ebfc53d04"
+          },
+          {
+            "path": "punycode/package.json",
+            "bytes": 1227,
+            "sha256": "e025033bd11110af671fb8eb62f0db8895073ccdca70b596aa94a27eb5bf9acb"
+          }
+        ]
+      }
+    },
+    "collation": {
+      "schemaVersion": "text-integrity.collation-calibration/1",
+      "authority": "runtime_icu_observation",
+      "environmentBound": true,
+      "configurationCount": 15,
+      "comparisonCount": 45,
+      "probeSetSha256": "42f126f05d03846e252081939c643ec5d0db4cec481f0b65afc5f8f9775a627c",
+      "observationSha256": "441e181cac4f7bc4ecac566b627b97b4d604d0561ed2ce72212be2282dd9f55b",
+      "environment": {
+        "node": "22.22.1",
+        "icu": "78.2",
+        "unicode": "17.0",
+        "cldr": "48.0"
+      }
+    }
+  },
+  "sourceRerunCommands": [
+    "npm run replay:check",
+    "npm run behavior:check",
+    "npm run property:check",
+    "npm run check:independent",
+    "npm run check"
+  ],
+  "nonClaims": [
+    "byte identity is not semantic correctness",
+    "a generated receipt does not certify itself",
+    "packageArtifact is null until an external tarball is supplied explicitly",
+    "business, experience, release, and publication acceptance remain external"
+  ]
+}

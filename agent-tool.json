@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "openadam.agent-tool-project.v0.1",
+  "id": "text-integrity",
+  "version": "1.0.0",
+  "name": "Text Integrity",
+  "summary": "Deterministic Unicode 17 text, encoding, coordinate, security-observation, and protocol-string operations.",
+  "documents": {
+    "productModel": "docs/PRODUCT_MODEL.md",
+    "reviewContract": "docs/REVIEW_CONTRACT.md"
+  },
+  "checks": [
+    {
+      "id": "development",
+      "lane": "development-regression",
+      "command": {
+        "executable": "npm",
+        "args": ["run", "check"],
+        "timeoutMs": 300000
+      }
+    }
+  ],
+  "carriers": [
+    { "kind": "library", "path": "src/library.js" },
+    { "kind": "cli", "path": "bin/text-integrity.js" },
+    { "kind": "mcp", "path": "bin/text-integrity-mcp.js" },
+    { "kind": "codex-plugin", "path": ".codex-plugin/plugin.json" },
+    { "kind": "skill", "path": "skills/text-integrity/SKILL.md" },
+    { "kind": "human-app", "path": "src/ui/server.js" }
+  ],
+  "package": {
+    "componentId": "text-integrity",
+    "command": {
+      "executable": "node",
+      "args": ["scripts/package-agent-host-component.mjs"],
+      "timeoutMs": 180000
+    },
+    "artifact": "dist/text-integrity-1.0.0-agent-host.tar.gz",
+    "integration": "packaging/agent-host-integration.json",
+    "legal": {
+      "spdx": "Apache-2.0",
+      "license": "LICENSE",
+      "notice": "NOTICE",
+      "thirdPartyNotices": "THIRD_PARTY_NOTICES.md",
+      "sbom": "packaging/agent-host-sbom.spdx.json"
+    },
+    "probes": [
+      {
+        "id": "inspect-valid",
+        "tool": "text_inspect",
+        "arguments": { "text": "A👩‍💻é" },
+        "expectation": "success",
+        "effects": "read-only"
+      },
+      {
+        "id": "inspect-invalid",
+        "tool": "text_inspect",
+        "arguments": {},
+        "expectation": "protocol-error",
+        "effects": "read-only"
+      }
+    ]
+  }
+}

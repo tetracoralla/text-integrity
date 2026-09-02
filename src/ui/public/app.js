@@ -1,3 +1,5 @@
+import { createTranscodeSourceDrafts } from "./transcode-source-drafts.js";
+
 const $ = (selector) => document.querySelector(selector);
 const operation = $("#operation");
 const form = $("#task-form");
@@ -10,6 +12,17 @@ const protocolProfile = $("#protocol-profile");
 const protocolAction = $("#protocol-action");
 let activeRequest;
 let requestSerial = 0;
+const transcodeSourceDrafts = createTranscodeSourceDrafts(sourceKind.value, primary.value);
+
+const AUTHORITY_LABELS = Object.freeze({
+  explicit_input: "Explicit input",
+  bundled_unicode_17: "Pinned Unicode 17 data",
+  bundled_unicode_17_uts39_revision_32: "Pinned Unicode 17 · UTS #39 rev. 32",
+  bundled_unicode_17_uax29_revision_47: "Bundled Unicode 17 grapheme rules",
+  project_core_explicit_code_units: "Text Integrity code-unit core",
+  runtime_icu: "Current ICU runtime",
+  bundled_unicode_17_uts39_revision_32_vendored_uba: "Pinned Unicode 17 · UTS #39 rev. 32 · vendored UBA"
+});
 
 function setActions() {
   const domain = protocolProfile.value === "uts46_domain";
@@ -39,6 +52,7 @@ function updateFields() {
   $("#index-fields").hidden = op !== "index";
   $("#protocol-fields").hidden = op !== "protocol_profile";
   $("#transcode-fields").hidden = op !== "transcode";
+  $("#witness-fields").hidden = !["normalize", "explain_difference", "protocol_profile", "transcode"].includes(op);
   const byteMode = op === "transcode" && sourceKind.value === "bytes";
   $("#source-encoding-label").hidden = !byteMode;
   primaryLabel.textContent = byteMode ? "Bytes (comma-separated)" : paired ? "First text" : "Text";
@@ -46,21 +60,28 @@ function updateFields() {
   setActions();
 }
 
-function resetTask() {
+function resetTask(updateLayout = true) {
   activeRequest?.abort();
   activeRequest = undefined;
   requestSerial += 1;
   form.querySelector("button").disabled = false;
   result.hidden = true;
   result.replaceChildren();
-  updateFields();
+  if (updateLayout) updateFields();
 }
 
+form.addEventListener("input", (event) => {
+  if (event.target.tagName === "TEXTAREA" || (event.target.tagName === "INPUT" && event.target.type !== "checkbox")) {
+    resetTask(false);
+  }
+});
+form.addEventListener("change", (event) => {
+  if (event.target === sourceKind) {
+    primary.value = transcodeSourceDrafts.switchTo(sourceKind.value, primary.value);
+  }
+  resetTask([sourceKind, securityMode, protocolProfile, protocolAction].includes(event.target));
+});
 operation.addEventListener("change", resetTask);
-sourceKind.addEventListener("change", resetTask);
-securityMode.addEventListener("change", resetTask);
-protocolProfile.addEventListener("change", resetTask);
-protocolAction.addEventListener("change", resetTask);
 updateFields();
 
 function collationOptions() {
@@ -89,13 +110,20 @@ function parseBytes(value) {
 function requestArguments() {
   const op = operation.value;
   if (op === "inspect") return { text: primary.value };
-  if (op === "normalize") return { text: primary.value, form: $("#normalization-form").value };
+  if (op === "normalize") return {
+    text: primary.value,
+    form: $("#normalization-form").value,
+    witnessMode: $("#witness-mode").value
+  };
   if (op === "compare" || op === "explain_difference") return {
     left: primary.value,
     right: $("#secondary").value,
     locale: $("#locale").value,
     options: collationOptions(),
-    ...(op === "explain_difference" ? { confusableDirection: $("#confusable-direction").value } : {})
+    ...(op === "explain_difference" ? {
+      confusableDirection: $("#confusable-direction").value,
+      witnessMode: $("#witness-mode").value
+    } : {})
   };
   if (op === "index") {
     const chunk = $("#chunk-bytes").value.trim();
@@ -117,7 +145,7 @@ function requestArguments() {
     const profile = protocolProfile.value;
     const action = protocolAction.value;
     if (profile === "uts46_domain") return {
-      profile, action, text: primary.value,
+      profile, action, text: primary.value, witnessMode: $("#witness-mode").value,
       options: {
         checkBidi: true, checkHyphens: true, checkJoiners: true, ignoreInvalidPunycode: false,
         transitionalProcessing: $("#domain-transitional").checked,
@@ -126,7 +154,7 @@ function requestArguments() {
       }
     };
     return {
-      profile, action, text: primary.value,
+      profile, action, text: primary.value, witnessMode: $("#witness-mode").value,
       ...(action === "compare" ? { comparison: $("#protocol-comparison").value } : {})
     };
   }
@@ -134,7 +162,8 @@ function requestArguments() {
     sourceKind: sourceKind.value,
     targetEncoding: $("#target-encoding").value,
     allowLossy: $("#allow-lossy").checked,
-    byteRepresentation: $("#byte-representation").value
+    byteRepresentation: $("#byte-representation").value,
+    witnessMode: $("#witness-mode").value
   };
   return sourceKind.value === "bytes"
     ? { ...common, bytes: parseBytes(primary.value), sourceEncoding: $("#source-encoding").value }
@@ -194,6 +223,21 @@ function renderNormalize(value) {
   result.append(element("h2", `${value.form}: ${value.changed ? "changed" : "unchanged"}`));
   summary(metric("Canonical equivalent", value.canonicalEquivalent ? "Yes" : "No"), metric("Compatibility equivalent", value.compatibilityEquivalent ? "Yes" : "No"), metric("UTF-8 bytes", `${value.bytes.originalUtf8} → ${value.bytes.normalizedUtf8}`));
   result.append(element("h3", "Normalized text"), element("p", value.normalized, "mono text-value"));
+  if (value.witness) {
+    summary(
+      metric("Decomposition changed", value.witness.decompositionChanged ? "Yes" : "No"),
+      metric("Reordered positions", value.witness.canonicalReorderedPositionCount),
+      metric("Compositions", value.witness.compositionCount)
+    );
+    if (value.witness.stages) {
+      result.append(
+        element("h3", "Transformation stages"),
+        element("p", `Input: ${value.witness.stages.input.join(" ")}`, "mono"),
+        element("p", `Decomposed: ${value.witness.stages.decomposed.join(" ")}`, "mono"),
+        element("p", `Canonical order: ${value.witness.stages.canonicalOrdered.join(" ")}`, "mono")
+      );
+    }
+  }
   renderRuntime(value);
 }
 
@@ -213,6 +257,35 @@ function renderDifference(value) {
     metric("Identifier relation", value.identifierConfusableComparison.relation.replaceAll("_", " "))
   );
   if (point) result.append(element("p", `First code-point difference at #${point.index}: ${point.left.value ?? "end"} / ${point.right.value ?? "end"}.`));
+  if (value.witness) {
+    const boundaries = Object.values(value.witness.factBoundaries);
+    summary(
+      metric("Witness stages", value.witness.stageOrder.length),
+      metric("Runtime-bound stages", boundaries.filter((boundary) => boundary.environmentBound).length),
+      metric("Complete transforms", value.witness.mode === "full_required" ? "Yes" : "No")
+    );
+    if (value.witness.mode === "full_required") {
+      result.append(element("h3", "Derived text"));
+      for (const [form, transformation] of Object.entries(value.witness.transformations.normalization)) {
+        result.append(
+          element("h4", form),
+          element("p", `Left: ${transformation.leftOutput}`, "mono text-value"),
+          element("p", `Right: ${transformation.rightOutput}`, "mono text-value")
+        );
+      }
+      const folded = value.witness.transformations.nfkcCasefold;
+      result.append(
+        element("h4", "NFKC casefold"),
+        element("p", `Left: ${folded.leftOutput}`, "mono text-value"),
+        element("p", `Right: ${folded.rightOutput}`, "mono text-value")
+      );
+    }
+    result.append(element("h3", "Fact boundaries"));
+    for (const [stage, boundary] of Object.entries(value.witness.factBoundaries)) {
+      const label = stage.replaceAll(/([A-Z])/g, " $1").toLowerCase();
+      result.append(element("p", `${label}: ${AUTHORITY_LABELS[boundary.authority]}${boundary.environmentBound ? " · runtime-bound" : ""}`));
+    }
+  }
   renderRuntime(value);
 }
 
@@ -234,6 +307,9 @@ function renderTranscode(value) {
   const heading = representation === "bytes" ? "Bytes" : representation === "base64" ? "Base64" : "Hex";
   result.append(element("h3", heading), element("p", representation === "bytes" ? value.bytes.join(", ") : value[representation], "mono"));
   for (const warning of value.warnings) result.append(element("p", warning, "warning"));
+  if (value.witness) {
+    summary(metric("Witness segments", value.witness.segmentCount), metric("Replacements", value.witness.replacementCount));
+  }
   renderRuntime(value);
 }
 
@@ -251,6 +327,43 @@ function renderProtocol(value) {
   result.append(element("h2", value.equal === undefined ? (value.changed ? "Profile changed the text" : "Profile left the text unchanged") : (value.equal ? "Equal under this profile" : "Different under this profile")));
   result.append(element("h3", "Output"), element("p", value.output, "mono text-value"));
   if (value.comparisonOutput !== undefined) result.append(element("h3", "Comparison output"), element("p", value.comparisonOutput, "mono text-value"));
+  if (value.witness?.kind === "uts46") {
+    summary(
+      metric("Input code points", value.witness.inputCodePointCount),
+      metric("Output code points", value.witness.outputCodePointCount),
+      metric("ASCII output", value.witness.outputAscii ? "Yes" : "No")
+    );
+    if (value.witness.stages) {
+      result.append(element("h3", "Engine boundary trace"));
+      for (const stage of value.witness.stages) {
+        result.append(
+          element("h4", stage.stage === "input" ? "Input" : "Engine output"),
+          element("p", stage.text, "mono text-value")
+        );
+      }
+    }
+  } else if (value.witness?.kind === "precis") {
+    for (const side of value.witness.sides) {
+      summary(
+        metric(side.side === "text" ? "Text passes" : "Comparison passes", side.passCount),
+        metric("Stable after", side.stabilizedAfterPass),
+        metric("NFC changes", side.transformations.nfc.changes)
+      );
+      if (side.passes) {
+        result.append(element("h3", side.side === "text" ? "Text trace" : "Comparison trace"));
+        for (const pass of side.passes) {
+          const qualifier = pass.verificationOnly ? " · stability check" : "";
+          result.append(element("h4", `Pass ${pass.index}${qualifier}`));
+          for (const event of pass.events) {
+            const label = event.stage.replaceAll("_", " ");
+            result.append(event.kind === "transform"
+              ? element("p", `${label}: ${event.output}${event.changed ? " · changed" : " · unchanged"}`, "mono text-value")
+              : element("p", `${label}: passed`));
+          }
+        }
+      }
+    }
+  }
   renderRuntime(value);
 }
 

@@ -1,0 +1,1638 @@
+{
+  "schemaVersion": "text-integrity.behavior-manifest/15",
+  "product": {
+    "name": "text-integrity",
+    "version": "1.0.0"
+  },
+  "contracts": {
+    "taggedRequest": "text-integrity.tagged-request/1",
+    "publicResult": "text-integrity.public-result-contract/2",
+    "measurementRecord": "text-integrity.measurement-record/2",
+    "measurementComparison": "text-integrity.measurement-comparison/1"
+  },
+  "corpus": {
+    "schemaVersion": "text-integrity.behavior-corpus/1",
+    "caseCount": 30,
+    "sha256": "cc5c61811963c676c984a47ee561e46942de276299a7c1dc049d7674e4acb687"
+  },
+  "data": {
+    "unicodeVersion": "17.0.0",
+    "uts39Revision": 32,
+    "sourceManifestSha256": "1e0677ee007d4b9d280c7d65209c13cc5c7ce09443fb05fa7b39cbc6652988cf",
+    "compactFormatVersion": 4,
+    "compactManifestSha256": "3c8a54c3d74be6b11ac6458c882d86d0564da031640f90b6a6354fef0dd001c0",
+    "compactDataSha256": "7419b6b6af6f8184dc13c48a5ce5b10c20edd80f977d6769bc71214a9c06b564"
+  },
+  "engines": {
+    "uts46": {
+      "specification": "UTS #46 revision 35",
+      "unicodeVersion": "17.0.0",
+      "package": "tr46",
+      "version": "6.0.0",
+      "packageIntegrity": "sha512-bLVMLPtstlZ4iMQHpFHTR7GAGj2jxi8Dg0s2h2MafAE4uSWF98FC/3MomU51iQAMf8/qDUbKWf5GxuvvVcXEhw==",
+      "runtimeTreeSha256": "a4b97c0735cda47715ec66318e2f8aba66db3427fec8aa8069f87257622fdfc4",
+      "dependency": {
+        "name": "punycode",
+        "version": "2.3.1",
+        "packageIntegrity": "sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg=="
+      },
+      "conformance": {
+        "corpus": "Unicode 17.0.0 IdnaTestV2.txt",
+        "compressedSha256": "9f8a1da3fee709da51a9bb80667db9b1f92df22f4577f8174ac9f1b4fec155c8",
+        "uncompressedSha256": "beb5d0be20e896189b03209a82fdc34f06351502bbd4b8e2523583fc2954d9cf",
+        "wellFormedCaseCount": 6389,
+        "rerunCommand": "npm run check"
+      }
+    },
+    "collation": {
+      "schemaVersion": "text-integrity.collation-calibration/1",
+      "authority": "runtime_icu_observation",
+      "environmentBound": true,
+      "configurationCount": 15,
+      "comparisonCount": 45,
+      "probeSetSha256": "42f126f05d03846e252081939c643ec5d0db4cec481f0b65afc5f8f9775a627c",
+      "observationSha256": "441e181cac4f7bc4ecac566b627b97b4d604d0561ed2ce72212be2282dd9f55b",
+      "environment": {
+        "node": "22.22.1",
+        "icu": "78.2",
+        "unicode": "17.0",
+        "cldr": "48.0"
+      },
+      "configurations": [
+        {
+          "id": "en-variant",
+          "requestedLocale": "en",
+          "canonicalLocale": "en",
+          "requestedOptions": {
+            "usage": "sort",
+            "sensitivity": "variant",
+            "ignorePunctuation": false,
+            "numeric": false,
+            "caseFirst": "false",
+            "localeMatcher": "best fit",
+            "collation": "default"
+          },
+          "resolvedOptions": {
+            "locale": "en",
+            "usage": "sort",
+            "sensitivity": "variant",
+            "ignorePunctuation": false,
+            "collation": "default",
+            "numeric": false,
+            "caseFirst": "false"
+          },
+          "comparisons": [
+            {
+              "id": "case",
+              "left": "A",
+              "right": "a",
+              "order": 1,
+              "relation": "after"
+            },
+            {
+              "id": "accent",
+              "left": "resume",
+              "right": "résumé",
+              "order": -1,
+              "relation": "before"
+            },
+            {
+              "id": "canonical",
+              "left": "é",
+              "right": "é",
+              "order": 0,
+              "relation": "equal"
+            }
+          ]
+        },
+        {
+          "id": "en-search-base",
+          "requestedLocale": "en",
+          "canonicalLocale": "en",
+          "requestedOptions": {
+            "usage": "search",
+            "sensitivity": "base",
+            "ignorePunctuation": false,
+            "numeric": false,
+            "caseFirst": "false",
+            "localeMatcher": "lookup",
+            "collation": "default"
+          },
+          "resolvedOptions": {
+            "locale": "en",
+            "usage": "search",
+            "sensitivity": "base",
+            "ignorePunctuation": false,
+            "collation": "default",
+            "numeric": false,
+            "caseFirst": "false"
+          },
+          "comparisons": [
+            {
+              "id": "case",
+              "left": "A",
+              "right": "a",
+              "order": 0,
+              "relation": "equal"
+            },
+            {
+              "id": "punctuation",
+              "left": "coop",
+              "right": "co-op",
+              "order": 1,
+              "relation": "after"
+            },
+            {
+              "id": "sharp-s",
+              "left": "ss",
+              "right": "ß",
+              "order": 0,
+              "relation": "equal"
+            }
+          ]
+        },
+        {
+          "id": "en-accent",
+          "requestedLocale": "en",
+          "canonicalLocale": "en",
+          "requestedOptions": {
+            "usage": "sort",
+            "sensitivity": "accent",
+            "ignorePunctuation": false,
+            "numeric": false,
+            "caseFirst": "false",
+            "localeMatcher": "best fit",
+            "collation": "default"
+          },
+          "resolvedOptions": {
+            "locale": "en",
+            "usage": "sort",
+            "sensitivity": "accent",
+            "ignorePunctuation": false,
+            "collation": "default",
+            "numeric": false,
+            "caseFirst": "false"
+          },
+          "comparisons": [
+            {
+              "id": "accent",
+              "left": "resume",
+              "right": "résumé",
+              "order": -1,
+              "relation": "before"
+            },
+            {
+              "id": "case",
+              "left": "A",
+              "right": "a",
+              "order": 0,
+              "relation": "equal"
+            },
+            {
+              "id": "canonical",
+              "left": "é",
+              "right": "é",
+              "order": 0,
+              "relation": "equal"
+            }
+          ]
+        },
+        {
+          "id": "en-ignore-punctuation",
+          "requestedLocale": "en",
+          "canonicalLocale": "en",
+          "requestedOptions": {
+            "usage": "sort",
+            "sensitivity": "base",
+            "ignorePunctuation": true,
+            "numeric": false,
+            "caseFirst": "false",
+            "localeMatcher": "best fit",
+            "collation": "default"
+          },
+          "resolvedOptions": {
+            "locale": "en",
+            "usage": "sort",
+            "sensitivity": "base",
+            "ignorePunctuation": true,
+            "collation": "default",
+            "numeric": false,
+            "caseFirst": "false"
+          },
+          "comparisons": [
+            {
+              "id": "hyphen",
+              "left": "coop",
+              "right": "co-op",
+              "order": 0,
+              "relation": "equal"
+            },
+            {
+              "id": "space",
+              "left": "ab",
+              "right": "a b",
+              "order": 0,
+              "relation": "equal"
+            },
+            {
+              "id": "apostrophe",
+              "left": "cant",
+              "right": "can't",
+              "order": 0,
+              "relation": "equal"
+            }
+          ]
+        },
+        {
+          "id": "en-numeric",
+          "requestedLocale": "en",
+          "canonicalLocale": "en",
+          "requestedOptions": {
+            "usage": "sort",
+            "sensitivity": "variant",
+            "ignorePunctuation": false,
+            "numeric": true,
+            "caseFirst": "false",
+            "localeMatcher": "best fit",
+            "collation": "default"
+          },
+          "resolvedOptions": {
+            "locale": "en",
+            "usage": "sort",
+            "sensitivity": "variant",
+            "ignorePunctuation": false,
+            "collation": "default",
+            "numeric": true,
+            "caseFirst": "false"
+          },
+          "comparisons": [
+            {
+              "id": "integer",
+              "left": "item2",
+              "right": "item10",
+              "order": -1,
+              "relation": "before"
+            },
+            {
+              "id": "leading-zero",
+              "left": "2",
+              "right": "02",
+              "order": 0,
+              "relation": "equal"
+            },
+            {
+              "id": "suffix",
+              "left": "file9a",
+              "right": "file10a",
+              "order": -1,
+              "relation": "before"
+            }
+          ]
+        },
+        {
+          "id": "en-case-upper",
+          "requestedLocale": "en",
+          "canonicalLocale": "en",
+          "requestedOptions": {
+            "usage": "sort",
+            "sensitivity": "case",
+            "ignorePunctuation": false,
+            "numeric": false,
+            "caseFirst": "upper",
+            "localeMatcher": "best fit",
+            "collation": "default"
+          },
+          "resolvedOptions": {
+            "locale": "en",
+            "usage": "sort",
+            "sensitivity": "case",
+            "ignorePunctuation": false,
+            "collation": "default",
+            "numeric": false,
+            "caseFirst": "upper"
+          },
+          "comparisons": [
+            {
+              "id": "ascii",
+              "left": "A",
+              "right": "a",
+              "order": -1,
+              "relation": "before"
+            },
+            {
+              "id": "word",
+              "left": "Alpha",
+              "right": "alpha",
+              "order": -1,
+              "relation": "before"
+            },
+            {
+              "id": "accented",
+              "left": "É",
+              "right": "é",
+              "order": -1,
+              "relation": "before"
+            }
+          ]
+        },
+        {
+          "id": "en-case-lower",
+          "requestedLocale": "en",
+          "canonicalLocale": "en",
+          "requestedOptions": {
+            "usage": "sort",
+            "sensitivity": "case",
+            "ignorePunctuation": false,
+            "numeric": false,
+            "caseFirst": "lower",
+            "localeMatcher": "best fit",
+            "collation": "default"
+          },
+          "resolvedOptions": {
+            "locale": "en",
+            "usage": "sort",
+            "sensitivity": "case",
+            "ignorePunctuation": false,
+            "collation": "default",
+            "numeric": false,
+            "caseFirst": "lower"
+          },
+          "comparisons": [
+            {
+              "id": "ascii",
+              "left": "A",
+              "right": "a",
+              "order": 1,
+              "relation": "after"
+            },
+            {
+              "id": "word",
+              "left": "Alpha",
+              "right": "alpha",
+              "order": 1,
+              "relation": "after"
+            },
+            {
+              "id": "accented",
+              "left": "É",
+              "right": "é",
+              "order": 1,
+              "relation": "after"
+            }
+          ]
+        },
+        {
+          "id": "de-default",
+          "requestedLocale": "de",
+          "canonicalLocale": "de",
+          "requestedOptions": {
+            "usage": "sort",
+            "sensitivity": "variant",
+            "ignorePunctuation": false,
+            "numeric": false,
+            "caseFirst": "false",
+            "localeMatcher": "best fit",
+            "collation": "default"
+          },
+          "resolvedOptions": {
+            "locale": "de",
+            "usage": "sort",
+            "sensitivity": "variant",
+            "ignorePunctuation": false,
+            "collation": "default",
+            "numeric": false,
+            "caseFirst": "false"
+          },
+          "comparisons": [
+            {
+              "id": "a-umlaut",
+              "left": "ä",
+              "right": "ae",
+              "order": -1,
+              "relation": "before"
+            },
+            {
+              "id": "o-umlaut",
+              "left": "ö",
+              "right": "oe",
+              "order": -1,
+              "relation": "before"
+            },
+            {
+              "id": "sharp-s",
+              "left": "ß",
+              "right": "ss",
+              "order": 1,
+              "relation": "after"
+            }
+          ]
+        },
+        {
+          "id": "de-phonebook",
+          "requestedLocale": "de",
+          "canonicalLocale": "de",
+          "requestedOptions": {
+            "usage": "sort",
+            "sensitivity": "variant",
+            "ignorePunctuation": false,
+            "numeric": false,
+            "caseFirst": "false",
+            "localeMatcher": "best fit",
+            "collation": "phonebk"
+          },
+          "resolvedOptions": {
+            "locale": "de-u-co-phonebk",
+            "usage": "sort",
+            "sensitivity": "variant",
+            "ignorePunctuation": false,
+            "collation": "phonebk",
+            "numeric": false,
+            "caseFirst": "false"
+          },
+          "comparisons": [
+            {
+              "id": "a-umlaut",
+              "left": "ä",
+              "right": "ae",
+              "order": 1,
+              "relation": "after"
+            },
+            {
+              "id": "o-umlaut",
+              "left": "ö",
+              "right": "oe",
+              "order": 1,
+              "relation": "after"
+            },
+            {
+              "id": "sharp-s",
+              "left": "ß",
+              "right": "ss",
+              "order": 1,
+              "relation": "after"
+            }
+          ]
+        },
+        {
+          "id": "sv-default",
+          "requestedLocale": "sv",
+          "canonicalLocale": "sv",
+          "requestedOptions": {
+            "usage": "sort",
+            "sensitivity": "variant",
+            "ignorePunctuation": false,
+            "numeric": false,
+            "caseFirst": "false",
+            "localeMatcher": "best fit",
+            "collation": "default"
+          },
+          "resolvedOptions": {
+            "locale": "sv",
+            "usage": "sort",
+            "sensitivity": "variant",
+            "ignorePunctuation": false,
+            "collation": "default",
+            "numeric": false,
+            "caseFirst": "false"
+          },
+          "comparisons": [
+            {
+              "id": "z-a-ring",
+              "left": "z",
+              "right": "å",
+              "order": -1,
+              "relation": "before"
+            },
+            {
+              "id": "a-umlaut",
+              "left": "ä",
+              "right": "ae",
+              "order": 1,
+              "relation": "after"
+            },
+            {
+              "id": "o-umlaut",
+              "left": "ö",
+              "right": "z",
+              "order": 1,
+              "relation": "after"
+            }
+          ]
+        },
+        {
+          "id": "tr-case",
+          "requestedLocale": "tr",
+          "canonicalLocale": "tr",
+          "requestedOptions": {
+            "usage": "sort",
+            "sensitivity": "case",
+            "ignorePunctuation": false,
+            "numeric": false,
+            "caseFirst": "false",
+            "localeMatcher": "best fit",
+            "collation": "default"
+          },
+          "resolvedOptions": {
+            "locale": "tr",
+            "usage": "sort",
+            "sensitivity": "case",
+            "ignorePunctuation": false,
+            "collation": "default",
+            "numeric": false,
+            "caseFirst": "false"
+          },
+          "comparisons": [
+            {
+              "id": "dotless",
+              "left": "I",
+              "right": "ı",
+              "order": 1,
+              "relation": "after"
+            },
+            {
+              "id": "ascii",
+              "left": "I",
+              "right": "i",
+              "order": -1,
+              "relation": "before"
+            },
+            {
+              "id": "dotted",
+              "left": "İ",
+              "right": "i",
+              "order": 1,
+              "relation": "after"
+            }
+          ]
+        },
+        {
+          "id": "ja-default",
+          "requestedLocale": "ja",
+          "canonicalLocale": "ja",
+          "requestedOptions": {
+            "usage": "sort",
+            "sensitivity": "variant",
+            "ignorePunctuation": false,
+            "numeric": false,
+            "caseFirst": "false",
+            "localeMatcher": "best fit",
+            "collation": "default"
+          },
+          "resolvedOptions": {
+            "locale": "ja",
+            "usage": "sort",
+            "sensitivity": "variant",
+            "ignorePunctuation": false,
+            "collation": "default",
+            "numeric": false,
+            "caseFirst": "false"
+          },
+          "comparisons": [
+            {
+              "id": "kana",
+              "left": "あ",
+              "right": "ア",
+              "order": 0,
+              "relation": "equal"
+            },
+            {
+              "id": "width",
+              "left": "ｱ",
+              "right": "ア",
+              "order": 0,
+              "relation": "equal"
+            },
+            {
+              "id": "voicing",
+              "left": "は",
+              "right": "ば",
+              "order": -1,
+              "relation": "before"
+            }
+          ]
+        },
+        {
+          "id": "zh-pinyin",
+          "requestedLocale": "zh",
+          "canonicalLocale": "zh",
+          "requestedOptions": {
+            "usage": "sort",
+            "sensitivity": "variant",
+            "ignorePunctuation": false,
+            "numeric": false,
+            "caseFirst": "false",
+            "localeMatcher": "best fit",
+            "collation": "pinyin"
+          },
+          "resolvedOptions": {
+            "locale": "zh",
+            "usage": "sort",
+            "sensitivity": "variant",
+            "ignorePunctuation": false,
+            "collation": "default",
+            "numeric": false,
+            "caseFirst": "false"
+          },
+          "comparisons": [
+            {
+              "id": "a-ba",
+              "left": "阿",
+              "right": "八",
+              "order": -1,
+              "relation": "before"
+            },
+            {
+              "id": "country-middle",
+              "left": "国",
+              "right": "中",
+              "order": -1,
+              "relation": "before"
+            },
+            {
+              "id": "polyphone",
+              "left": "行",
+              "right": "重",
+              "order": -1,
+              "relation": "before"
+            }
+          ]
+        },
+        {
+          "id": "zh-stroke",
+          "requestedLocale": "zh",
+          "canonicalLocale": "zh",
+          "requestedOptions": {
+            "usage": "sort",
+            "sensitivity": "variant",
+            "ignorePunctuation": false,
+            "numeric": false,
+            "caseFirst": "false",
+            "localeMatcher": "best fit",
+            "collation": "stroke"
+          },
+          "resolvedOptions": {
+            "locale": "zh-u-co-stroke",
+            "usage": "sort",
+            "sensitivity": "variant",
+            "ignorePunctuation": false,
+            "collation": "stroke",
+            "numeric": false,
+            "caseFirst": "false"
+          },
+          "comparisons": [
+            {
+              "id": "a-ba",
+              "left": "阿",
+              "right": "八",
+              "order": 1,
+              "relation": "after"
+            },
+            {
+              "id": "country-middle",
+              "left": "国",
+              "right": "中",
+              "order": 1,
+              "relation": "after"
+            },
+            {
+              "id": "polyphone",
+              "left": "行",
+              "right": "重",
+              "order": -1,
+              "relation": "before"
+            }
+          ]
+        },
+        {
+          "id": "canonical-locale-alias",
+          "requestedLocale": "EN-us",
+          "canonicalLocale": "en-US",
+          "requestedOptions": {
+            "usage": "sort",
+            "sensitivity": "variant",
+            "ignorePunctuation": false,
+            "numeric": false,
+            "caseFirst": "false",
+            "localeMatcher": "lookup",
+            "collation": "default"
+          },
+          "resolvedOptions": {
+            "locale": "en-US",
+            "usage": "sort",
+            "sensitivity": "variant",
+            "ignorePunctuation": false,
+            "collation": "default",
+            "numeric": false,
+            "caseFirst": "false"
+          },
+          "comparisons": [
+            {
+              "id": "case",
+              "left": "A",
+              "right": "a",
+              "order": 1,
+              "relation": "after"
+            },
+            {
+              "id": "numeric-text",
+              "left": "2",
+              "right": "10",
+              "order": 1,
+              "relation": "after"
+            },
+            {
+              "id": "punctuation",
+              "left": "a-b",
+              "right": "ab",
+              "order": -1,
+              "relation": "before"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "semanticProjection": {
+    "schemaVersion": "text-integrity.semantic-projection/1",
+    "excludedFields": [
+      "runtime",
+      "confusableComparison.engine",
+      "identifierConfusableComparison.engine",
+      "standards.engine",
+      "witness.engine",
+      "error.details.actualBytes for RESULT_TOO_LARGE",
+      "error.details.metadataBytes for RESULT_TOO_LARGE"
+    ],
+    "resultBudget": {
+      "maxBytes": 65536,
+      "semanticBytesPlusMetadataReservation": true,
+      "metadataReservationBytes": 512
+    }
+  },
+  "environmentProjection": {
+    "schemaVersion": "text-integrity.environment-projection/1",
+    "includedFields": [
+      "runtime",
+      "confusableComparison.engine",
+      "identifierConfusableComparison.engine",
+      "standards.engine",
+      "witness.engine",
+      "error.details.actualBytes for RESULT_TOO_LARGE",
+      "error.details.metadataBytes for RESULT_TOO_LARGE"
+    ]
+  },
+  "primitives": {
+    "bidiSkeleton": {
+      "role": "shared_internal_semantic_primitive",
+      "publicOperation": false,
+      "consumers": [
+        "explain_difference",
+        "namespace_integrity",
+        "security",
+        "source_diagnostics"
+      ],
+      "verificationStatus": "scoped_native_wasm_parity",
+      "claimBoundary": "complete Unicode 17 bidiSkeleton value and paragraph levels only; X9-excluded engine diagnostics and consumer envelopes remain separately classified",
+      "independentVerification": {
+        "command": "npm run check:independent",
+        "implementations": [
+          "node_bidi_js_1_0_3_generated_unicode17",
+          "rust_unicode_bidi_0_3_18_generated_unicode17_native",
+          "rust_unicode_bidi_0_3_18_generated_unicode17_wasm32_unknown_unknown"
+        ],
+        "dataAuthority": "same_pinned_unicode_source",
+        "projectionExcludedFields": [
+          "engine",
+          "standards.uba.algorithm",
+          "standards.uba.hardcodedDataFeature",
+          "standards.uba.dataSource",
+          "resolvedLevels",
+          "visualOrder",
+          "entries",
+          "reordered"
+        ],
+        "sourceManifestSha256": "1e0677ee007d4b9d280c7d65209c13cc5c7ce09443fb05fa7b39cbc6652988cf",
+        "bidiClassSourcePath": "ucd/extracted/DerivedBidiClass.txt",
+        "bidiClassSourceSha256": "4867b4b7f0731ed1bfcd34cc6251211ff1542541fce0734b6fbda139ee80b3a4",
+        "scalarBoundaryCodePointCount": 3795,
+        "scalarBoundaryDirectionCaseCount": 11385,
+        "bidiBracketsSourcePath": "ucd/BidiBrackets.txt",
+        "bidiBracketsSourceSha256": "dadbaf38a0d0246e5b805bf8725cb81b7c621f93d030595635f5ba2c2f179428",
+        "bracketEntryCount": 128,
+        "bracketDirectionCaseCount": 384,
+        "bidiMirroringSourcePath": "ucd/BidiMirroring.txt",
+        "bidiMirroringSourceSha256": "a2f16fb873ab4fcdf3221cb1a8a85a134ddd6ed03603181823ff5206af3741ce",
+        "mirroringEntryCount": 428,
+        "unicodeDataSourcePath": "ucd/UnicodeData.txt",
+        "unicodeDataSourceSha256": "2e1efc1dcb59c575eedf5ccae60f95229f706ee6d031835247d843c11d96470c",
+        "combiningCodePointCount": 968,
+        "conformanceManifestSha256": "61c3f102afd997d929634ea5170e094a2d9808394113d6d749f8f448b1a5497d",
+        "bidiTestCompressedSha256": "b1e05b09dbd0a03dca1ed880f41c4002de38ef57adca88ac4052b8ef17a7249e",
+        "bidiTestParagraphModeCaseCount": 770241,
+        "bidiTestSampleCount": 2997,
+        "bidiCharacterTestCompressedSha256": "8b80599d288bad03ed420564ae0a6b7b92cc63027f55d51c6d55ad56ede85e54",
+        "bidiCharacterTestCaseCount": 91707,
+        "bidiCharacterTestSampleCount": 717,
+        "sequenceCaseCount": 42,
+        "totalCaseCount": 16921
+      }
+    },
+    "confusableComparison": {
+      "role": "shared_internal_semantic_primitive",
+      "publicOperation": false,
+      "consumers": [
+        "explain_difference",
+        "namespace_integrity",
+        "security",
+        "source_diagnostics"
+      ],
+      "verificationStatus": "native_wasm_parity",
+      "claimBoundary": "Unicode 17 resolved-script sets and complete UTS #39 confusable relation, class, paragraph levels, and skeleton digests only; consumer envelopes remain separately classified",
+      "independentVerification": {
+        "command": "npm run check:independent",
+        "implementations": [
+          "node_compact_unicode17_bidi_js_1_0_3",
+          "rust_generated_unicode17_unicode_bidi_0_3_18_native",
+          "rust_generated_unicode17_unicode_bidi_0_3_18_wasm32_unknown_unknown"
+        ],
+        "dataAuthority": "same_pinned_unicode_source",
+        "projectionExcludedFields": [
+          "engine"
+        ],
+        "sourceManifestSha256": "1e0677ee007d4b9d280c7d65209c13cc5c7ce09443fb05fa7b39cbc6652988cf",
+        "scriptsSourcePath": "ucd/Scripts.txt",
+        "scriptsSourceSha256": "9f5e50d3abaee7d6ce09480f325c706f485ae3240912527e651954d2d6b035bf",
+        "scriptExtensionsSourcePath": "ucd/ScriptExtensions.txt",
+        "scriptExtensionsSourceSha256": "ec2107e58825a1586acee8e0911ce18260394ac8b87e535ca325f1ccbeb06bc6",
+        "propertyValueAliasesSourcePath": "ucd/PropertyValueAliases.txt",
+        "propertyValueAliasesSourceSha256": "64e9a5f76f7a1e8b5a47d6a1f9a26522a251208f5276bdfa1559dac7cf2e827a",
+        "scriptBoundaryCaseCount": 3826,
+        "confusablesSourcePath": "security/confusables.txt",
+        "confusablesSourceSha256": "091c7f82fc39ef208faf8f94d29c244de99254675e09de163160c810d13ef22a",
+        "confusableMappingCaseCount": 6565,
+        "sequenceCaseCount": 42,
+        "totalCaseCount": 10433
+      }
+    },
+    "nfkcCasefold": {
+      "role": "shared_internal_semantic_primitive",
+      "publicOperation": false,
+      "consumers": [
+        "explain_difference",
+        "namespace_integrity",
+        "security"
+      ],
+      "verificationStatus": "native_wasm_parity",
+      "claimBoundary": "NFKC_CF mapping followed by Unicode 17 NFC only; consumer operations remain separately classified",
+      "independentVerification": {
+        "command": "npm run check:independent",
+        "implementations": [
+          "node_compact_unicode17",
+          "rust_generated_unicode17_native",
+          "rust_generated_unicode17_wasm32_unknown_unknown"
+        ],
+        "dataAuthority": "same_pinned_unicode_source",
+        "projectionExcludedFields": [
+          "engine"
+        ],
+        "sourceManifestSha256": "1e0677ee007d4b9d280c7d65209c13cc5c7ce09443fb05fa7b39cbc6652988cf",
+        "sourceFilePath": "ucd/DerivedNormalizationProps.txt",
+        "sourceFileSha256": "71fd6a206a2c0cdd41feb6b7f656aa31091db45e9cedc926985d718397f9e488",
+        "mappingRowCount": 6183,
+        "mappedCodePointCaseCount": 10583,
+        "identityBoundaryCaseCount": 1063,
+        "sequenceCaseCount": 16,
+        "totalCaseCount": 11662
+      }
+    },
+    "uts39PostReorderSkeleton": {
+      "role": "shared_internal_semantic_primitive",
+      "publicOperation": false,
+      "consumers": [
+        "explain_difference",
+        "namespace_integrity",
+        "security"
+      ],
+      "verificationStatus": "native_wasm_parity",
+      "claimBoundary": "post-reorder NFD, Default_Ignorable removal, confusable mapping, and final NFD only; UBA reordering and consumer operations remain separately classified",
+      "independentVerification": {
+        "command": "npm run check:independent",
+        "implementations": [
+          "node_compact_unicode17_uts39_revision32",
+          "rust_generated_unicode17_uts39_revision32_native",
+          "rust_generated_unicode17_uts39_revision32_wasm32_unknown_unknown"
+        ],
+        "dataAuthority": "same_pinned_unicode_source",
+        "projectionExcludedFields": [
+          "engine"
+        ],
+        "sourceManifestSha256": "1e0677ee007d4b9d280c7d65209c13cc5c7ce09443fb05fa7b39cbc6652988cf",
+        "confusablesSourcePath": "security/confusables.txt",
+        "confusablesSourceSha256": "091c7f82fc39ef208faf8f94d29c244de99254675e09de163160c810d13ef22a",
+        "derivedCoreSourcePath": "ucd/DerivedCoreProperties.txt",
+        "derivedCoreSourceSha256": "24c7fed1195c482faaefd5c1e7eb821c5ee1fb6de07ecdbaa64b56a99da22c08",
+        "confusableMappingRowCount": 6565,
+        "mappedSourceCaseCount": 6565,
+        "defaultIgnorableRangeCount": 27,
+        "defaultIgnorableCodePointCount": 4174,
+        "defaultIgnorableCaseCount": 4174,
+        "identityBoundaryCaseCount": 2607,
+        "sequenceCaseCount": 24,
+        "normalizationConformanceSourceCaseCount": 20034,
+        "totalCaseCount": 33404
+      }
+    }
+  },
+  "environment": {
+    "node": "22.22.1",
+    "icu": "78.2",
+    "unicode": "17.0",
+    "cldr": "48.0"
+  },
+  "operations": {
+    "inspect": {
+      "reproducibilityTarget": "cross_runtime_exact",
+      "verificationStatus": "native_wasm_parity",
+      "independentVerification": {
+        "command": "npm run check:independent",
+        "implementations": [
+          "node",
+          "rust_native",
+          "rust_wasm32_unknown_unknown"
+        ],
+        "canonicalCaseCount": 3,
+        "additionalComparisonCaseCount": 1299,
+        "totalCaseCount": 1302,
+        "negativeRequestShapeCaseCount": 11,
+        "packagedReferenceWasmNegativeRequestShapeCaseCount": 11
+      },
+      "caseCount": 3,
+      "semanticRootSha256": "27c448f193b5b51abb3791a2e804a1a581da67d2301423c4b377b14533b83c80"
+    },
+    "normalize": {
+      "reproducibilityTarget": "cross_runtime_exact",
+      "verificationStatus": "native_wasm_parity",
+      "independentVerification": {
+        "command": "npm run check:independent",
+        "implementations": [
+          "node",
+          "rust_native",
+          "rust_wasm32_unknown_unknown"
+        ],
+        "canonicalCaseCount": 5,
+        "additionalComparisonCaseCount": 80248,
+        "totalCaseCount": 80253,
+        "negativeRequestShapeCaseCount": 16,
+        "packagedReferenceWasmNegativeRequestShapeCaseCount": 16
+      },
+      "caseCount": 5,
+      "semanticRootSha256": "ba0df5e326f095d6ae9cf3a0635cea8d31b84c545d078dfc4339b84b6cdb9920"
+    },
+    "compare": {
+      "reproducibilityTarget": "environment_bound",
+      "verificationStatus": "single_implementation",
+      "caseCount": 2,
+      "semanticRootSha256": "20fd4efa8f5e76991b59d9116da8517ebe5abcffa375c2f280f49655e9482850"
+    },
+    "transcode": {
+      "reproducibilityTarget": "cross_runtime_exact",
+      "verificationStatus": "native_wasm_parity",
+      "independentVerification": {
+        "command": "npm run check:independent",
+        "implementations": [
+          "node",
+          "rust_native",
+          "rust_wasm32_unknown_unknown"
+        ],
+        "canonicalCaseCount": 4,
+        "additionalComparisonCaseCount": 1587,
+        "totalCaseCount": 1591,
+        "negativeRequestShapeCaseCount": 45,
+        "packagedReferenceWasmNegativeRequestShapeCaseCount": 45
+      },
+      "caseCount": 4,
+      "semanticRootSha256": "7682d40ba06220c83f111c43f5f6e66302d23da27420642a93437e87e5281833"
+    },
+    "security": {
+      "reproducibilityTarget": "cross_runtime_exact",
+      "verificationStatus": "native_wasm_parity",
+      "independentVerification": {
+        "command": "npm run check:independent",
+        "implementations": [
+          "node_compact_unicode17_bidi_js_1_0_3",
+          "rust_generated_unicode17_unicode_bidi_0_3_18_native",
+          "rust_generated_unicode17_unicode_bidi_0_3_18_wasm32_unknown_unknown"
+        ],
+        "canonicalCaseCount": 4,
+        "additionalComparisonCaseCount": 39010,
+        "totalCaseCount": 39014,
+        "dataAuthority": "same_pinned_unicode_source",
+        "projectionExcludedFields": [
+          "confusableComparison.engine"
+        ],
+        "scope": {
+          "modes": [
+            "free_text",
+            "identifier",
+            "source"
+          ]
+        },
+        "sourceManifestSha256": "1e0677ee007d4b9d280c7d65209c13cc5c7ce09443fb05fa7b39cbc6652988cf",
+        "sourceFiles": {
+          "identifierStatus": {
+            "path": "security/IdentifierStatus.txt",
+            "sha256": "617228a16da13850bf8af28b6cd08f5e9b6595d2eb60404fe6eee2c85b4e4a35"
+          },
+          "identifierType": {
+            "path": "security/IdentifierType.txt",
+            "sha256": "924ac63faa97ed73420d6ac48d08279d90968c7da0502ab701e08bfbb9683c22"
+          },
+          "derivedCore": {
+            "path": "ucd/DerivedCoreProperties.txt",
+            "sha256": "24c7fed1195c482faaefd5c1e7eb821c5ee1fb6de07ecdbaa64b56a99da22c08"
+          },
+          "propList": {
+            "path": "ucd/PropList.txt",
+            "sha256": "130dcddcaadaf071008bdfce1e7743e04fdfbc910886f017d9f9ac931d8c64dd"
+          },
+          "generalCategory": {
+            "path": "ucd/extracted/DerivedGeneralCategory.txt",
+            "sha256": "d62e5bab70ca74f099343f71224fa051cb1fdd61a1ab45c0488c44cfc0b6102e"
+          },
+          "unicodeData": {
+            "path": "ucd/UnicodeData.txt",
+            "sha256": "2e1efc1dcb59c575eedf5ccae60f95229f706ee6d031835247d843c11d96470c"
+          },
+          "scripts": {
+            "path": "ucd/Scripts.txt",
+            "sha256": "9f5e50d3abaee7d6ce09480f325c706f485ae3240912527e651954d2d6b035bf"
+          },
+          "scriptExtensions": {
+            "path": "ucd/ScriptExtensions.txt",
+            "sha256": "ec2107e58825a1586acee8e0911ce18260394ac8b87e535ca325f1ccbeb06bc6"
+          },
+          "bidiClass": {
+            "path": "ucd/extracted/DerivedBidiClass.txt",
+            "sha256": "4867b4b7f0731ed1bfcd34cc6251211ff1542541fce0734b6fbda139ee80b3a4"
+          },
+          "nfkcCasefold": {
+            "path": "ucd/DerivedNormalizationProps.txt",
+            "sha256": "71fd6a206a2c0cdd41feb6b7f656aa31091db45e9cedc926985d718397f9e488"
+          },
+          "confusables": {
+            "path": "security/confusables.txt",
+            "sha256": "091c7f82fc39ef208faf8f94d29c244de99254675e09de163160c810d13ef22a"
+          }
+        },
+        "propertyBoundaryCaseCount": 10034,
+        "freeTextBoundaryCaseCount": 58,
+        "xidProfileCaseCount": 5084,
+        "nfkcCasefoldProfileCaseCount": 10583,
+        "confusableEnvelopeCaseCount": 6565,
+        "sequenceCaseCount": 13,
+        "negativeCaseCount": 14,
+        "sourceDiagnostics": {
+          "sourceManifestSha256": "1e0677ee007d4b9d280c7d65209c13cc5c7ce09443fb05fa7b39cbc6652988cf",
+          "sourceFiles": {
+            "derivedCore": {
+              "path": "ucd/DerivedCoreProperties.txt",
+              "sha256": "24c7fed1195c482faaefd5c1e7eb821c5ee1fb6de07ecdbaa64b56a99da22c08"
+            },
+            "propList": {
+              "path": "ucd/PropList.txt",
+              "sha256": "130dcddcaadaf071008bdfce1e7743e04fdfbc910886f017d9f9ac931d8c64dd"
+            },
+            "generalCategory": {
+              "path": "ucd/extracted/DerivedGeneralCategory.txt",
+              "sha256": "d62e5bab70ca74f099343f71224fa051cb1fdd61a1ab45c0488c44cfc0b6102e"
+            },
+            "confusables": {
+              "path": "security/confusables.txt",
+              "sha256": "091c7f82fc39ef208faf8f94d29c244de99254675e09de163160c810d13ef22a"
+            }
+          },
+          "signalBoundaryCaseCount": 58,
+          "confusableEnvelopeCaseCount": 6565,
+          "sequenceCaseCount": 7,
+          "negativeCaseCount": 29,
+          "totalCaseCount": 6659
+        }
+      },
+      "caseCount": 4,
+      "semanticRootSha256": "4b69c01da8d1ec37256ec720125d65edcd72cdd61046e2ce88fba195f990b3a3"
+    },
+    "explain_difference": {
+      "reproducibilityTarget": "environment_bound",
+      "verificationStatus": "scoped_native_wasm_parity",
+      "independentVerification": {
+        "command": "npm run check:independent",
+        "implementations": [
+          "node_composed_core_with_runtime_icu_projected_out",
+          "rust_generated_unicode17_native",
+          "rust_generated_unicode17_wasm32_unknown_unknown"
+        ],
+        "canonicalCaseCount": 2,
+        "additionalComparisonCaseCount": 42966,
+        "totalCaseCount": 42968,
+        "dataAuthority": "same_pinned_unicode_source",
+        "projectionExcludedFields": [
+          "collation",
+          "runtime",
+          "identifierConfusableComparison.engine"
+        ],
+        "scope": {
+          "kind": "deterministic_spine",
+          "includedStages": [
+            "exact_representation",
+            "normalization",
+            "nfkc_casefold",
+            "coordinate_mapping",
+            "alignment",
+            "unicode_signals",
+            "line_endings",
+            "identifier_confusable"
+          ],
+          "excludedStages": [
+            "collation"
+          ],
+          "requiresValidNodeCollationRequest": true,
+          "completeConsumerParity": false
+        },
+        "graphemeConformanceCaseCount": 766,
+        "normalizationConformanceCaseCount": 20034,
+        "nfkcCasefoldCaseCount": 11662,
+        "confusableComparisonCaseCount": 10433,
+        "signalBoundaryCaseCount": 58,
+        "composedSequenceCaseCount": 13
+      },
+      "caseCount": 2,
+      "semanticRootSha256": "c2001a6bc6e468b0208bf204d2c4f861124365be8de38501220d778f2a92edb9"
+    },
+    "index": {
+      "reproducibilityTarget": "cross_runtime_exact",
+      "verificationStatus": "native_wasm_parity",
+      "independentVerification": {
+        "command": "npm run check:independent",
+        "implementations": [
+          "node",
+          "rust_native",
+          "rust_wasm32_unknown_unknown"
+        ],
+        "canonicalCaseCount": 2,
+        "additionalComparisonCaseCount": 984,
+        "totalCaseCount": 986,
+        "negativeRequestShapeCaseCount": 18,
+        "packagedReferenceWasmNegativeRequestShapeCaseCount": 18
+      },
+      "caseCount": 2,
+      "semanticRootSha256": "43b9a22d703e3c5399d296d3572b07aab29eb00e2472709370cb228561442650"
+    },
+    "protocol_profile": {
+      "reproducibilityTarget": "cross_runtime_exact",
+      "verificationStatus": "native_wasm_parity",
+      "independentVerification": {
+        "command": "npm run check:independent",
+        "implementations": [
+          "node_tr46_6_0_0_and_unicode17_precis_core",
+          "rust_idna_adapter_1_2_1_configurable_uts46_and_generated_unicode17_precis_native",
+          "rust_idna_adapter_1_2_1_configurable_uts46_and_generated_unicode17_precis_wasm32_unknown_unknown"
+        ],
+        "canonicalCaseCount": 5,
+        "additionalComparisonCaseCount": 68149,
+        "totalCaseCount": 68154,
+        "officialInputCaseCount": 6389,
+        "officialOperationCaseCount": 19167,
+        "dataAuthority": "locked_independent_uts46_engines_and_same_pinned_unicode_source_for_precis",
+        "projectionExcludedFields": [
+          "standards.engine",
+          "witness.engine"
+        ],
+        "scope": {
+          "uts46": {
+            "profile": "uts46_domain",
+            "actions": [
+              "to_ascii",
+              "to_unicode"
+            ],
+            "witnessModes": [
+              "none",
+              "summary",
+              "full_required"
+            ],
+            "implementationScope": "complete_option_space",
+            "requestShapeValidationIncluded": true
+          },
+          "precis": {
+            "profiles": [
+              "precis_username_case_mapped",
+              "precis_username_case_preserved",
+              "precis_opaque_string"
+            ],
+            "actions": [
+              "enforce",
+              "compare"
+            ],
+            "witnessModes": [
+              "none",
+              "summary",
+              "full_required"
+            ],
+            "implementationScope": "complete_profile_execution",
+            "requestShapeValidationIncluded": true
+          }
+        },
+        "uts46Options": {
+          "probeCount": 19,
+          "toAsciiOptionCombinationCount": 128,
+          "toUnicodeOptionCombinationCount": 64,
+          "allLegalOptionCombinationsIncluded": true,
+          "totalCaseCount": 3648
+        },
+        "requestShape": {
+          "sharedCaseCount": 4,
+          "uts46CaseCount": 26,
+          "precisCaseCount": 14,
+          "totalCaseCount": 44
+        },
+        "precis": {
+          "sourceManifestSha256": "1e0677ee007d4b9d280c7d65209c13cc5c7ce09443fb05fa7b39cbc6652988cf",
+          "sourceFiles": {
+            "derivedCore": {
+              "path": "ucd/DerivedCoreProperties.txt",
+              "sha256": "24c7fed1195c482faaefd5c1e7eb821c5ee1fb6de07ecdbaa64b56a99da22c08"
+            },
+            "propList": {
+              "path": "ucd/PropList.txt",
+              "sha256": "130dcddcaadaf071008bdfce1e7743e04fdfbc910886f017d9f9ac931d8c64dd"
+            },
+            "generalCategory": {
+              "path": "ucd/extracted/DerivedGeneralCategory.txt",
+              "sha256": "d62e5bab70ca74f099343f71224fa051cb1fdd61a1ab45c0488c44cfc0b6102e"
+            },
+            "unicodeData": {
+              "path": "ucd/UnicodeData.txt",
+              "sha256": "2e1efc1dcb59c575eedf5ccae60f95229f706ee6d031835247d843c11d96470c"
+            },
+            "specialCasing": {
+              "path": "ucd/SpecialCasing.txt",
+              "sha256": "efc25faf19de21b92c1194c111c932e03d2a5eaf18194e33f1156e96de4c9588"
+            },
+            "joiningType": {
+              "path": "ucd/extracted/DerivedJoiningType.txt",
+              "sha256": "f39ebe974825d6736aee15582250307aa532b2cfab3caf3f86bd23fddc9c5c4d"
+            },
+            "hangulSyllableType": {
+              "path": "ucd/HangulSyllableType.txt",
+              "sha256": "5a57450afde0d082bc5026f7458649eac3b615490cc7e3d916b0367f1593c0e3"
+            },
+            "scripts": {
+              "path": "ucd/Scripts.txt",
+              "sha256": "9f5e50d3abaee7d6ce09480f325c706f485ae3240912527e651954d2d6b035bf"
+            },
+            "scriptExtensions": {
+              "path": "ucd/ScriptExtensions.txt",
+              "sha256": "ec2107e58825a1586acee8e0911ce18260394ac8b87e535ca325f1ccbeb06bc6"
+            },
+            "bidiClass": {
+              "path": "ucd/extracted/DerivedBidiClass.txt",
+              "sha256": "4867b4b7f0731ed1bfcd34cc6251211ff1542541fce0734b6fbda139ee80b3a4"
+            }
+          },
+          "propertyBoundaryCodePointCount": 7819,
+          "propertyBoundaryProfileCaseCount": 23457,
+          "widthMappingCaseCount": 226,
+          "lowercaseMappingCaseCount": 1488,
+          "normalizationConformanceSourceCaseCount": 20034,
+          "contextSequenceCaseCount": 48,
+          "bidiSequenceCaseCount": 18,
+          "composedSequenceCaseCount": 17,
+          "negativeEncodingCaseCount": 2,
+          "totalCaseCount": 45290
+        }
+      },
+      "caseCount": 5,
+      "semanticRootSha256": "9a9309032e92664b89ad58a77778034f339d0de5a08f44efed1ff9397828a07e"
+    },
+    "namespace_integrity": {
+      "reproducibilityTarget": "relation_bound",
+      "verificationStatus": "scoped_native_wasm_parity",
+      "independentVerification": {
+        "command": "npm run check:independent",
+        "implementations": [
+          "node_composed_unicode17_core_with_runtime_icu_collation_excluded",
+          "rust_generated_unicode17_and_configurable_uts46_native",
+          "rust_generated_unicode17_and_configurable_uts46_wasm32_unknown_unknown"
+        ],
+        "canonicalCaseCount": 2,
+        "additionalComparisonCaseCount": 239,
+        "totalCaseCount": 241,
+        "dataAuthority": "locked_independent_uts46_engines_and_same_pinned_unicode_source_for_other_relations",
+        "projectionExcludedFields": [
+          "runtime"
+        ],
+        "scope": {
+          "includedRelations": [
+            "exact",
+            "nfc",
+            "nfkc",
+            "nfkc_casefold",
+            "uts39_confusable",
+            "protocol:uts46_domain",
+            "protocol:precis_username_case_mapped",
+            "protocol:precis_username_case_preserved",
+            "protocol:precis_opaque_string"
+          ],
+          "excludedRelations": [
+            "declared_collation"
+          ],
+          "completeConsumerParity": false,
+          "deterministicUtf16Ordering": true,
+          "requestShapeValidationIncluded": true,
+          "completeResultBudgetEnforcementImplemented": true,
+          "runtimeDependentBudgetDiagnosticsExcluded": true
+        },
+        "simpleDirectionCaseCount": 3,
+        "utf16OrderingCaseCount": 1,
+        "uts46ConfigurationCaseCount": 192,
+        "precisProfileCaseCount": 3,
+        "composedProtocolRelationCaseCount": 1,
+        "negativeCaseCount": 39
+      },
+      "caseCount": 3,
+      "semanticRootSha256": "bedcf3a404ba128c4de1fd6fa9b61f468e8e3a20881d181a60c145ed5c625628"
+    }
+  },
+  "cases": [
+    {
+      "id": "compare-error-invalid-locale",
+      "operation": "compare",
+      "reproducibilityTarget": "environment_bound",
+      "requestSha256": "b800d91230707828bf9f64eb4a54c6eacdf46a9f2d78ed14cee40f46c7f7b88e",
+      "semanticSha256": "8a1556586816f7590348550157e2debd0db86616db3c9d412725f5ad917b9f26",
+      "environmentSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "resultSha256": "8a1556586816f7590348550157e2debd0db86616db3c9d412725f5ad917b9f26"
+    },
+    {
+      "id": "compare-explicit-collation",
+      "operation": "compare",
+      "reproducibilityTarget": "environment_bound",
+      "requestSha256": "8fd4c8132c1a54e4c9e2db9fa707c7018585378420a3aa7043aa3139596e9ece",
+      "semanticSha256": "713bbddc8619f797ac099fd7b8a0d58d76fc90651bb37f97c28ff015d5f4fe2c",
+      "environmentSha256": "232239f7f4a26f2c4e33a9ef06d7b1e7aa14461796fb67c5c4b71510f9d746aa",
+      "resultSha256": "25703e47dec06429e84dc8f91dfb07832a2fd02c9d6d97c0683852e89b7f9fc5"
+    },
+    {
+      "id": "explain-composed-difference",
+      "operation": "explain_difference",
+      "reproducibilityTarget": "environment_bound",
+      "requestSha256": "6b8bf1873e666c3b657a49c14cf1dca713369ddd2564847a6263225255d521e8",
+      "semanticSha256": "72baf901ca8ff7bd07dc473f25873ff7b0421a7f50e40e7449bbde14d90c836e",
+      "environmentSha256": "2bd4feedfee7fb42cbfab6ca5a288c50261a1eb3897cf42769ed4714ca905916",
+      "resultSha256": "d929c59dc7e32f4bc65a248d472602c1f59f743f851a89bf746f23ad5dfc8dda"
+    },
+    {
+      "id": "explain-error-invalid-unicode",
+      "operation": "explain_difference",
+      "reproducibilityTarget": "environment_bound",
+      "requestSha256": "3dbcf50561332c4994bfc2e2ceb8627a8f4b00ef5f211b17610632b149cc7fc9",
+      "semanticSha256": "4d97f5d451f798397b6a4d962f2a4d8736777ab185fb0110c05a2f782e192695",
+      "environmentSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "resultSha256": "4d97f5d451f798397b6a4d962f2a4d8736777ab185fb0110c05a2f782e192695"
+    },
+    {
+      "id": "index-error-grapheme-too-large",
+      "operation": "index",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "997303e06b44568b53c92f25b0a9d900907016da399f32d52c48863dde58d6f8",
+      "semanticSha256": "f114976ea3a6717631fec51d1e6ad5d1dc1fdd5072dd91bbd02a32ab489230ab",
+      "environmentSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "resultSha256": "f114976ea3a6717631fec51d1e6ad5d1dc1fdd5072dd91bbd02a32ab489230ab"
+    },
+    {
+      "id": "index-grapheme-lines-and-chunks",
+      "operation": "index",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "9a376e676c8dc15cfc042d0c3e71c3a5971d6d9a34233e217d38c9fc22066d77",
+      "semanticSha256": "c778b2afba49728912d323b742514b1b9381a0b498f8255ae3e9a6dff8a0ec93",
+      "environmentSha256": "232239f7f4a26f2c4e33a9ef06d7b1e7aa14461796fb67c5c4b71510f9d746aa",
+      "resultSha256": "de814921e1f4c300d549dfb1ccac43dd2689c000d4e0663792305f05888b3677"
+    },
+    {
+      "id": "inspect-decomposed-family",
+      "operation": "inspect",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "8c57b608fdbc62b1b2c5edfb56acf6986ef76ab424008d87fad39770ecd325e6",
+      "semanticSha256": "bd78a7933c474a3775ce823625536999f8574d6e976c1c484f3e7b2b435103f3",
+      "environmentSha256": "232239f7f4a26f2c4e33a9ef06d7b1e7aa14461796fb67c5c4b71510f9d746aa",
+      "resultSha256": "9c7bac977f3395418313ffd143010f86f6786744a190662ca9dcda6c15ef4c66"
+    },
+    {
+      "id": "inspect-error-request-budget",
+      "operation": "inspect",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "c7e11f634064f7593820bf17cae5a4085f08f3b99566fe1cbb74d0331e465554",
+      "semanticSha256": "7a2fd1fcfaf69d2a866f6c5be3a11a9f84b1ecca102e909ea1c4325181f491fe",
+      "environmentSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "resultSha256": "7a2fd1fcfaf69d2a866f6c5be3a11a9f84b1ecca102e909ea1c4325181f491fe"
+    },
+    {
+      "id": "inspect-unpaired-high-surrogate",
+      "operation": "inspect",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "7e515d2033b9f7b786dfb7a2f22d9b0f4b293d715801771fca48023b0a9c54b8",
+      "semanticSha256": "edae4973a7842fef89eb54e7adf3e3b04819e828eae76c9ceceb49652a427c7f",
+      "environmentSha256": "232239f7f4a26f2c4e33a9ef06d7b1e7aa14461796fb67c5c4b71510f9d746aa",
+      "resultSha256": "4cfd287fab878287d188004f5cd89b5f829b933e3cdc97ed1e5aacdad433fac1"
+    },
+    {
+      "id": "namespace-error-duplicate-item-id",
+      "operation": "namespace_integrity",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "9f031e5f271cb864d3b21bfa3f8432fb1748a893bcda0dd820ec691f2994c188",
+      "semanticSha256": "a8b1f5095a6d5a76fc3b62e328a263987fe2afce41f17e17ca2c5a412917fcfc",
+      "environmentSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "resultSha256": "a8b1f5095a6d5a76fc3b62e328a263987fe2afce41f17e17ca2c5a412917fcfc"
+    },
+    {
+      "id": "namespace-multi-relation-collisions",
+      "operation": "namespace_integrity",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "fc62356a83f10c59bea6aa37cc25430b3f73aaacfc30a7a16a5c054356d01514",
+      "semanticSha256": "f98faa67fb48892211407d97d6752f52a0b2e596d8f92fbb98761c02cc83673a",
+      "environmentSha256": "232239f7f4a26f2c4e33a9ef06d7b1e7aa14461796fb67c5c4b71510f9d746aa",
+      "resultSha256": "4b7f880c20a6702000d1afd4ebb7df14cf4f4c2ab27281b8efc9a0d2d5b1ff7c"
+    },
+    {
+      "id": "namespace-protocol-and-declared-collation",
+      "operation": "namespace_integrity",
+      "reproducibilityTarget": "environment_bound",
+      "requestSha256": "91f8f58f0ade9ed017102042e49030a4732a2b6c6ee21d9067b01e3eaba1eabf",
+      "semanticSha256": "5f3e67ba27d36ed021e88b6c32e936aab4c76d5c17935355f5e63d5a562783dd",
+      "environmentSha256": "232239f7f4a26f2c4e33a9ef06d7b1e7aa14461796fb67c5c4b71510f9d746aa",
+      "resultSha256": "588e7b3ddcdec4f1e5d181f88dd18e2ea23720be832176f26c1f9bff69e77c22"
+    },
+    {
+      "id": "normalize-canonical-composition",
+      "operation": "normalize",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "deaceafab4dc02bb32e4d1660713379c709ab2895e689c119e42c49baf0e0c1f",
+      "semanticSha256": "2db5e2d2b26ea188d78c0c478bc7d1e636aa82f0191b09893789c9a9679c962d",
+      "environmentSha256": "232239f7f4a26f2c4e33a9ef06d7b1e7aa14461796fb67c5c4b71510f9d746aa",
+      "resultSha256": "913dc0c928d99cfcce7fffd12811a5781eb817286bab8fa076d8d4aaa0463302"
+    },
+    {
+      "id": "normalize-compatibility-composition",
+      "operation": "normalize",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "c5bac77e8a2d7a1a256c2c9f90af8158826d39762a8f0fc48de0a5af7386dfc4",
+      "semanticSha256": "063b39847b5fc73c9fb96643d30ef5258e66ea58609c3e7439b843d76bb2face",
+      "environmentSha256": "232239f7f4a26f2c4e33a9ef06d7b1e7aa14461796fb67c5c4b71510f9d746aa",
+      "resultSha256": "75e1943b832580f39b2ccc4305044fc87f731237aa09786a3685ce0485c1a09f"
+    },
+    {
+      "id": "normalize-compatibility-reorder-full-witness",
+      "operation": "normalize",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "5049e7fa2704f03091cc11a6901efe83b603bed9a51ad935f26ec658cbd0913e",
+      "semanticSha256": "9d292b782db5ffd4a078f1ad32640209edf27072f4f54fe9a95a58de5440e850",
+      "environmentSha256": "232239f7f4a26f2c4e33a9ef06d7b1e7aa14461796fb67c5c4b71510f9d746aa",
+      "resultSha256": "08c33873b645088582284a01da2ce3734e5d8bd44bf0b45a1a7925e630165385"
+    },
+    {
+      "id": "normalize-error-invalid-unicode",
+      "operation": "normalize",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "6fe267dcd847915927643310d0682d2dda3c429bd174b336127f170b33f1714d",
+      "semanticSha256": "cc9e7d8304d8b1ef33a519aec1bf6449ca5031fb628100a82f6d140123d87be0",
+      "environmentSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "resultSha256": "cc9e7d8304d8b1ef33a519aec1bf6449ca5031fb628100a82f6d140123d87be0"
+    },
+    {
+      "id": "normalize-error-result-budget",
+      "operation": "normalize",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "84bcb88a65f41eb43b481e21d621b5492b14782c631a0adab68d4c1d275ca8fe",
+      "semanticSha256": "07292b7bf903b6a9440c7ff9655faa69795b5d63d9f94ccf821038902d5543a2",
+      "environmentSha256": "6ed5501dca11c9deccdf64f4ce33e8241c5363dbb39595d6ee5d7b66907fe574",
+      "resultSha256": "6e18f149550ca7e6689d289439b4ac34b016fda73bc47108359b506df5e9a4e1"
+    },
+    {
+      "id": "protocol-error-disallowed-code-point",
+      "operation": "protocol_profile",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "0d95a12cee7aa32f0fda1aa4853f03d0a1d8735a87ca4ca6868a7ab9c0774c3b",
+      "semanticSha256": "f8b06e56a7d38af6ef6f33b3429201930d085cb46d7f672bee66750da36221b7",
+      "environmentSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "resultSha256": "f8b06e56a7d38af6ef6f33b3429201930d085cb46d7f672bee66750da36221b7"
+    },
+    {
+      "id": "protocol-precis-compare",
+      "operation": "protocol_profile",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "475e23bc2360919e9fb86867055ad8b895b2716bcf57ae0554887df27f3a6c6b",
+      "semanticSha256": "dd5d5400103dadae4b5713eb849563496dee3a4eacb6f50983338c73e0fe9be5",
+      "environmentSha256": "232239f7f4a26f2c4e33a9ef06d7b1e7aa14461796fb67c5c4b71510f9d746aa",
+      "resultSha256": "7372e8f5413e011048e0f6c9db2bf13a92f15846c8bd2e0bee975162729ae38c"
+    },
+    {
+      "id": "protocol-precis-enforce",
+      "operation": "protocol_profile",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "f309064baa2c7c761653c462f4b5fe85aedac9b2b0000d1027a9ff13bd613cf6",
+      "semanticSha256": "00dc884f558e0ab200bed9c5e80a4f3bdc398c1b3e68f25a6d780e358f953c65",
+      "environmentSha256": "232239f7f4a26f2c4e33a9ef06d7b1e7aa14461796fb67c5c4b71510f9d746aa",
+      "resultSha256": "3d611d5034f7af4818400014a6ba3b7e690362a3881214ad95d5a500c996e5f0"
+    },
+    {
+      "id": "protocol-uts46-to-ascii",
+      "operation": "protocol_profile",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "cc7e3778cf3325b2ef23175be13ba03e33176b032d21d3e888cd865f3485048c",
+      "semanticSha256": "5dfb7fbb6c20fe10f581884d064d0538d72e2796efe0a5693d833a5a6840b12b",
+      "environmentSha256": "4276d623eed1e6bbaa7b1be207b668e91f64dd3f7d72dafc83deaf1ec0463dff",
+      "resultSha256": "8cd39e007335e4ff9845d64a109ce490e63bcb5b06904f34bb0f882d7cf10afb"
+    },
+    {
+      "id": "protocol-uts46-to-unicode-root",
+      "operation": "protocol_profile",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "6a9ae0f474caaf8fd97a3002cdeb8e9144e95d72ea6c28675718932ba1230ae8",
+      "semanticSha256": "690353ef14a14b020b37dc74a63593613e7a67e551e94a6f417e835d4263f8aa",
+      "environmentSha256": "4276d623eed1e6bbaa7b1be207b668e91f64dd3f7d72dafc83deaf1ec0463dff",
+      "resultSha256": "a6b0a768c5167e56529b48cc55b2af69cf3799502c92a0832256e46300d38a16"
+    },
+    {
+      "id": "security-error-invalid-span",
+      "operation": "security",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "a1f53796271d19a4fb1db9f23b94af6cbaf676476217d34b044024dff7a39bf0",
+      "semanticSha256": "15e2257d64ca2451f754a9e4d519fc47e6bf207e0c9d721b11c5b2c9a6fe7176",
+      "environmentSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "resultSha256": "15e2257d64ca2451f754a9e4d519fc47e6bf207e0c9d721b11c5b2c9a6fe7176"
+    },
+    {
+      "id": "security-free-text-signals",
+      "operation": "security",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "747233fdf18dec4828a052ec967d485752c586900e643a68d96d4bc2c759260f",
+      "semanticSha256": "fe683506651449a8b1fb78069f7a58e065f8261277f2a99a000244d7448f79cd",
+      "environmentSha256": "232239f7f4a26f2c4e33a9ef06d7b1e7aa14461796fb67c5c4b71510f9d746aa",
+      "resultSha256": "395c2842cd33448f699cf8971792ab48fda5b97430ab157f97f32d6bb282d9cb"
+    },
+    {
+      "id": "security-identifier-confusable",
+      "operation": "security",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "a64ca21d82cebb541e364fccc9121582cf027946fba63700c42a86ee5ecfd34c",
+      "semanticSha256": "656a81ae70a7708a70f714691a58aa42998bfcf761ea37c51ff312555a520c3b",
+      "environmentSha256": "8412a72eb824feea92389f4c4779ead476cdd0ae6ac8ea9a6820c06e3990b85e",
+      "resultSha256": "4408c96f50900bd86154ebbe1462cf189e2f5c0d002d47709599c443e84563da"
+    },
+    {
+      "id": "security-source-host-spans",
+      "operation": "security",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "37a5b9f7973ab9d9411a43f3d8cc6b86f8341e92a02389a6c099e3778cf82b09",
+      "semanticSha256": "a28bb3678693c5e76abe774bd28005bfa622246b721186342826db382c08c78a",
+      "environmentSha256": "232239f7f4a26f2c4e33a9ef06d7b1e7aa14461796fb67c5c4b71510f9d746aa",
+      "resultSha256": "1121ec0b42c7730f3bee45d5d3eb3ac4adc647ece573e0ce8b1d609d4904527f"
+    },
+    {
+      "id": "transcode-error-invalid-utf8",
+      "operation": "transcode",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "8ec5ba9489b2c1920ee2b8e57dca13bf3af20e72505a33b3df40991534a01a9d",
+      "semanticSha256": "ceaf73e7dad814ce848e1874cad5e0e1a048cb1b42e8e6f246e4e96160ce8c29",
+      "environmentSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "resultSha256": "ceaf73e7dad814ce848e1874cad5e0e1a048cb1b42e8e6f246e4e96160ce8c29"
+    },
+    {
+      "id": "transcode-invalid-utf8-full-witness",
+      "operation": "transcode",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "9227149110918a2e1443158521898910aebf35fc894f716eee4aebc12210ad8d",
+      "semanticSha256": "10e2a5e51ab3a20136ffb954c4e96a4e68c0cf29ebe8a64ce67ce9f90f3f991e",
+      "environmentSha256": "232239f7f4a26f2c4e33a9ef06d7b1e7aa14461796fb67c5c4b71510f9d746aa",
+      "resultSha256": "1122b6223f9b98d30cc1b0761b9245b712809e4c6944ccf4f722b09f5d6e4d53"
+    },
+    {
+      "id": "transcode-invalid-utf8-lossy",
+      "operation": "transcode",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "9c50cce87ef41d79852cd24e5871e7a0fc6774f6fe48b26ae418eab12fbf7043",
+      "semanticSha256": "9e60641ab4e79f6af65db87eb1f01fe105f4d71dff191dd30484ee8ba0a1026d",
+      "environmentSha256": "232239f7f4a26f2c4e33a9ef06d7b1e7aa14461796fb67c5c4b71510f9d746aa",
+      "resultSha256": "bb3514c79036a08f141e19690e3ac16df6931fb858c4fadb9d29c225c709bb27"
+    },
+    {
+      "id": "transcode-utf8-bom-to-utf16",
+      "operation": "transcode",
+      "reproducibilityTarget": "cross_runtime_exact",
+      "requestSha256": "8173532fd7358361f7f135da0797befea2b9e83b7e97844b90e0b6f46a210a52",
+      "semanticSha256": "17d4ae8951bc70184a3cff3524910c978c85a76264ebe85d642aca2245f8d4f8",
+      "environmentSha256": "232239f7f4a26f2c4e33a9ef06d7b1e7aa14461796fb67c5c4b71510f9d746aa",
+      "resultSha256": "f8c818e2c7b185e5e3072408e35349c80abcbe723f3f93ecf053b253065ca8c2"
+    }
+  ],
+  "behaviorRootSha256": "75a8e76a26542ab46c85977deb4eb5a340c9d5a8982a9203e04f6d11fa4fdd4c"
+}

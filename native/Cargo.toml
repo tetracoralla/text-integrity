@@ -1,0 +1,34 @@
+[package]
+name = "text-integrity-reference"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "Apache-2.0"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "text-integrity-reference"
+path = "src/bin/text-integrity-reference.rs"
+
+[dependencies]
+idna = "=1.1.0"
+idna_adapter = { version = "=1.2.1", features = ["compiled_data"] }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = { version = "=1.0.151", features = ["raw_value"] }
+sha2 = { version = "=0.11.0", default-features = false }
+unicode-segmentation = "=1.13.3"
+unicode-normalization = "=0.1.25"
+unicode-bidi = { version = "=0.3.18", default-features = false }
+
+[dev-dependencies]
+flate2 = "=1.1.10"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

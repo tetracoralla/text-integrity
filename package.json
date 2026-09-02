@@ -32,17 +32,26 @@
     "text-integrity-mcp": "bin/text-integrity-mcp.js"
   },
   "exports": {
-    ".": "./src/library.js"
+    ".": "./src/library.js",
+    "./reference": "./src/reference/behavior.js",
+    "./reference/wasm": "./src/reference/wasm.js",
+    "./reference/wasm/module": "./wasm/text_integrity_reference.wasm",
+    "./reference/behavior-corpus.json": "./reference/behavior-corpus.json",
+    "./reference/behavior-manifest.json": "./reference/behavior-manifest.json",
+    "./reference/replay-receipt.json": "./reference/replay-receipt.json"
   },
   "files": [
     "bin",
     "src",
+    "reference",
+    "wasm",
     "vendor/bidi-js-unicode17",
     "vendor/unicode/17.0.0/compact",
     "vendor/unicode/17.0.0/license",
     "vendor/unicode/17.0.0/MANIFEST.json",
     ".codex-plugin",
     ".mcp.json",
+    "skills",
     "NOTICE",
     "THIRD_PARTY_NOTICES.md"
   ],
@@ -50,6 +59,29 @@
     "check": "node scripts/check.mjs",
     "test": "node --test",
     "build:unicode": "node scripts/build-unicode-data.mjs",
+    "build:native-nfkc-casefold": "node scripts/build-native-nfkc-casefold.mjs --write",
+    "build:native-uts39-skeleton": "node scripts/build-native-uts39-skeleton.mjs --write",
+    "build:native-bidi-data": "node scripts/build-native-bidi-data.mjs --write",
+    "build:native-script-data": "node scripts/build-native-script-data.mjs --write",
+    "build:native-security-data": "node scripts/build-native-security-data.mjs --write",
+    "build:native-precis-data": "node scripts/build-native-precis-data.mjs --write",
+    "behavior:check": "node scripts/behavior-manifest.mjs --check",
+    "behavior:write": "node scripts/behavior-manifest.mjs --write",
+    "behavior:compare": "node scripts/compare-behavior-manifests.mjs",
+    "property:check": "node scripts/verify-properties.mjs",
+    "replay:check": "node scripts/replay-receipt.mjs --check",
+    "replay:package": "node scripts/replay-receipt.mjs --package",
+    "replay:write": "node scripts/replay-receipt.mjs --write",
+    "replay:stdout": "node scripts/replay-receipt.mjs --stdout",
+    "check:independent": "node scripts/verify-independent-runtime.mjs && node scripts/build-independent-wasm.mjs --check",
+    "wasm:check": "node scripts/build-independent-wasm.mjs --check",
+    "wasm:write": "node scripts/build-independent-wasm.mjs --write",
+    "sbom:cargo": "node scripts/generate-cargo-sbom.mjs",
+    "sbom:agent-host": "node scripts/generate-agent-host-sbom.mjs",
+    "sbom:agent-host:write": "node scripts/generate-agent-host-sbom.mjs --write",
+    "sbom:check": "node scripts/check-release-sboms.mjs && node scripts/generate-agent-host-sbom.mjs --check",
+    "sbom:verify": "node scripts/verify-release-sboms.mjs",
+    "release:check": "npm run check && npm run check:independent && node --expose-gc scripts/bench.mjs --slo && npm run sbom:check",
     "bench": "node scripts/bench.mjs",
     "cli": "node bin/text-integrity.js",
     "mcp": "node bin/text-integrity-mcp.js",
@@ -59,6 +91,7 @@
     "node": ">=22.22.1 <23 || >=24.20.0 <25 || >=26.8.1 <27"
   },
   "dependencies": {
+    "punycode": "2.3.1",
     "tr46": "6.0.0"
   }
 }

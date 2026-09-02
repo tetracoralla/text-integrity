@@ -12,13 +12,14 @@
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { UNICODE_SECURITY_MANIFEST_SHA256 } from "../src/core/unicode-security-data.js";
+import { parseNormalizationData } from "./unicode-normalization-data.mjs";
 
 const ROOT = new URL("../", import.meta.url);
 const DATA_ROOT = new URL("../vendor/unicode/17.0.0/", import.meta.url);
 const COMPACT_DIR = new URL("compact/", DATA_ROOT);
 const COMPACT_DATA_PATH = new URL("data.bin", COMPACT_DIR);
 const COMPACT_MANIFEST_PATH = new URL("MANIFEST.json", COMPACT_DIR);
-const FORMAT_VERSION = 1;
+const FORMAT_VERSION = 4;
 const CHECK_ONLY = process.argv.includes("--check");
 
 const EXPECTED_UNICODE_VERSION = "17.0.0";
@@ -81,6 +82,17 @@ function parsePropertyRanges(text, property) {
     .map(({ start, end }) => ({ start, end, value: true }));
 }
 
+function parseQualifiedAssignments(text, property) {
+  const ranges = [];
+  for (const fields of dataRows(text)) {
+    if (fields[1] !== property || fields.length < 3) continue;
+    const [start, end] = parseRange(fields[0]);
+    ranges.push({ start, end, value: fields[2] });
+  }
+  ranges.sort((left, right) => left.start - right.start || left.end - right.end);
+  return ranges;
+}
+
 function parseMissingAssignments(text, aliases) {
   const ranges = [];
   for (const line of text.split(/\r?\n/u)) {
@@ -125,6 +137,7 @@ function parseUnicodeData(text) {
   const combiningClasses = [];
   const decimalValues = [];
   const widthMappings = [];
+  const lowercaseMappings = new Map();
   for (const line of text.split(/\r?\n/u)) {
     if (line === "") continue;
     const fields = line.split(";");
@@ -133,6 +146,9 @@ function parseUnicodeData(text) {
     const combiningClass = Number.parseInt(fields[3], 10);
     if (combiningClass !== 0) combiningClasses.push({ start: codePoint, end: codePoint, value: combiningClass });
     if (fields[6] !== "") decimalValues.push({ start: codePoint, end: codePoint, value: Number.parseInt(fields[6], 10) });
+    if (fields[13] !== "") {
+      lowercaseMappings.set(codePoint, String.fromCodePoint(Number.parseInt(fields[13], 16)));
+    }
     const decomposition = fields[5];
     if (decomposition.startsWith("<")) {
       const match = decomposition.match(/^<(?:wide|narrow)>\s+(.+)$/u);
@@ -147,7 +163,23 @@ function parseUnicodeData(text) {
   combiningClasses.sort((left, right) => left.start - right.start);
   decimalValues.sort((left, right) => left.start - right.start);
   widthMappings.sort((left, right) => left.key - right.key);
-  return { combiningClasses, decimalValues, widthMappings };
+  return { combiningClasses, decimalValues, widthMappings, lowercaseMappings };
+}
+
+function parseDefaultLowercaseMappings(unicodeData, specialCasingText) {
+  const mappings = new Map(unicodeData.lowercaseMappings);
+  for (const fields of dataRows(specialCasingText)) {
+    if (fields.length < 5) throw new Error("malformed SpecialCasing row");
+    if (fields[4] !== "") continue;
+    const codePoint = Number.parseInt(fields[0], 16);
+    const value = fields[1].split(/\s+/u).filter(Boolean)
+      .map((item) => String.fromCodePoint(Number.parseInt(item, 16))).join("");
+    mappings.set(codePoint, value);
+  }
+  return [...mappings.entries()]
+    .filter(([codePoint, value]) => value !== String.fromCodePoint(codePoint))
+    .map(([key, value]) => ({ key, value }))
+    .sort((left, right) => left.key - right.key);
 }
 
 function parseBidiMirroring(text) {
@@ -210,13 +242,22 @@ const SECTION_ENTRY_UNITS = Object.freeze({
   recommendedScripts: 1,
   bidiMirroring: 2,
   confusables: 2,
-  widthMappings: 2
+  widthMappings: 2,
+  lowercaseMappings: 2,
+  canonicalDecompositions: 2,
+  compatibilityDecompositions: 2,
+  compositionMappings: 3
 });
 const SECTION_ORDER = Object.freeze([
   "identifierAllowed",
   "identifierTypes",
   "confusables",
   "defaultIgnorable",
+  "cased",
+  "caseIgnorable",
+  "graphemeBreaks",
+  "extendedPictographic",
+  "indicConjunctBreak",
   "xidStart",
   "xidContinue",
   "bidiControl",
@@ -229,8 +270,12 @@ const SECTION_ORDER = Object.freeze([
   "bidiMirroring",
   "nfkcCasefoldMappings",
   "combiningClasses",
+  "canonicalDecompositions",
+  "compatibilityDecompositions",
+  "compositionMappings",
   "decimalValues",
   "widthMappings",
+  "lowercaseMappings",
   "joinControl",
   "noncharacter",
   "unassigned",
@@ -251,6 +296,11 @@ function buildBlob() {
   const identifierTypes = parseAssignments(source("security/IdentifierType.txt"), (value) => value.split(/\s+/u));
   const scripts = parseAssignments(source("ucd/Scripts.txt"), canonicalScript);
   const unicodeData = parseUnicodeData(source("ucd/UnicodeData.txt"));
+  const derivedCoreProperties = source("ucd/DerivedCoreProperties.txt");
+  const normalizationData = parseNormalizationData(
+    source("ucd/UnicodeData.txt"),
+    source("ucd/DerivedNormalizationProps.txt")
+  );
   const categories = source("ucd/extracted/DerivedGeneralCategory.txt");
   const properties = source("ucd/PropList.txt");
 
@@ -265,14 +315,28 @@ function buildBlob() {
   const boolRanges = (entries) => entries.flatMap(({ start, end }) => [start, end, 1]);
   // Code-point keyed maps with string or integer values.
   const pairs = (entries, encodeValue) => entries.flatMap(({ key, value }) => [key, encodeValue(value)]);
+  const triples = (entries) => entries.flatMap(({ first, second, value }) => [first, second, value]);
 
   const sections = new Map();
   sections.set("identifierAllowed", ranges(parseAssignments(source("security/IdentifierStatus.txt")), poolIndex));
   sections.set("identifierTypes", ranges(identifierTypes, (value) => poolIndex(value.join("+"))));
   sections.set("confusables", pairs(parseConfusables(source("security/confusables.txt")), poolIndex));
-  sections.set("defaultIgnorable", boolRanges(parsePropertyRanges(source("ucd/DerivedCoreProperties.txt"), "Default_Ignorable_Code_Point")));
-  sections.set("xidStart", boolRanges(parsePropertyRanges(source("ucd/DerivedCoreProperties.txt"), "XID_Start")));
-  sections.set("xidContinue", boolRanges(parsePropertyRanges(source("ucd/DerivedCoreProperties.txt"), "XID_Continue")));
+  sections.set("defaultIgnorable", boolRanges(parsePropertyRanges(derivedCoreProperties, "Default_Ignorable_Code_Point")));
+  sections.set("cased", boolRanges(parsePropertyRanges(derivedCoreProperties, "Cased")));
+  sections.set("caseIgnorable", boolRanges(parsePropertyRanges(derivedCoreProperties, "Case_Ignorable")));
+  sections.set("graphemeBreaks", ranges(
+    parseAssignments(source("ucd/auxiliary/GraphemeBreakProperty.txt")),
+    poolIndex
+  ));
+  sections.set("extendedPictographic", boolRanges(
+    parsePropertyRanges(source("ucd/emoji/emoji-data.txt"), "Extended_Pictographic")
+  ));
+  sections.set("indicConjunctBreak", ranges(
+    parseQualifiedAssignments(derivedCoreProperties, "InCB"),
+    poolIndex
+  ));
+  sections.set("xidStart", boolRanges(parsePropertyRanges(derivedCoreProperties, "XID_Start")));
+  sections.set("xidContinue", boolRanges(parsePropertyRanges(derivedCoreProperties, "XID_Continue")));
   sections.set("bidiControl", boolRanges(parsePropertyRanges(properties, "Bidi_Control")));
   sections.set("formatCharacter", boolRanges(parsePropertyRanges(categories, "Cf")));
   sections.set("scripts", ranges(scripts, poolIndex));
@@ -286,8 +350,15 @@ function buildBlob() {
   sections.set("bidiMirroring", pairs(parseBidiMirroring(source("ucd/BidiMirroring.txt")), (value) => value));
   sections.set("nfkcCasefoldMappings", ranges(parseNfkcCasefold(source("ucd/DerivedNormalizationProps.txt")), poolIndex));
   sections.set("combiningClasses", ranges(unicodeData.combiningClasses, (value) => value));
+  sections.set("canonicalDecompositions", pairs(normalizationData.canonicalDecompositions, poolIndex));
+  sections.set("compatibilityDecompositions", pairs(normalizationData.compatibilityDecompositions, poolIndex));
+  sections.set("compositionMappings", triples(normalizationData.compositionMappings));
   sections.set("decimalValues", ranges(unicodeData.decimalValues, (value) => value));
   sections.set("widthMappings", pairs(unicodeData.widthMappings, poolIndex));
+  sections.set("lowercaseMappings", pairs(
+    parseDefaultLowercaseMappings(unicodeData, source("ucd/SpecialCasing.txt")),
+    poolIndex
+  ));
   sections.set("joinControl", boolRanges(parsePropertyRanges(properties, "Join_Control")));
   sections.set("noncharacter", boolRanges(parsePropertyRanges(properties, "Noncharacter_Code_Point")));
   sections.set("unassigned", boolRanges(parsePropertyRanges(categories, "Cn")));

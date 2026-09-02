@@ -37,3 +37,19 @@ jobs:
           cache: npm
       - run: npm ci
       - run: node --expose-gc scripts/bench.mjs --slo
+
+  independent-parity:
+    name: independent native/WASM parity
+    runs-on: ubuntu-latest
+    env:
+      RUSTUP_TOOLCHAIN: 1.89.0
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: rustup toolchain install 1.89.0 --profile minimal --component rustfmt --target wasm32-unknown-unknown
+      - run: npm ci
+      - run: npm run check:independent
+      - run: npm run sbom:check

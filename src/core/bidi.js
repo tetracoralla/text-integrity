@@ -101,5 +101,5 @@ export const BIDI_ENGINE = Object.freeze({
   name: "bidi-js-unicode17-adapter",
   upstreamVersion: "1.0.3",
   unicodeVersion: "17.0.0",
-  conformance: ["BidiTest.txt", "BidiCharacterTest.txt"]
+  conformance: Object.freeze(["BidiTest.txt", "BidiCharacterTest.txt"])
 });

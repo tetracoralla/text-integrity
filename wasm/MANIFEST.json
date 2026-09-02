@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "text-integrity.reference-wasm/3",
+  "rustToolchain": "1.89.0",
+  "rustc": "rustc 1.89.0 (29483883e 2025-08-04)",
+  "target": "wasm32-unknown-unknown",
+  "sourceSha256": "670153ae019629d379c3c26b4839e445208c094639505dc9a27932e91437ff31",
+  "cargoLockSha256": "524c8e53920daf54385e691103920f1028d27a96cf599748f43771b72db64a4b",
+  "rawAbi": {
+    "version": 2,
+    "maxInputBytes": 1048576,
+    "maxBatchRequests": 1024,
+    "maxResultBytes": 8388608,
+    "workLimits": {
+      "differenceAlignmentCells": 33554432,
+      "sourceDiagnosticUnits": 1576960,
+      "uts46PunycodeScanUnits": 16777216
+    },
+    "statuses": {
+      "ok": 0,
+      "invalidInputBuffer": 1,
+      "inputTooLarge": 2,
+      "batchTooLarge": 3,
+      "resultTooLarge": 4,
+      "differenceAlignmentWorkTooLarge": 5,
+      "sourceDiagnosticWorkTooLarge": 6,
+      "uts46PunycodeWorkTooLarge": 7
+    }
+  },
+  "wasm": {
+    "path": "text_integrity_reference.wasm",
+    "bytes": 1623878,
+    "sha256": "82d45bb3c0718f6f0d127895553f723a22cd0433e38134bb8481c68a3bbef23e",
+    "imports": [],
+    "exports": [
+      {
+        "name": "memory",
+        "kind": "memory"
+      },
+      {
+        "name": "ti_alloc",
+        "kind": "function"
+      },
+      {
+        "name": "ti_dealloc",
+        "kind": "function"
+      },
+      {
+        "name": "ti_run",
+        "kind": "function"
+      },
+      {
+        "name": "ti_abi_version",
+        "kind": "function"
+      },
+      {
+        "name": "ti_max_input_len",
+        "kind": "function"
+      },
+      {
+        "name": "ti_max_batch_len",
+        "kind": "function"
+      },
+      {
+        "name": "ti_max_result_len",
+        "kind": "function"
+      },
+      {
+        "name": "ti_max_difference_alignment_cells",
+        "kind": "function"
+      },
+      {
+        "name": "ti_max_source_diagnostic_units",
+        "kind": "function"
+      },
+      {
+        "name": "ti_max_uts46_punycode_scan_units",
+        "kind": "function"
+      },
+      {
+        "name": "ti_result_ptr",
+        "kind": "function"
+      },
+      {
+        "name": "ti_result_len",
+        "kind": "function"
+      },
+      {
+        "name": "__data_end",
+        "kind": "global"
+      },
+      {
+        "name": "__heap_base",
+        "kind": "global"
+      }
+    ]
+  }
+}

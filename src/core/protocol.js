@@ -4,6 +4,14 @@ import { TextIntegrityError } from "./errors.js";
 import { LIMITS, assertCombinedTextBudget, assertTextBudget } from "./limits.js";
 import { runtimeInfo } from "./runtime.js";
 import { dataLookup, unicodeProtocolData } from "./unicode-security-data.js";
+import { normalizeUnicode17 } from "./normalization.js";
+import { lowercaseUnicode17 } from "./unicode-case.js";
+import { UTS46_ENGINE_IDENTITY, UTS46_ENGINE_LABEL } from "./protocol-engine.js";
+import {
+  buildPrecisWitness,
+  buildUts46Witness,
+  createPrecisSideTrace
+} from "./protocol-witness.js";
 import {
   assertKeys,
   requireBoolean,
@@ -20,6 +28,7 @@ const PROFILES = Object.freeze([
 ]);
 const UTS46_ACTIONS = Object.freeze(["to_ascii", "to_unicode"]);
 const PRECIS_ACTIONS = Object.freeze(["enforce", "compare"]);
+const WITNESS_MODES = Object.freeze(["none", "summary", "full_required"]);
 
 const EXCEPTIONS = new Map([
   [0x00df, "PVALID"],
@@ -79,7 +88,7 @@ function precisProperty(data, codePoint, baseClass) {
   const category = dataLookup(data.generalCategories, codePoint);
   if (category === "Cc") return "DISALLOWED";
   const character = String.fromCodePoint(codePoint);
-  if (character.normalize("NFKC") !== character) return baseClass === "freeform" ? "PVALID" : "DISALLOWED";
+  if (normalizeUnicode17(character, "NFKC", data) !== character) return baseClass === "freeform" ? "PVALID" : "DISALLOWED";
   if (LETTER_DIGITS.has(category)) return "PVALID";
   if (
     OTHER_LETTER_DIGITS.has(category)
@@ -171,9 +180,14 @@ function widthMap(data, text) {
   return mapped;
 }
 
-function preparePrecis(data, text, profile) {
+function enforcePrecisOnce(data, text, profile, trace) {
   const username = profile !== "precis_opaque_string";
-  const output = username ? widthMap(data, text) : text;
+  let output = text;
+  if (username) {
+    const mapped = widthMap(data, output);
+    trace?.transform("width_mapping", output, mapped);
+    output = mapped;
+  }
   // RFC 8265 username preparation applies width mapping before validating
   // IdentifierClass. OpaqueString preparation validates FreeformClass before
   // its additional non-ASCII-space mapping. In both cases class preparation
@@ -182,38 +196,52 @@ function preparePrecis(data, text, profile) {
   // become acceptable merely because a later lowercase operation maps it to
   // ASCII.
   assertPrecisClass(data, output, username ? "identifier" : "freeform");
-  return output;
-}
-
-function enforcePrecisOnce(data, text, profile) {
-  const username = profile !== "precis_opaque_string";
-  let output = preparePrecis(data, text, profile);
+  trace?.validate(username ? "identifier_class" : "freeform_class");
   if (!username) {
-    output = [...output].map((character) => {
+    const mapped = [...output].map((character) => {
       const category = dataLookup(data.generalCategories, character.codePointAt(0));
       return category === "Zs" && character !== " " ? " " : character;
     }).join("");
+    trace?.transform("additional_mapping", output, mapped);
+    output = mapped;
   }
-  if (profile === "precis_username_case_mapped") output = output.toLowerCase();
-  output = output.normalize("NFC");
-  if (username) assertBidiRule(data, output);
+  if (profile === "precis_username_case_mapped") {
+    const mapped = lowercaseUnicode17(output, data);
+    trace?.transform("case_mapping", output, mapped);
+    output = mapped;
+  }
+  const normalized = normalizeUnicode17(output, "NFC", data);
+  trace?.transform("nfc", output, normalized);
+  output = normalized;
+  if (username) {
+    assertBidiRule(data, output);
+    trace?.validate("bidi_rule");
+  }
   if (output === "") {
     throw new TextIntegrityError("PROTOCOL_STRING_INVALID", "The selected PRECIS profile does not allow an empty result.");
   }
+  trace?.validate("non_empty");
   return output;
 }
 
-function enforcePrecis(data, text, profile) {
+function enforcePrecis(data, text, profile, trace) {
   let output = text;
   // RFC 8264 section 7 recommends the first application plus at most three
   // additional applications. A fifth evaluation checks whether the fourth
   // result is stable without accepting another transformed value.
   for (let pass = 0; pass < 4; pass += 1) {
-    const next = enforcePrecisOnce(data, output, profile);
-    if (next === output) return output;
+    trace?.startPass(output);
+    const next = enforcePrecisOnce(data, output, profile, trace);
+    const stabilized = next === output;
+    trace?.finishPass(next, stabilized);
+    if (stabilized) return output;
     output = next;
   }
-  if (enforcePrecisOnce(data, output, profile) !== output) {
+  trace?.startPass(output, true);
+  const verification = enforcePrecisOnce(data, output, profile, trace);
+  const stabilized = verification === output;
+  trace?.finishPass(verification, stabilized);
+  if (!stabilized) {
     throw new TextIntegrityError("PROTOCOL_STRING_INVALID", "PRECIS processing did not stabilize after four passes.");
   }
   return output;
@@ -222,10 +250,13 @@ function enforcePrecis(data, text, profile) {
 function runPrecis(args, profile) {
   assertKeys(
     args,
-    ["profile", "action", "text", "comparison"],
+    ["profile", "action", "text", "comparison", "witnessMode"],
     args.action === "compare" ? ["profile", "action", "text", "comparison"] : ["profile", "action", "text"]
   );
   const action = requireEnum(args.action, "action", PRECIS_ACTIONS);
+  const witnessMode = Object.hasOwn(args, "witnessMode")
+    ? requireEnum(args.witnessMode, "witnessMode", WITNESS_MODES)
+    : "none";
   if (action !== "compare" && Object.hasOwn(args, "comparison")) {
     throw new TextIntegrityError("INVALID_INPUT", "comparison is allowed only for the compare action.", {
       field: "comparison"
@@ -243,8 +274,17 @@ function runPrecis(args, profile) {
   }
 
   const data = unicodeProtocolData();
-  const output = enforcePrecis(data, text, profile);
-  const comparisonOutput = comparison === undefined ? undefined : enforcePrecis(data, comparison, profile);
+  const textTrace = witnessMode === "none" ? undefined : createPrecisSideTrace(witnessMode, "text");
+  const comparisonTrace = witnessMode === "none" || comparison === undefined
+    ? undefined
+    : createPrecisSideTrace(witnessMode, "comparison");
+  const output = enforcePrecis(data, text, profile, textTrace);
+  const comparisonOutput = comparison === undefined
+    ? undefined
+    : enforcePrecis(data, comparison, profile, comparisonTrace);
+  const witness = witnessMode === "none"
+    ? undefined
+    : buildPrecisWitness(witnessMode, profile, [textTrace, ...(comparisonTrace === undefined ? [] : [comparisonTrace])]);
   return {
     status: "ok",
     operation: "protocol_profile",
@@ -262,13 +302,17 @@ function runPrecis(args, profile) {
       profile: "RFC 8265",
       unicodeVersion: data.metadata.unicodeVersion
     },
+    ...(witness === undefined ? {} : { witness }),
     runtime: runtimeInfo()
   };
 }
 
 function runUts46(args) {
-  assertKeys(args, ["profile", "action", "text", "options"], ["profile", "action", "text", "options"]);
+  assertKeys(args, ["profile", "action", "text", "options", "witnessMode"], ["profile", "action", "text", "options"]);
   const action = requireEnum(args.action, "action", UTS46_ACTIONS);
+  const witnessMode = Object.hasOwn(args, "witnessMode")
+    ? requireEnum(args.witnessMode, "witnessMode", WITNESS_MODES)
+    : "none";
   const text = requireString(args.text, "text");
   assertTextBudget(text, "text");
   assertWellFormed(text, "text");
@@ -305,10 +349,11 @@ function runUts46(args) {
     changed: output !== text,
     options: resolvedOptions,
     standards: {
-      specification: "UTS #46 revision 35",
-      unicodeVersion: "17.0.0",
-      engine: "tr46@6.0.0"
+      specification: UTS46_ENGINE_IDENTITY.specification,
+      unicodeVersion: UTS46_ENGINE_IDENTITY.unicodeVersion,
+      engine: UTS46_ENGINE_LABEL
     },
+    ...(witnessMode === "none" ? {} : { witness: buildUts46Witness(witnessMode, action, text, output) }),
     runtime: runtimeInfo()
   };
 }

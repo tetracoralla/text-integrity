@@ -1,6 +1,7 @@
 import { TextIntegrityError } from "./errors.js";
 import { LIMITS, assertTextBudget } from "./limits.js";
 import { runtimeInfo } from "./runtime.js";
+import { segmentGraphemesUnicode17 } from "./grapheme.js";
 import { assertKeys, requireInteger, requireObject, requireString } from "./validation.js";
 
 function assertWellFormed(text, field = "text") {
@@ -36,8 +37,7 @@ function rawCodePoints(text) {
 function assignGraphemes(text, entries) {
   const graphemes = [];
   let entryIndex = 0;
-  const segmenter = new Intl.Segmenter("und", { granularity: "grapheme" });
-  for (const [graphemeIndex, part] of [...segmenter.segment(text)].entries()) {
+  for (const [graphemeIndex, part] of segmentGraphemesUnicode17(text).entries()) {
     const endUtf16 = part.index + part.segment.length;
     while (entryIndex < entries.length && entries[entryIndex].start.utf16CodeUnit < endUtf16) {
       entries[entryIndex].grapheme = graphemeIndex;
