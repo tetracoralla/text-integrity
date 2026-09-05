@@ -3,7 +3,7 @@
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
   "name": "text-integrity-agent-host-1.0.0",
-  "documentNamespace": "https://github.com/tetracoralla/text-integrity/sbom/agent-host/1.0.0/cd6dae1ee77fad105946e889e72dd6016341fe0853d1fc21856e4b6eccc99733",
+  "documentNamespace": "https://github.com/tetracoralla/text-integrity/sbom/agent-host/1.0.0/727d9465cf473e315343f61c8e861dff182616b59a54339f74706ded7f031a1d",
   "creationInfo": {
     "created": "2026-09-02T08:26:51Z",
     "creators": [
@@ -790,7 +790,7 @@
     },
     {
       "name": "text-integrity-reference-wasm",
-      "SPDXID": "SPDXRef-Package-text-integrity-reference-wasm-67a688346d14",
+      "SPDXID": "SPDXRef-Package-text-integrity-reference-wasm-62f9d9bba87b",
       "versionInfo": "1.0.0",
       "downloadLocation": "NOASSERTION",
       "filesAnalyzed": false,
@@ -800,7 +800,7 @@
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "82d45bb3c0718f6f0d127895553f723a22cd0433e38134bb8481c68a3bbef23e"
+          "checksumValue": "2e6e00a440f872d3e0b3a82d6dacd637797346a4362ed58a5ea474c49aca2ac7"
         }
       ]
     },
@@ -1576,7 +1576,7 @@
     {
       "spdxElementId": "SPDXRef-Package-text-integrity-agent-host-b89538191d97",
       "relationshipType": "DEPENDS_ON",
-      "relatedSpdxElement": "SPDXRef-Package-text-integrity-reference-wasm-67a688346d14"
+      "relatedSpdxElement": "SPDXRef-Package-text-integrity-reference-wasm-62f9d9bba87b"
     },
     {
       "spdxElementId": "SPDXRef-Package-text-integrity-c512d1d03f26",
@@ -1629,7 +1629,7 @@
       "relatedSpdxElement": "SPDXRef-Package-unicode-segmentation-f0887223759f"
     },
     {
-      "spdxElementId": "SPDXRef-Package-text-integrity-reference-wasm-67a688346d14",
+      "spdxElementId": "SPDXRef-Package-text-integrity-reference-wasm-62f9d9bba87b",
       "relationshipType": "DEPENDS_ON",
       "relatedSpdxElement": "SPDXRef-Package-text-integrity-reference-730b0cab3f05"
     },
