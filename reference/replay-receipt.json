@@ -157,13 +157,13 @@
     },
     "referenceWasmManifest": {
       "path": "wasm/MANIFEST.json",
-      "bytes": 2296,
-      "sha256": "f1a7a23f197d3e8a93d6bebc2068d4426db1338ee20c24c9b0b045080234ec7b"
+      "bytes": 2321,
+      "sha256": "f215d82c4355a880fa8ccb153dc2d60708d9c7cebd15f82608456bf4a0333286"
     },
     "referenceWasmModule": {
       "path": "wasm/text_integrity_reference.wasm",
-      "bytes": 1623574,
-      "sha256": "ec11657e0a8f72cc1260690e99095eda087d536c92bd1269176e3230d0417c76"
+      "bytes": 1624161,
+      "sha256": "2e6e00a440f872d3e0b3a82d6dacd637797346a4362ed58a5ea474c49aca2ac7"
     },
     "packageArtifact": null
   },

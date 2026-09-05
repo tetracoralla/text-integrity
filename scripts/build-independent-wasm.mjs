@@ -103,8 +103,7 @@ if (rawAbi.version !== 2
 }
 const manifest = {
   schemaVersion: "text-integrity.reference-wasm/3",
-  rustToolchain: TOOLCHAIN,
-  buildHost: BUILD_HOST,
+  rustToolchain: `${TOOLCHAIN}-${BUILD_HOST}`,
   rustc: rustc.stdout.trim(),
   target: "wasm32-unknown-unknown",
   sourceSha256: nativeSourceDigest(NATIVE_ROOT),

@@ -1,7 +1,6 @@
 {
   "schemaVersion": "text-integrity.reference-wasm/3",
-  "rustToolchain": "1.89.0",
-  "buildHost": "x86_64-unknown-linux-gnu",
+  "rustToolchain": "1.89.0-x86_64-unknown-linux-gnu",
   "rustc": "rustc 1.89.0 (29483883e 2025-08-04)",
   "target": "wasm32-unknown-unknown",
   "sourceSha256": "670153ae019629d379c3c26b4839e445208c094639505dc9a27932e91437ff31",
