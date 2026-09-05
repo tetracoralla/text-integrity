@@ -28,8 +28,8 @@
   },
   "wasm": {
     "path": "text_integrity_reference.wasm",
-    "bytes": 1623878,
-    "sha256": "82d45bb3c0718f6f0d127895553f723a22cd0433e38134bb8481c68a3bbef23e",
+    "bytes": 1623574,
+    "sha256": "ec11657e0a8f72cc1260690e99095eda087d536c92bd1269176e3230d0417c76",
     "imports": [],
     "exports": [
       {

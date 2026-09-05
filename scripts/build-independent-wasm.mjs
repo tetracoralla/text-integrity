@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -28,7 +29,19 @@ function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
 }
 
-const environment = { ...process.env, RUSTUP_TOOLCHAIN: TOOLCHAIN };
+// Panic locations retain Cargo registry paths even in a stripped release.
+// Normalize both source roots so another machine reproduces the same bytes
+// without embedding its account name or accepting ambient compiler flags.
+const cargoHome = realpathSync(process.env.CARGO_HOME ?? path.join(homedir(), ".cargo"));
+const environment = {
+  ...process.env,
+  RUSTUP_TOOLCHAIN: TOOLCHAIN,
+  CARGO_ENCODED_RUSTFLAGS: [
+    `--remap-path-prefix=${cargoHome}=/cargo-home`,
+    `--remap-path-prefix=${realpathSync(ROOT)}=/text-integrity`
+  ].join("\x1f")
+};
+delete environment.RUSTFLAGS;
 const build = spawnSync(
   "cargo",
   ["build", "--manifest-path", path.join(NATIVE_ROOT, "Cargo.toml"), "--locked", "--release", "--target", "wasm32-unknown-unknown"],

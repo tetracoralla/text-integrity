@@ -74,3 +74,9 @@ budget.
   not enough.
 - The verifier does not establish release readiness, installed Agent routing,
   public substitutability, application policy, or business acceptance.
+
+Reproducible WASM packaging uses Rust 1.89.0 and remaps the Cargo home and
+repository paths to fixed virtual roots. This removes machine-specific panic
+locations from the stripped module; the packaged bytes and manifest must match
+a rebuild on Linux as well as the maintainer build. Ambient Rust compiler flags
+do not alter this packaging recipe.
