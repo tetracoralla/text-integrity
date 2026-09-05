@@ -49,5 +49,37 @@ License and retain their package license files when installed by npm.
 - tr46: <https://github.com/jsdom/tr46>
 - punycode.js: <https://github.com/mathiasbynens/punycode.js>
 
-Exact versions and integrity digests are pinned in
-[`package-lock.json`](package-lock.json).
+Both are exact direct runtime dependencies in `package.json`; their package
+integrity digests are pinned in [`package-lock.json`](package-lock.json), and
+the reference behavior manifest binds the installed runtime-file-tree digest.
+
+## Independent Rust verifier dependencies
+
+The source-only native/WASM parity verifier under `native/` depends on
+`serde` 1.0.229, `serde_json` 1.0.151, `unicode-segmentation` 1.13.3,
+`unicode-normalization` 0.1.25, `unicode-bidi` 0.3.18, `idna` 1.1.0, and
+`idna_adapter` 1.2.1. The verifier also uses `sha2` 0.11.0 to reproduce the
+Node core's non-disclosing SHA-256 skeleton digests. The
+IDNA adapter uses the pinned ICU4X 2.1 runtime/data packages in
+`native/Cargo.lock`. Their exact transitive dependency versions and crates.io
+checksums are pinned there. The Unicode and IDNA crates are available under
+MIT or Apache-2.0 terms.
+
+The verifier disables `unicode-bidi`'s `hardcoded-data` feature, overrides its
+paired-bracket lookup, and supplies generated Unicode 17 `Bidi_Class` and
+`Bidi_Paired_Bracket` data. The same generated verifier module carries the
+project-owned combining-class and mirroring tables used for UAX #9 L3/L4.
+`flate2` 1.1.10 and its pinned transitive crates are test-only dependencies
+used to rerun the repository's compressed official Bidi corpora.
+
+`serde`, `serde_json`, `itoa`, `proc-macro2`, `quote`, `syn`, `displaydoc`,
+`litemap`, `potential_utf`, `stable_deref_trait`, `tinystr`, `utf8_iter`,
+`writeable`, `yoke`, `zerofrom`, `zerotrie`, `zerovec`, and `synstructure` are
+available under MIT or Apache-2.0 terms; `sha2`, `digest`, `block-buffer`,
+`crypto-common`, `generic-array`, `typenum`, and `cpufeatures` under MIT or
+Apache-2.0; `smallvec` under MIT or Apache-2.0;
+`tinyvec` and `tinyvec_macros` under Zlib, MIT, or Apache-2.0; `memchr` under
+Unlicense or MIT; `zmij` under MIT; and `unicode-ident` under MIT or
+Apache-2.0 together with the Unicode 3.0 license.
+These crates are fetched for the independent build and are not vendored into
+the npm runtime package.

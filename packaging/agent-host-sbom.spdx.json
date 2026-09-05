@@ -1,0 +1,1767 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "text-integrity-agent-host-1.0.0",
+  "documentNamespace": "https://github.com/tetracoralla/text-integrity/sbom/agent-host/1.0.0/727d9465cf473e315343f61c8e861dff182616b59a54339f74706ded7f031a1d",
+  "creationInfo": {
+    "created": "2026-09-02T08:26:51Z",
+    "creators": [
+      "Tool: text-integrity Agent Host SBOM generator-1.0.0"
+    ]
+  },
+  "packages": [
+    {
+      "name": "block-buffer",
+      "SPDXID": "SPDXRef-Package-block-buffer-4677371dc360",
+      "versionInfo": "0.12.1",
+      "downloadLocation": "https://crates.io/api/v1/crates/block-buffer/0.12.1/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "d2f6c7dbe95a6ed67ad9f18e57daf93a2f034c524b99fd2b76d18fdfeb6660aa"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/block-buffer@0.12.1"
+        }
+      ]
+    },
+    {
+      "name": "cfg-if",
+      "SPDXID": "SPDXRef-Package-cfg-if-7c4d5fee2153",
+      "versionInfo": "1.0.4",
+      "downloadLocation": "https://crates.io/api/v1/crates/cfg-if/1.0.4/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/cfg-if@1.0.4"
+        }
+      ]
+    },
+    {
+      "name": "crypto-common",
+      "SPDXID": "SPDXRef-Package-crypto-common-69491ae24507",
+      "versionInfo": "0.2.2",
+      "downloadLocation": "https://crates.io/api/v1/crates/crypto-common/0.2.2/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "ce6e4c961d6cd6c9a86db418387425e8bdeaf05b3c8bc1411e6dca4c252f1453"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/crypto-common@0.2.2"
+        }
+      ]
+    },
+    {
+      "name": "digest",
+      "SPDXID": "SPDXRef-Package-digest-20ede1b2bcd7",
+      "versionInfo": "0.11.3",
+      "downloadLocation": "https://crates.io/api/v1/crates/digest/0.11.3/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "f1dd6dbb5841937940781866fa1281a1ff7bd3bf827091440879f9994983d5c2"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/digest@0.11.3"
+        }
+      ]
+    },
+    {
+      "name": "displaydoc",
+      "SPDXID": "SPDXRef-Package-displaydoc-338830cadd95",
+      "versionInfo": "0.2.7",
+      "downloadLocation": "https://crates.io/api/v1/crates/displaydoc/0.2.7/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "c6232dd377dcc64799954cbd3a9bb882e9cdc1308ccd87b1c098f1fb2eaf82a8"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/displaydoc@0.2.7"
+        }
+      ]
+    },
+    {
+      "name": "hybrid-array",
+      "SPDXID": "SPDXRef-Package-hybrid-array-bc125d2366d2",
+      "versionInfo": "0.4.14",
+      "downloadLocation": "https://crates.io/api/v1/crates/hybrid-array/0.4.14/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "707114b52a152fa7bdb290cd7cd5912d9467273b6d74e21b8d81aca1f8533f6b"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/hybrid-array@0.4.14"
+        }
+      ]
+    },
+    {
+      "name": "icu_collections",
+      "SPDXID": "SPDXRef-Package-icu-collections-c610c7f3371d",
+      "versionInfo": "2.1.1",
+      "downloadLocation": "https://crates.io/api/v1/crates/icu_collections/2.1.1/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unicode-3.0",
+      "licenseDeclared": "Unicode-3.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "4c6b649701667bbe825c3b7e6388cb521c23d88644678e83c0c4d0a621a34b43"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/icu_collections@2.1.1"
+        }
+      ]
+    },
+    {
+      "name": "icu_locale_core",
+      "SPDXID": "SPDXRef-Package-icu-locale-core-fc8efa73337b",
+      "versionInfo": "2.1.1",
+      "downloadLocation": "https://crates.io/api/v1/crates/icu_locale_core/2.1.1/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unicode-3.0",
+      "licenseDeclared": "Unicode-3.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "edba7861004dd3714265b4db54a3c390e880ab658fec5f7db895fae2046b5bb6"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/icu_locale_core@2.1.1"
+        }
+      ]
+    },
+    {
+      "name": "icu_normalizer",
+      "SPDXID": "SPDXRef-Package-icu-normalizer-ceaf7fd9393b",
+      "versionInfo": "2.1.1",
+      "downloadLocation": "https://crates.io/api/v1/crates/icu_normalizer/2.1.1/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unicode-3.0",
+      "licenseDeclared": "Unicode-3.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "5f6c8828b67bf8908d82127b2054ea1b4427ff0230ee9141c54251934ab1b599"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/icu_normalizer@2.1.1"
+        }
+      ]
+    },
+    {
+      "name": "icu_normalizer_data",
+      "SPDXID": "SPDXRef-Package-icu-normalizer-data-8768cfe00bed",
+      "versionInfo": "2.1.1",
+      "downloadLocation": "https://crates.io/api/v1/crates/icu_normalizer_data/2.1.1/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unicode-3.0",
+      "licenseDeclared": "Unicode-3.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "7aedcccd01fc5fe81e6b489c15b247b8b0690feb23304303a9e560f37efc560a"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/icu_normalizer_data@2.1.1"
+        }
+      ]
+    },
+    {
+      "name": "icu_properties",
+      "SPDXID": "SPDXRef-Package-icu-properties-983f6811e53f",
+      "versionInfo": "2.1.2",
+      "downloadLocation": "https://crates.io/api/v1/crates/icu_properties/2.1.2/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unicode-3.0",
+      "licenseDeclared": "Unicode-3.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "020bfc02fe870ec3a66d93e677ccca0562506e5872c650f893269e08615d74ec"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/icu_properties@2.1.2"
+        }
+      ]
+    },
+    {
+      "name": "icu_properties_data",
+      "SPDXID": "SPDXRef-Package-icu-properties-data-b7dddaf4e444",
+      "versionInfo": "2.1.2",
+      "downloadLocation": "https://crates.io/api/v1/crates/icu_properties_data/2.1.2/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unicode-3.0",
+      "licenseDeclared": "Unicode-3.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "616c294cf8d725c6afcd8f55abc17c56464ef6211f9ed59cccffe534129c77af"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/icu_properties_data@2.1.2"
+        }
+      ]
+    },
+    {
+      "name": "icu_provider",
+      "SPDXID": "SPDXRef-Package-icu-provider-9a4c369e0962",
+      "versionInfo": "2.1.1",
+      "downloadLocation": "https://crates.io/api/v1/crates/icu_provider/2.1.1/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unicode-3.0",
+      "licenseDeclared": "Unicode-3.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "85962cf0ce02e1e0a629cc34e7ca3e373ce20dda4c4d7294bbd0bf1fdb59e614"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/icu_provider@2.1.1"
+        }
+      ]
+    },
+    {
+      "name": "idna",
+      "SPDXID": "SPDXRef-Package-idna-99aa6cf83302",
+      "versionInfo": "1.1.0",
+      "downloadLocation": "https://crates.io/api/v1/crates/idna/1.1.0/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "3b0875f23caa03898994f6ddc501886a45c7d3d62d04d2d90788d47be1b1e4de"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/idna@1.1.0"
+        }
+      ]
+    },
+    {
+      "name": "idna_adapter",
+      "SPDXID": "SPDXRef-Package-idna-adapter-9a32a2e1a92e",
+      "versionInfo": "1.2.1",
+      "downloadLocation": "https://crates.io/api/v1/crates/idna_adapter/1.2.1/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Apache-2.0 OR MIT",
+      "licenseDeclared": "Apache-2.0 OR MIT",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "3acae9609540aa318d1bc588455225fb2085b9ed0c4f6bd0d9d5bcd86f1a0344"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/idna_adapter@1.2.1"
+        }
+      ]
+    },
+    {
+      "name": "itoa",
+      "SPDXID": "SPDXRef-Package-itoa-fd3a71e8a8d4",
+      "versionInfo": "1.0.18",
+      "downloadLocation": "https://crates.io/api/v1/crates/itoa/1.0.18/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/itoa@1.0.18"
+        }
+      ]
+    },
+    {
+      "name": "litemap",
+      "SPDXID": "SPDXRef-Package-litemap-9e80f0b3f9fd",
+      "versionInfo": "0.8.3",
+      "downloadLocation": "https://crates.io/api/v1/crates/litemap/0.8.3/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unicode-3.0",
+      "licenseDeclared": "Unicode-3.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "47d9d19d1d6efa0109d2f65ff4c85cddd50bd572e5a00127ab10987290bcefae"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/litemap@0.8.3"
+        }
+      ]
+    },
+    {
+      "name": "memchr",
+      "SPDXID": "SPDXRef-Package-memchr-50134c616a68",
+      "versionInfo": "2.8.3",
+      "downloadLocation": "https://crates.io/api/v1/crates/memchr/2.8.3/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unlicense OR MIT",
+      "licenseDeclared": "Unlicense OR MIT",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "cf8baf1c55e62ffcace7a9f06f4bd9cd3f0c4beb022d3b367256b91b87513d98"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/memchr@2.8.3"
+        }
+      ]
+    },
+    {
+      "name": "potential_utf",
+      "SPDXID": "SPDXRef-Package-potential-utf-7efa599196ff",
+      "versionInfo": "0.1.6",
+      "downloadLocation": "https://crates.io/api/v1/crates/potential_utf/0.1.6/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unicode-3.0",
+      "licenseDeclared": "Unicode-3.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "d83eb9bc6d8e5cf568e7a1101d60ee05e81ed50ea106026f3d18deeb046d7661"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/potential_utf@0.1.6"
+        }
+      ]
+    },
+    {
+      "name": "proc-macro2",
+      "SPDXID": "SPDXRef-Package-proc-macro2-e0494bfa751d",
+      "versionInfo": "1.0.107",
+      "downloadLocation": "https://crates.io/api/v1/crates/proc-macro2/1.0.107/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "985e7ec9bb745e6ce6535b544d84d6cd6f7ad8bd711c398938ae983b91a766d9"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/proc-macro2@1.0.107"
+        }
+      ]
+    },
+    {
+      "name": "punycode",
+      "SPDXID": "SPDXRef-Package-punycode-3fe331f5536b",
+      "versionInfo": "2.3.1",
+      "downloadLocation": "https://registry.npmjs.org/punycode/-/punycode-2.3.1.tgz",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION",
+      "checksums": [],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/punycode@2.3.1"
+        }
+      ]
+    },
+    {
+      "name": "quote",
+      "SPDXID": "SPDXRef-Package-quote-e098ce860678",
+      "versionInfo": "1.0.47",
+      "downloadLocation": "https://crates.io/api/v1/crates/quote/1.0.47/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "1fbf4db142a473a8d80c26bbf18454ed458bf8d26c8219c331daecfdbd079001"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/quote@1.0.47"
+        }
+      ]
+    },
+    {
+      "name": "serde",
+      "SPDXID": "SPDXRef-Package-serde-1fa41e0721d3",
+      "versionInfo": "1.0.229",
+      "downloadLocation": "https://crates.io/api/v1/crates/serde/1.0.229/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "4148590afebada386688f18773da617792bf2ef03ffc1e4cbd2b1d45b023e0ba"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/serde@1.0.229"
+        }
+      ]
+    },
+    {
+      "name": "serde_core",
+      "SPDXID": "SPDXRef-Package-serde-core-deda674f8fe6",
+      "versionInfo": "1.0.229",
+      "downloadLocation": "https://crates.io/api/v1/crates/serde_core/1.0.229/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "67dca2c9c51e58a4791a4b1ed58308b39c64224d349a935ab5039aa360942a48"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/serde_core@1.0.229"
+        }
+      ]
+    },
+    {
+      "name": "serde_derive",
+      "SPDXID": "SPDXRef-Package-serde-derive-08608362b8d2",
+      "versionInfo": "1.0.229",
+      "downloadLocation": "https://crates.io/api/v1/crates/serde_derive/1.0.229/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "e7a5d71263a5a7d47b41f6b3f06ba276f10cc18b0931f1799f710578e2309348"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/serde_derive@1.0.229"
+        }
+      ]
+    },
+    {
+      "name": "serde_json",
+      "SPDXID": "SPDXRef-Package-serde-json-249ac28b2ae3",
+      "versionInfo": "1.0.151",
+      "downloadLocation": "https://crates.io/api/v1/crates/serde_json/1.0.151/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "c841b55ecdae098c80dcae9cf767f6f8a0c2cdb3416bbef72181df4d0fe73f14"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/serde_json@1.0.151"
+        }
+      ]
+    },
+    {
+      "name": "sha2",
+      "SPDXID": "SPDXRef-Package-sha2-425bc3fa7458",
+      "versionInfo": "0.11.0",
+      "downloadLocation": "https://crates.io/api/v1/crates/sha2/0.11.0/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "446ba717509524cb3f22f17ecc096f10f4822d76ab5c0b9822c5f9c284e825f4"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/sha2@0.11.0"
+        }
+      ]
+    },
+    {
+      "name": "smallvec",
+      "SPDXID": "SPDXRef-Package-smallvec-26d6943858b6",
+      "versionInfo": "1.15.2",
+      "downloadLocation": "https://crates.io/api/v1/crates/smallvec/1.15.2/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "8ed6a63f02c8539c91a8685a86f4099661ba3da017932f6ebbea6de3f0fa7c90"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/smallvec@1.15.2"
+        }
+      ]
+    },
+    {
+      "name": "stable_deref_trait",
+      "SPDXID": "SPDXRef-Package-stable-deref-trait-3666bc4ef1bc",
+      "versionInfo": "1.2.1",
+      "downloadLocation": "https://crates.io/api/v1/crates/stable_deref_trait/1.2.1/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "6ce2be8dc25455e1f91df71bfa12ad37d7af1092ae736f3a6cd0e37bc7810596"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/stable_deref_trait@1.2.1"
+        }
+      ]
+    },
+    {
+      "name": "syn",
+      "SPDXID": "SPDXRef-Package-syn-0da883e49b85",
+      "versionInfo": "2.0.119",
+      "downloadLocation": "https://crates.io/api/v1/crates/syn/2.0.119/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "872831b642d1a07999a962a351ed35b955ea2cfc8f3862091e2a240a84f17297"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/syn@2.0.119"
+        }
+      ]
+    },
+    {
+      "name": "syn",
+      "SPDXID": "SPDXRef-Package-syn-1b787626bf35",
+      "versionInfo": "3.0.4",
+      "downloadLocation": "https://crates.io/api/v1/crates/syn/3.0.4/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "e6275cddf4610d1775e6d1fe9469b2e77d0f39fd98fb7450901b821e0c53649f"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/syn@3.0.4"
+        }
+      ]
+    },
+    {
+      "name": "synstructure",
+      "SPDXID": "SPDXRef-Package-synstructure-12658d3f1458",
+      "versionInfo": "0.13.2",
+      "downloadLocation": "https://crates.io/api/v1/crates/synstructure/0.13.2/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "728a70f3dbaf5bab7f0c4b1ac8d7ae5ea60a4b5549c8a5914361c99147a709d2"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/synstructure@0.13.2"
+        }
+      ]
+    },
+    {
+      "name": "text-integrity-agent-host",
+      "SPDXID": "SPDXRef-Package-text-integrity-agent-host-b89538191d97",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Apache-2.0",
+      "licenseDeclared": "Apache-2.0",
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "name": "text-integrity",
+      "SPDXID": "SPDXRef-Package-text-integrity-c512d1d03f26",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Apache-2.0",
+      "licenseDeclared": "Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/text-integrity@1.0.0"
+        }
+      ]
+    },
+    {
+      "name": "text-integrity-reference",
+      "SPDXID": "SPDXRef-Package-text-integrity-reference-730b0cab3f05",
+      "versionInfo": "0.1.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Apache-2.0",
+      "licenseDeclared": "Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/text-integrity-reference@0.1.0"
+        }
+      ]
+    },
+    {
+      "name": "text-integrity-reference-wasm",
+      "SPDXID": "SPDXRef-Package-text-integrity-reference-wasm-62f9d9bba87b",
+      "versionInfo": "1.0.0",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "2e6e00a440f872d3e0b3a82d6dacd637797346a4362ed58a5ea474c49aca2ac7"
+        }
+      ]
+    },
+    {
+      "name": "tinystr",
+      "SPDXID": "SPDXRef-Package-tinystr-d2e4e6fda23b",
+      "versionInfo": "0.8.4",
+      "downloadLocation": "https://crates.io/api/v1/crates/tinystr/0.8.4/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unicode-3.0",
+      "licenseDeclared": "Unicode-3.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "b1e27c91459209c2986af3dcf603a5a74a4368754ce37414f59acc971167f643"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/tinystr@0.8.4"
+        }
+      ]
+    },
+    {
+      "name": "tinyvec",
+      "SPDXID": "SPDXRef-Package-tinyvec-fca85fff7b50",
+      "versionInfo": "1.12.0",
+      "downloadLocation": "https://crates.io/api/v1/crates/tinyvec/1.12.0/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Zlib OR Apache-2.0 OR MIT",
+      "licenseDeclared": "Zlib OR Apache-2.0 OR MIT",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "bb4ebadaa0af04fab11ae01eb5f9fdb5f9c5b875506e210e71c07873528baa7f"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/tinyvec@1.12.0"
+        }
+      ]
+    },
+    {
+      "name": "tinyvec_macros",
+      "SPDXID": "SPDXRef-Package-tinyvec-macros-c8c9bf420561",
+      "versionInfo": "0.1.1",
+      "downloadLocation": "https://crates.io/api/v1/crates/tinyvec_macros/0.1.1/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0 OR Zlib",
+      "licenseDeclared": "MIT OR Apache-2.0 OR Zlib",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/tinyvec_macros@0.1.1"
+        }
+      ]
+    },
+    {
+      "name": "tr46",
+      "SPDXID": "SPDXRef-Package-tr46-582a9fa99fc2",
+      "versionInfo": "6.0.0",
+      "downloadLocation": "https://registry.npmjs.org/tr46/-/tr46-6.0.0.tgz",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION",
+      "checksums": [],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:npm/tr46@6.0.0"
+        }
+      ]
+    },
+    {
+      "name": "typenum",
+      "SPDXID": "SPDXRef-Package-typenum-a6aba2b09b91",
+      "versionInfo": "1.20.1",
+      "downloadLocation": "https://crates.io/api/v1/crates/typenum/1.20.1/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "b6f5e870be6c3b371b77fe0ee0bafb859fa4964b4404c27de1d380043c4dda20"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/typenum@1.20.1"
+        }
+      ]
+    },
+    {
+      "name": "unicode-bidi",
+      "SPDXID": "SPDXRef-Package-unicode-bidi-00d936af2861",
+      "versionInfo": "0.3.18",
+      "downloadLocation": "https://crates.io/api/v1/crates/unicode-bidi/0.3.18/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "5c1cb5db39152898a79168971543b1cb5020dff7fe43c8dc468b0885f5e29df5"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/unicode-bidi@0.3.18"
+        }
+      ]
+    },
+    {
+      "name": "unicode-ident",
+      "SPDXID": "SPDXRef-Package-unicode-ident-3a764a9e319d",
+      "versionInfo": "1.0.24",
+      "downloadLocation": "https://crates.io/api/v1/crates/unicode-ident/1.0.24/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "(MIT OR Apache-2.0) AND Unicode-3.0",
+      "licenseDeclared": "(MIT OR Apache-2.0) AND Unicode-3.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/unicode-ident@1.0.24"
+        }
+      ]
+    },
+    {
+      "name": "unicode-normalization",
+      "SPDXID": "SPDXRef-Package-unicode-normalization-e62386781052",
+      "versionInfo": "0.1.25",
+      "downloadLocation": "https://crates.io/api/v1/crates/unicode-normalization/0.1.25/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "5fd4f6878c9cb28d874b009da9e8d183b5abc80117c40bbd187a1fde336be6e8"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/unicode-normalization@0.1.25"
+        }
+      ]
+    },
+    {
+      "name": "unicode-segmentation",
+      "SPDXID": "SPDXRef-Package-unicode-segmentation-f0887223759f",
+      "versionInfo": "1.13.3",
+      "downloadLocation": "https://crates.io/api/v1/crates/unicode-segmentation/1.13.3/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT OR Apache-2.0",
+      "licenseDeclared": "MIT OR Apache-2.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "c6f5d3c3b1bf09027a88a6bc961fc00497d651009560b5463668dc81b0fa87a8"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/unicode-segmentation@1.13.3"
+        }
+      ]
+    },
+    {
+      "name": "utf8_iter",
+      "SPDXID": "SPDXRef-Package-utf8-iter-5906c20c38f0",
+      "versionInfo": "1.0.4",
+      "downloadLocation": "https://crates.io/api/v1/crates/utf8_iter/1.0.4/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Apache-2.0 OR MIT",
+      "licenseDeclared": "Apache-2.0 OR MIT",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "b6c140620e7ffbb22c2dee59cafe6084a59b5ffc27a8859a5f0d494b5d52b6be"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/utf8_iter@1.0.4"
+        }
+      ]
+    },
+    {
+      "name": "writeable",
+      "SPDXID": "SPDXRef-Package-writeable-0389ed9a0de4",
+      "versionInfo": "0.6.4",
+      "downloadLocation": "https://crates.io/api/v1/crates/writeable/0.6.4/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unicode-3.0",
+      "licenseDeclared": "Unicode-3.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "3ad82d2a33cdc9674dc7465672f271e096168fcdbe0f799d9e6db8c5892679dc"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/writeable@0.6.4"
+        }
+      ]
+    },
+    {
+      "name": "yoke",
+      "SPDXID": "SPDXRef-Package-yoke-85fd7be43325",
+      "versionInfo": "0.8.3",
+      "downloadLocation": "https://crates.io/api/v1/crates/yoke/0.8.3/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unicode-3.0",
+      "licenseDeclared": "Unicode-3.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "709fe23a0424b6a435d82152b1bd3fdfb0833487d5fa90d05d42762a9891fef5"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/yoke@0.8.3"
+        }
+      ]
+    },
+    {
+      "name": "yoke-derive",
+      "SPDXID": "SPDXRef-Package-yoke-derive-54fda72f0dff",
+      "versionInfo": "0.8.2",
+      "downloadLocation": "https://crates.io/api/v1/crates/yoke-derive/0.8.2/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unicode-3.0",
+      "licenseDeclared": "Unicode-3.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "de844c262c8848816172cef550288e7dc6c7b7814b4ee56b3e1553f275f1858e"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/yoke-derive@0.8.2"
+        }
+      ]
+    },
+    {
+      "name": "zerofrom",
+      "SPDXID": "SPDXRef-Package-zerofrom-15f000de8791",
+      "versionInfo": "0.1.8",
+      "downloadLocation": "https://crates.io/api/v1/crates/zerofrom/0.1.8/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unicode-3.0",
+      "licenseDeclared": "Unicode-3.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "0ec05a11813ea801ff6d75110ad09cd0824ddba17dfe17128ea0d5f68e6c5272"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/zerofrom@0.1.8"
+        }
+      ]
+    },
+    {
+      "name": "zerofrom-derive",
+      "SPDXID": "SPDXRef-Package-zerofrom-derive-a96d6d17e1d0",
+      "versionInfo": "0.1.7",
+      "downloadLocation": "https://crates.io/api/v1/crates/zerofrom-derive/0.1.7/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unicode-3.0",
+      "licenseDeclared": "Unicode-3.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "11532158c46691caf0f2593ea8358fed6bbf68a0315e80aae9bd41fbade684a1"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/zerofrom-derive@0.1.7"
+        }
+      ]
+    },
+    {
+      "name": "zerotrie",
+      "SPDXID": "SPDXRef-Package-zerotrie-d84f4a45617d",
+      "versionInfo": "0.2.5",
+      "downloadLocation": "https://crates.io/api/v1/crates/zerotrie/0.2.5/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unicode-3.0",
+      "licenseDeclared": "Unicode-3.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "4ea269c3bd32f0a32c321907a2ae912ba6f4649bb0fc764a15627e99a7095a3f"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/zerotrie@0.2.5"
+        }
+      ]
+    },
+    {
+      "name": "zerovec",
+      "SPDXID": "SPDXRef-Package-zerovec-70da7ea41bf8",
+      "versionInfo": "0.11.8",
+      "downloadLocation": "https://crates.io/api/v1/crates/zerovec/0.11.8/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unicode-3.0",
+      "licenseDeclared": "Unicode-3.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "bb0464e17806c1d976d5cba29399c7f08e516e279e2ba493f63123b5fca67dd8"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/zerovec@0.11.8"
+        }
+      ]
+    },
+    {
+      "name": "zerovec-derive",
+      "SPDXID": "SPDXRef-Package-zerovec-derive-cb1776f3b415",
+      "versionInfo": "0.11.6",
+      "downloadLocation": "https://crates.io/api/v1/crates/zerovec-derive/0.11.6/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "Unicode-3.0",
+      "licenseDeclared": "Unicode-3.0",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "34df6fc39dbd26ddc9c10e6a2984476e13acce22e64e4487636ef494369225da"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/zerovec-derive@0.11.6"
+        }
+      ]
+    },
+    {
+      "name": "zmij",
+      "SPDXID": "SPDXRef-Package-zmij-ca458c71f00a",
+      "versionInfo": "1.0.23",
+      "downloadLocation": "https://crates.io/api/v1/crates/zmij/1.0.23/download",
+      "filesAnalyzed": false,
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "29666d0abbfad1e3dc4dcf6144730dd3a3ab225bbbdac83319345b1b44ccfc1b"
+        }
+      ],
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:cargo/zmij@1.0.23"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-Package-text-integrity-agent-host-b89538191d97"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-block-buffer-4677371dc360",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-hybrid-array-bc125d2366d2"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-crypto-common-69491ae24507",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-hybrid-array-bc125d2366d2"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-digest-20ede1b2bcd7",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-block-buffer-4677371dc360"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-digest-20ede1b2bcd7",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-crypto-common-69491ae24507"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-displaydoc-338830cadd95",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-proc-macro2-e0494bfa751d"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-displaydoc-338830cadd95",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-quote-e098ce860678"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-displaydoc-338830cadd95",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-syn-1b787626bf35"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-hybrid-array-bc125d2366d2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-typenum-a6aba2b09b91"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-collections-c610c7f3371d",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-displaydoc-338830cadd95"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-collections-c610c7f3371d",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-potential-utf-7efa599196ff"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-collections-c610c7f3371d",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-yoke-85fd7be43325"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-collections-c610c7f3371d",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-zerofrom-15f000de8791"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-collections-c610c7f3371d",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-zerovec-70da7ea41bf8"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-locale-core-fc8efa73337b",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-displaydoc-338830cadd95"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-locale-core-fc8efa73337b",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-litemap-9e80f0b3f9fd"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-locale-core-fc8efa73337b",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-tinystr-d2e4e6fda23b"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-locale-core-fc8efa73337b",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-writeable-0389ed9a0de4"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-locale-core-fc8efa73337b",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-zerovec-70da7ea41bf8"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-normalizer-ceaf7fd9393b",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-icu-collections-c610c7f3371d"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-normalizer-ceaf7fd9393b",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-icu-normalizer-data-8768cfe00bed"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-normalizer-ceaf7fd9393b",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-icu-properties-983f6811e53f"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-normalizer-ceaf7fd9393b",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-icu-provider-9a4c369e0962"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-normalizer-ceaf7fd9393b",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-smallvec-26d6943858b6"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-normalizer-ceaf7fd9393b",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-zerovec-70da7ea41bf8"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-properties-983f6811e53f",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-icu-collections-c610c7f3371d"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-properties-983f6811e53f",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-icu-locale-core-fc8efa73337b"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-properties-983f6811e53f",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-icu-properties-data-b7dddaf4e444"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-properties-983f6811e53f",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-icu-provider-9a4c369e0962"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-properties-983f6811e53f",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-zerotrie-d84f4a45617d"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-properties-983f6811e53f",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-zerovec-70da7ea41bf8"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-provider-9a4c369e0962",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-displaydoc-338830cadd95"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-provider-9a4c369e0962",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-icu-locale-core-fc8efa73337b"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-provider-9a4c369e0962",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-writeable-0389ed9a0de4"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-provider-9a4c369e0962",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-yoke-85fd7be43325"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-provider-9a4c369e0962",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-zerofrom-15f000de8791"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-provider-9a4c369e0962",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-zerotrie-d84f4a45617d"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-icu-provider-9a4c369e0962",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-zerovec-70da7ea41bf8"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-idna-99aa6cf83302",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-idna-adapter-9a32a2e1a92e"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-idna-99aa6cf83302",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-smallvec-26d6943858b6"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-idna-99aa6cf83302",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-utf8-iter-5906c20c38f0"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-idna-adapter-9a32a2e1a92e",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-icu-normalizer-ceaf7fd9393b"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-idna-adapter-9a32a2e1a92e",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-icu-properties-983f6811e53f"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-potential-utf-7efa599196ff",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-zerovec-70da7ea41bf8"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-proc-macro2-e0494bfa751d",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-unicode-ident-3a764a9e319d"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-quote-e098ce860678",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-proc-macro2-e0494bfa751d"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-serde-1fa41e0721d3",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-serde-core-deda674f8fe6"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-serde-1fa41e0721d3",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-serde-derive-08608362b8d2"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-serde-derive-08608362b8d2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-proc-macro2-e0494bfa751d"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-serde-derive-08608362b8d2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-quote-e098ce860678"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-serde-derive-08608362b8d2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-syn-1b787626bf35"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-serde-json-249ac28b2ae3",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-itoa-fd3a71e8a8d4"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-serde-json-249ac28b2ae3",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-memchr-50134c616a68"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-serde-json-249ac28b2ae3",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-serde-core-deda674f8fe6"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-serde-json-249ac28b2ae3",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-zmij-ca458c71f00a"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-sha2-425bc3fa7458",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-cfg-if-7c4d5fee2153"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-sha2-425bc3fa7458",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-digest-20ede1b2bcd7"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-syn-0da883e49b85",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-proc-macro2-e0494bfa751d"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-syn-0da883e49b85",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-quote-e098ce860678"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-syn-0da883e49b85",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-unicode-ident-3a764a9e319d"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-syn-1b787626bf35",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-proc-macro2-e0494bfa751d"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-syn-1b787626bf35",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-quote-e098ce860678"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-syn-1b787626bf35",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-unicode-ident-3a764a9e319d"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-synstructure-12658d3f1458",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-proc-macro2-e0494bfa751d"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-synstructure-12658d3f1458",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-quote-e098ce860678"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-synstructure-12658d3f1458",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-syn-0da883e49b85"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-text-integrity-agent-host-b89538191d97",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-text-integrity-c512d1d03f26"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-text-integrity-agent-host-b89538191d97",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-text-integrity-reference-wasm-62f9d9bba87b"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-text-integrity-c512d1d03f26",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-punycode-3fe331f5536b"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-text-integrity-c512d1d03f26",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-tr46-582a9fa99fc2"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-text-integrity-reference-730b0cab3f05",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-idna-99aa6cf83302"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-text-integrity-reference-730b0cab3f05",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-idna-adapter-9a32a2e1a92e"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-text-integrity-reference-730b0cab3f05",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-serde-1fa41e0721d3"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-text-integrity-reference-730b0cab3f05",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-serde-json-249ac28b2ae3"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-text-integrity-reference-730b0cab3f05",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-sha2-425bc3fa7458"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-text-integrity-reference-730b0cab3f05",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-unicode-bidi-00d936af2861"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-text-integrity-reference-730b0cab3f05",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-unicode-normalization-e62386781052"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-text-integrity-reference-730b0cab3f05",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-unicode-segmentation-f0887223759f"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-text-integrity-reference-wasm-62f9d9bba87b",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-text-integrity-reference-730b0cab3f05"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-tinystr-d2e4e6fda23b",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-displaydoc-338830cadd95"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-tinystr-d2e4e6fda23b",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-zerovec-70da7ea41bf8"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-tinyvec-fca85fff7b50",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-tinyvec-macros-c8c9bf420561"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-tr46-582a9fa99fc2",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-punycode-3fe331f5536b"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-unicode-normalization-e62386781052",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-tinyvec-fca85fff7b50"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-yoke-85fd7be43325",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-stable-deref-trait-3666bc4ef1bc"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-yoke-85fd7be43325",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-yoke-derive-54fda72f0dff"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-yoke-85fd7be43325",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-zerofrom-15f000de8791"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-yoke-derive-54fda72f0dff",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-proc-macro2-e0494bfa751d"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-yoke-derive-54fda72f0dff",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-quote-e098ce860678"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-yoke-derive-54fda72f0dff",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-syn-0da883e49b85"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-yoke-derive-54fda72f0dff",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-synstructure-12658d3f1458"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-zerofrom-15f000de8791",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-zerofrom-derive-a96d6d17e1d0"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-zerofrom-derive-a96d6d17e1d0",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-proc-macro2-e0494bfa751d"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-zerofrom-derive-a96d6d17e1d0",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-quote-e098ce860678"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-zerofrom-derive-a96d6d17e1d0",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-syn-0da883e49b85"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-zerofrom-derive-a96d6d17e1d0",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-synstructure-12658d3f1458"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-zerotrie-d84f4a45617d",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-displaydoc-338830cadd95"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-zerotrie-d84f4a45617d",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-yoke-85fd7be43325"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-zerotrie-d84f4a45617d",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-zerofrom-15f000de8791"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-zerovec-70da7ea41bf8",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-yoke-85fd7be43325"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-zerovec-70da7ea41bf8",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-zerofrom-15f000de8791"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-zerovec-70da7ea41bf8",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-zerovec-derive-cb1776f3b415"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-zerovec-derive-cb1776f3b415",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-proc-macro2-e0494bfa751d"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-zerovec-derive-cb1776f3b415",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-quote-e098ce860678"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-zerovec-derive-cb1776f3b415",
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-syn-1b787626bf35"
+    }
+  ]
+}

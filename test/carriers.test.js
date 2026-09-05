@@ -2,11 +2,24 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { spawn, spawnSync } from "node:child_process";
 import { once } from "node:events";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { createUiServer } from "../src/ui/server.js";
 import { createMcpSession, runMcpServer } from "../src/mcp/server.js";
-import { TOOL_DEFINITIONS } from "../src/contracts.js";
+import { TOOL_BY_NAME, TOOL_DEFINITIONS } from "../src/contracts.js";
 import { executeOperation } from "../src/core/operations.js";
 import { LIMITS } from "../src/core/limits.js";
+import { analyzeNamespaceIntegrity } from "../src/core/namespace-integrity.js";
+import { MCP_OUTPUT_SCHEMAS } from "../src/mcp-output-schemas.js";
+import { OUTPUT_SCHEMAS } from "../src/output-schemas.js";
+import { NAMESPACE_INPUT_SCHEMA } from "../src/namespace-contract.js";
+import { createTranscodeSourceDrafts } from "../src/ui/public/transcode-source-drafts.js";
+import {
+  PUBLIC_RESULT_SCHEMA_VERSION,
+  RESULT_SCHEMA_RESOURCE_LIST,
+  RESULT_SCHEMA_RESOURCES
+} from "../src/result-contract.js";
 
 const ROOT = new URL("../", import.meta.url);
 const COLLATION_FLAGS = [
@@ -14,22 +27,145 @@ const COLLATION_FLAGS = [
   "--ignore-punctuation", "false", "--numeric", "false", "--case-first", "false",
   "--locale-matcher", "best fit", "--collation", "default"
 ];
+const COLLATION_OPTIONS = Object.freeze({
+  usage: "sort", sensitivity: "variant", ignorePunctuation: false, numeric: false,
+  caseFirst: "false", localeMatcher: "best fit", collation: "default"
+});
+
+test("transcode source modes preserve separate compatible drafts", () => {
+  const drafts = createTranscodeSourceDrafts("text", "hello");
+  assert.equal(drafts.switchTo("bytes", "hello"), "");
+  assert.equal(drafts.switchTo("text", "72, 105"), "hello");
+  assert.equal(drafts.switchTo("bytes", "updated"), "72, 105");
+  assert.throws(() => drafts.switchTo("path", "ignored"), TypeError);
+});
+
+test("the tag release binds native/WASM source and both dependency ecosystems", () => {
+  const packageManifest = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+  const releaseWorkflow = readFileSync(new URL("../.github/workflows/release.yml", import.meta.url), "utf8");
+  assert.match(packageManifest.scripts["release:check"], /check:independent/u);
+  assert.match(packageManifest.scripts["release:check"], /bench\.mjs --slo/u);
+  assert.match(packageManifest.scripts["release:check"], /sbom:check/u);
+  assert.match(releaseWorkflow, /npm run release:check/u);
+  assert.match(releaseWorkflow, /text-integrity-npm-sbom\.cdx\.json/u);
+  assert.match(releaseWorkflow, /text-integrity-cargo-wasm-sbom\.cdx\.json/u);
+  assert.equal((releaseWorkflow.match(/sbom-path:/gu) ?? []).length, 2);
+});
+
+test("the Agent Host component stages the exact packed runtime and product Skill", () => {
+  const stage = mkdtempSync(path.join(tmpdir(), "text-integrity-agent-host-test-"));
+  try {
+    const packaged = spawnSync(process.execPath, ["scripts/package-agent-host-component.mjs"], {
+      cwd: ROOT,
+      env: { ...process.env, OPENADAM_COMPONENT_STAGE: stage },
+      encoding: "utf8",
+      maxBuffer: 16 << 20
+    });
+    assert.equal(packaged.status, 0, packaged.stderr);
+    const pluginRoot = path.join(stage, "marketplace", "plugins", "text-integrity");
+    for (const relativePath of [
+      ".codex-plugin/plugin.json",
+      ".mcp.json",
+      "skills/text-integrity/SKILL.md",
+      "bin/text-integrity-mcp.js",
+      "src/transport-json.js",
+      "node_modules/punycode/package.json",
+      "node_modules/tr46/package.json"
+    ]) {
+      assert.equal(existsSync(path.join(pluginRoot, relativePath)), true, relativePath);
+    }
+    const componentSbomPath = path.join(stage, "packaging", "agent-host-sbom.spdx.json");
+    assert.equal(existsSync(componentSbomPath), true);
+    const componentSbom = JSON.parse(readFileSync(componentSbomPath, "utf8"));
+    assert.equal(componentSbom.spdxVersion, "SPDX-2.3");
+    assert.equal(componentSbom.dataLicense, "CC0-1.0");
+    assert.equal(componentSbom.name, "text-integrity-agent-host-1.0.0");
+    const componentNames = new Set(componentSbom.packages.map((component) => component.name));
+    for (const name of ["text-integrity", "text-integrity-reference-wasm", "punycode", "tr46", "serde", "unicode-normalization"]) {
+      assert.equal(componentNames.has(name), true, `component SBOM must include ${name}`);
+    }
+    const componentRefs = new Set(componentSbom.packages.map((component) => component.SPDXID));
+    for (const relationship of componentSbom.relationships) {
+      if (relationship.spdxElementId === "SPDXRef-DOCUMENT") continue;
+      assert.equal(componentRefs.has(relationship.spdxElementId), true, relationship.spdxElementId);
+      assert.equal(componentRefs.has(relationship.relatedSpdxElement), true, relationship.relatedSpdxElement);
+    }
+    assert.equal(existsSync(path.join(
+      pluginRoot,
+      "vendor",
+      "unicode",
+      "17.0.0",
+      "conformance",
+      "NormalizationTest.txt.gz"
+    )), false);
+
+    const meta = { "io.modelcontextprotocol/protocolVersion": "2026-07-28" };
+    const runtime = spawnSync(process.execPath, [path.join(pluginRoot, "bin", "text-integrity-mcp.js")], {
+      cwd: pluginRoot,
+      encoding: "utf8",
+      input: [
+        { jsonrpc: "2.0", id: 1, method: "tools/list", params: { _meta: meta } },
+        {
+          jsonrpc: "2.0", id: 2, method: "tools/call",
+          params: { _meta: meta, name: "text_inspect", arguments: { text: "A👩‍💻é" } }
+        },
+        {
+          jsonrpc: "2.0", id: 3, method: "tools/call",
+          params: { _meta: meta, name: "text_inspect", arguments: {} }
+        }
+      ].map(JSON.stringify).join("\n") + "\n",
+      maxBuffer: 16 << 20
+    });
+    assert.equal(runtime.status, 0, runtime.stderr);
+    const messages = runtime.stdout.trim().split("\n").map(JSON.parse);
+    assert.equal(messages[0].result.tools.length, 8);
+    assert.equal(messages[1].result.structuredContent.counts.graphemes, 3);
+    assert.equal(messages[2].error.code, -32602);
+  } finally {
+    rmSync(stage, { recursive: true, force: true });
+  }
+});
 
 function cli(args, input) {
   return spawnSync(process.execPath, ["bin/text-integrity.js", ...args], { cwd: ROOT, encoding: "utf8", input, maxBuffer: 1 << 20 });
 }
 
-function validateSchemaNode(schema, path = "$") {
+function invalidUtf8Json(prefix, suffix) {
+  return Buffer.concat([Buffer.from(prefix), Buffer.from([0xff]), Buffer.from(suffix)]);
+}
+
+function validateSchemaNode(schema, path = "$", requireClosedObjects = false) {
   assert.notDeepEqual(schema, {}, `${path} must not be an unconstrained schema`);
   if (schema.oneOf) {
-    for (const [index, branch] of schema.oneOf.entries()) validateSchemaNode(branch, `${path}.oneOf[${index}]`);
-  }
-  if (schema.type === "object") {
-    for (const [name, property] of Object.entries(schema.properties ?? {})) {
-      validateSchemaNode(property, `${path}.properties.${name}`);
+    for (const [index, branch] of schema.oneOf.entries()) {
+      validateSchemaNode(branch, `${path}.oneOf[${index}]`, requireClosedObjects);
     }
   }
-  if (schema.type === "array") validateSchemaNode(schema.items, `${path}.items`);
+  if (schema.type === "object") {
+    if (requireClosedObjects) {
+      assert.equal(schema.additionalProperties, false, `${path} must reject unknown object fields`);
+      assert.ok(Object.keys(schema.properties ?? {}).length > 0, `${path} must declare its object properties`);
+    }
+    for (const [name, property] of Object.entries(schema.properties ?? {})) {
+      validateSchemaNode(property, `${path}.properties.${name}`, requireClosedObjects);
+    }
+  }
+  if (schema.type === "array") {
+    validateSchemaNode(schema.items, `${path}.items`, requireClosedObjects);
+    if (schema.contains) validateSchemaNode(schema.contains, `${path}.contains`, requireClosedObjects);
+  }
+}
+
+function assertDeepFrozen(value, path = "$", seen = new WeakSet()) {
+  if (value === null || (typeof value !== "object" && typeof value !== "function") || seen.has(value)) return;
+  seen.add(value);
+  assert.equal(Object.isFrozen(value), true, `${path} must be frozen`);
+  for (const key of Reflect.ownKeys(value)) {
+    const descriptor = Object.getOwnPropertyDescriptor(value, key);
+    if (descriptor !== undefined && Object.hasOwn(descriptor, "value")) {
+      assertDeepFrozen(descriptor.value, `${path}.${String(key)}`, seen);
+    }
+  }
 }
 
 function valueMatchesSchema(value, schema) {
@@ -51,7 +187,10 @@ function valueMatchesSchema(value, schema) {
   if (schema.type === "number") return typeof value === "number" && Number.isFinite(value);
   if (schema.type === "array") {
     return Array.isArray(value)
+      && (schema.minItems === undefined || value.length >= schema.minItems)
       && (schema.maxItems === undefined || value.length <= schema.maxItems)
+      && (schema.uniqueItems !== true || new Set(value.map((item) => JSON.stringify(item))).size === value.length)
+      && (schema.contains === undefined || value.some((item) => valueMatchesSchema(item, schema.contains)))
       && value.every((item) => valueMatchesSchema(item, schema.items));
   }
   if (schema.type === "object") {
@@ -70,13 +209,13 @@ function valueMatchesSchema(value, schema) {
 test("CLI carries all operations, raw JSON, help, schemas, literal -- values, and strict errors", () => {
   const cases = [
     ["inspect", "--text=--literal"],
-    ["normalize", "--text", "e\u0301", "--form", "NFC"],
+    ["normalize", "--text", "e\u0301", "--form", "NFC", "--witness-mode", "summary"],
     ["compare", "--left", "A", "--right", "a", ...COLLATION_FLAGS],
-    ["explain_difference", "--left", "é", "--right", "e\u0301", ...COLLATION_FLAGS, "--confusable-direction", "LTR"],
+    ["explain_difference", "--left", "é", "--right", "e\u0301", ...COLLATION_FLAGS, "--confusable-direction", "LTR", "--witness-mode", "summary"],
     ["index", "--text", "A😀B", "--max-chunk-utf8-bytes", "4"],
     ["security", "--text", "pаypаl", "--mode", "identifier", "--profile", "uts39_general_security", "--comparison", "paypal", "--confusable-direction", "LTR"],
-    ["protocol_profile", "--profile", "precis_username_case_mapped", "--action", "enforce", "--text", "User"],
-    ["transcode", "--source-kind", "bytes", "--bytes", "[65,0]", "--source-encoding", "utf-16le", "--target-encoding", "utf-8", "--allow-lossy", "false", "--byte-representation", "hex"]
+    ["protocol_profile", "--profile", "precis_username_case_mapped", "--action", "enforce", "--text", "User", "--witness-mode", "summary"],
+    ["transcode", "--source-kind", "bytes", "--bytes", "[65,0]", "--source-encoding", "utf-16le", "--target-encoding", "utf-8", "--allow-lossy", "false", "--byte-representation", "hex", "--witness-mode", "summary"]
   ];
   for (const args of cases) {
     const child = cli(args);
@@ -87,10 +226,25 @@ test("CLI carries all operations, raw JSON, help, schemas, literal -- values, an
   const raw = cli(["--json"], '{"operation":"inspect","arguments":{"text":"\\ud800"}}');
   assert.equal(raw.status, 0, raw.stderr);
   assert.equal(JSON.parse(raw.stdout).inputWellFormed, false);
+  const invalidUtf8 = cli(["--json"], invalidUtf8Json(
+    '{"operation":"inspect","arguments":{"text":"',
+    '"}}'
+  ));
+  assert.equal(invalidUtf8.status, 2);
+  assert.equal(JSON.parse(invalidUtf8.stderr).error.code, "INVALID_INPUT");
   assert.match(cli(["--help"]).stdout, /Raw JSON preserves escaped unpaired surrogates/u);
   const schema = JSON.parse(cli(["--schema"]).stdout);
   assert.equal(schema.tools.length, 8);
+  assert.equal(schema.publicResultContract, PUBLIC_RESULT_SCHEMA_VERSION);
+  assert.equal(schema.strictOutputSchemaResources.length, 9);
   assert.ok(schema.tools.every((tool) => tool.inputSchema && tool.outputSchema));
+  const fullSchema = JSON.parse(cli(["--schema-full", "normalize"]).stdout);
+  assert.equal(fullSchema.$schema, "https://json-schema.org/draft/2020-12/schema");
+  assert.equal(fullSchema["x-text-integrity-contract"], PUBLIC_RESULT_SCHEMA_VERSION);
+  validateSchemaNode(fullSchema, "cli.normalize.fullOutputSchema", true);
+  const unknownFullSchema = cli(["--schema-full", "missing"]);
+  assert.equal(unknownFullSchema.status, 2);
+  assert.equal(JSON.parse(unknownFullSchema.stderr).error.code, "UNKNOWN_OPERATION");
 
   for (const [args, code] of [
     [["transcode", "--source-kind", "bytes", "--bytes", "65,,66", "--source-encoding", "utf-8", "--target-encoding", "utf-8", "--allow-lossy", "false", "--byte-representation", "hex"], "INVALID_INPUT"],
@@ -109,6 +263,8 @@ test("MCP publishes eight direct closed contracts across both protocol eras", ()
   ]);
   for (const tool of TOOL_DEFINITIONS) {
     assert.ok(tool.outputSchema);
+    assert.equal(tool.inputSchema.type, "object");
+    assert.equal(tool.outputSchema.type, "object");
     validateSchemaNode(tool.outputSchema, `${tool.name}.outputSchema`);
     const outputBranches = tool.outputSchema.oneOf ?? [tool.outputSchema];
     for (const branch of outputBranches) assert.equal(branch.additionalProperties, false);
@@ -131,17 +287,87 @@ test("MCP publishes eight direct closed contracts across both protocol eras", ()
   const listed = legacy.handleMessage({ jsonrpc: "2.0", id: 5, method: "tools/list" });
   assert.equal(listed.result.tools.length, 8);
   assert.ok(Buffer.byteLength(JSON.stringify(listed), "utf8") <= LIMITS.maxToolCatalogBytes);
+  const legacyResources = legacy.handleMessage({ jsonrpc: "2.0", id: "resources", method: "resources/list" });
+  assert.equal(legacyResources.result.resources.length, 9);
+  const legacyNormalizeSchema = legacy.handleMessage({
+    jsonrpc: "2.0", id: "normalize-schema", method: "resources/read",
+    params: { uri: RESULT_SCHEMA_RESOURCES.normalize.uri }
+  });
+  assert.equal(
+    JSON.parse(legacyNormalizeSchema.result.contents[0].text)["x-text-integrity-contract"],
+    PUBLIC_RESULT_SCHEMA_VERSION
+  );
   const called = legacy.handleMessage({
     jsonrpc: "2.0", id: 6, method: "tools/call",
     params: { name: "text_normalize", arguments: { text: "e\u0301", form: "NFC" } }
   });
   assert.equal(called.result.isError, false);
   assert.deepEqual(JSON.parse(called.result.content[0].text), called.result.structuredContent);
+  const normalizedWitness = legacy.handleMessage({
+    jsonrpc: "2.0", id: "normalize-witness", method: "tools/call",
+    params: {
+      name: "text_normalize",
+      arguments: { text: "①A\u0315\u0300", form: "NFKC", witnessMode: "full_required" }
+    }
+  });
+  assert.equal(normalizedWitness.result.isError, false);
+  assert.deepEqual(normalizedWitness.result.structuredContent.witness.stages.compositions, [{
+    starter: "U+0041", current: "U+0300", composite: "U+00C0", outputIndexCodePoint: 1
+  }]);
+  const protocolWitness = legacy.handleMessage({
+    jsonrpc: "2.0", id: "protocol-witness", method: "tools/call",
+    params: {
+      name: "text_protocol_profile",
+      arguments: {
+        profile: "precis_username_case_mapped", action: "enforce", text: "Ｕser",
+        witnessMode: "full_required"
+      }
+    }
+  });
+  assert.equal(protocolWitness.result.isError, false);
+  assert.equal(protocolWitness.result.structuredContent.witness.sides[0].stabilizedAfterPass, 2);
+  const differenceWitness = legacy.handleMessage({
+    jsonrpc: "2.0", id: "difference-witness", method: "tools/call",
+    params: {
+      name: "text_explain_difference",
+      arguments: {
+        left: "e\u0301", right: "é", locale: "en", options: COLLATION_OPTIONS,
+        confusableDirection: "LTR", witnessMode: "full_required"
+      }
+    }
+  });
+  assert.equal(differenceWitness.result.isError, false);
+  assert.equal(differenceWitness.result.structuredContent.witness.transformations.normalization.NFC.leftOutput, "é");
+  assert.equal(differenceWitness.result.structuredContent.witness.alignment.codePoint.segments[0].kind, "replace");
+  assert.equal(differenceWitness.result.structuredContent.witness.alignment.grapheme.segments[0].kind, "replace");
+  const witnessed = legacy.handleMessage({
+    jsonrpc: "2.0", id: "legacy-witness", method: "tools/call",
+    params: {
+      name: "text_transcode",
+      arguments: {
+        sourceKind: "bytes", bytes: [0x61, 0xe1, 0x80, 0x41, 0x80], sourceEncoding: "utf-8",
+        targetEncoding: "utf-8", allowLossy: true, byteRepresentation: "hex", witnessMode: "full_required"
+      }
+    }
+  });
+  assert.equal(witnessed.result.isError, false);
+  assert.deepEqual(
+    witnessed.result.structuredContent.witness.segments
+      .filter((segment) => segment.kind === "replacement")
+      .map(({ sourceStart, sourceEnd }) => [sourceStart, sourceEnd]),
+    [[1, 3], [4, 5]]
+  );
   const invalid = legacy.handleMessage({
     jsonrpc: "2.0", id: 7, method: "tools/call",
     params: { name: "text_inspect", arguments: { text: "ok", invented: true } }
   });
-  assert.equal(invalid.result.structuredContent.error.code, "INVALID_INPUT");
+  assert.equal(invalid.error.code, -32602);
+  const semanticError = legacy.handleMessage({
+    jsonrpc: "2.0", id: "semantic-error", method: "tools/call",
+    params: { name: "text_normalize", arguments: { text: "\ud800", form: "NFC" } }
+  });
+  assert.equal(semanticError.result.isError, true);
+  assert.equal(semanticError.result.structuredContent.error.code, "INVALID_UNICODE");
   assert.equal(legacy.handleMessage({ jsonrpc: "2.0", method: "notifications/initialized" }), null);
 
   const oldLegacy = createMcpSession();
@@ -154,6 +380,46 @@ test("MCP publishes eight direct closed contracts across both protocol eras", ()
   assert.equal(JSON.parse(oldCall.result.content[0].text).status, "ok");
 });
 
+test("the public result ABI closes and types every nested object", () => {
+  for (const [operation, schema] of Object.entries(OUTPUT_SCHEMAS)) {
+    validateSchemaNode(schema, `${operation}.resultSchema`, true);
+  }
+  for (const resource of Object.values(RESULT_SCHEMA_RESOURCES)) {
+    validateSchemaNode(resource.schema, `${resource.operation}.resourceSchema`, true);
+  }
+});
+
+test("the library-first namespace input contract is closed and direction-aware", () => {
+  validateSchemaNode(NAMESPACE_INPUT_SCHEMA, "namespace.inputSchema", true);
+  assert.equal(valueMatchesSchema({
+    items: [{ id: "a", text: "é", scope: "one" }, { id: "b", text: "e\u0301", scope: "one" }],
+    relations: ["nfc"]
+  }, NAMESPACE_INPUT_SCHEMA), true);
+  assert.equal(valueMatchesSchema({
+    items: [{ id: "a", text: "paypal", scope: "one" }, { id: "b", text: "pаypal", scope: "one" }],
+    relations: ["uts39_confusable"],
+    confusableDirection: "LTR"
+  }, NAMESPACE_INPUT_SCHEMA), true);
+  assert.equal(valueMatchesSchema({ items: [], relations: ["uts39_confusable"] }, NAMESPACE_INPUT_SCHEMA), false);
+  assert.equal(valueMatchesSchema({ items: [], relations: ["exact"], confusableDirection: "LTR" }, NAMESPACE_INPUT_SCHEMA), false);
+  assert.equal(valueMatchesSchema({
+    items: [],
+    relations: [{
+      kind: "protocol", profile: "precis_username_case_mapped", action: "enforce"
+    }, {
+      kind: "declared_collation", locale: "en", options: { ...COLLATION_OPTIONS, sensitivity: "base" }
+    }]
+  }, NAMESPACE_INPUT_SCHEMA), true);
+  assert.equal(valueMatchesSchema({
+    items: [], relations: [{ kind: "protocol", profile: "uts46_domain", action: "to_ascii", options: {} }]
+  }, NAMESPACE_INPUT_SCHEMA), false);
+  assert.equal(valueMatchesSchema({
+    items: [],
+    relations: [{ kind: "declared_collation", locale: "en", options: COLLATION_OPTIONS }],
+    confusableDirection: "LTR"
+  }, NAMESPACE_INPUT_SCHEMA), false);
+});
+
 test("modern MCP era answers discover, concise text plus structured results, and version errors", () => {
   const modern = createMcpSession();
   const meta = { "io.modelcontextprotocol/protocolVersion": "2026-07-28" };
@@ -162,6 +428,7 @@ test("modern MCP era answers discover, concise text plus structured results, and
   assert.equal(discover.result.supportedVersions[0], "2026-07-28");
   assert.ok(discover.result.supportedVersions.includes("2025-06-18"));
   assert.equal(discover.result._meta["io.modelcontextprotocol/serverInfo"].name, "text-integrity");
+  assert.equal(discover.result.capabilities.resources.listChanged, false);
   assert.equal(typeof discover.result.ttlMs, "number");
   assert.equal(discover.result.cacheScope, "public");
 
@@ -172,17 +439,31 @@ test("modern MCP era answers discover, concise text plus structured results, and
   assert.equal(listed.result.cacheScope, "public");
   assert.ok(Buffer.byteLength(JSON.stringify(listed), "utf8") <= LIMITS.maxToolCatalogBytes);
 
-  const originalDescription = TOOL_DEFINITIONS[0].description;
-  try {
-    TOOL_DEFINITIONS[0].description = originalDescription + "x".repeat(LIMITS.maxToolCatalogBytes);
-    const oversizedCatalog = modern.handleMessage({
-      jsonrpc: "2.0", id: "catalog-limit", method: "tools/list", params: { _meta: meta }
-    });
-    assert.equal(oversizedCatalog.error.code, -32001);
-    assert.equal(oversizedCatalog.error.data.code, "RESULT_TOO_LARGE");
-  } finally {
-    TOOL_DEFINITIONS[0].description = originalDescription;
-  }
+  const resources = modern.handleMessage({
+    jsonrpc: "2.0", id: "resource-list", method: "resources/list", params: { _meta: meta }
+  });
+  assert.equal(resources.result.resultType, "complete");
+  assert.deepEqual(resources.result.resources, RESULT_SCHEMA_RESOURCE_LIST);
+  assert.equal(resources.result.cacheScope, "public");
+  const normalizeSchema = modern.handleMessage({
+    jsonrpc: "2.0", id: "resource-read", method: "resources/read",
+    params: { _meta: meta, uri: RESULT_SCHEMA_RESOURCES.normalize.uri }
+  });
+  const normalizeSchemaValue = JSON.parse(normalizeSchema.result.contents[0].text);
+  assert.equal(normalizeSchemaValue.$id, RESULT_SCHEMA_RESOURCES.normalize.uri);
+  assert.equal(normalizeSchemaValue["x-text-integrity-contract"], PUBLIC_RESULT_SCHEMA_VERSION);
+  assert.equal(modern.handleMessage({
+    jsonrpc: "2.0", id: "missing-resource", method: "resources/read",
+    params: { _meta: meta, uri: "text-integrity://schemas/missing" }
+  }).error.code, -32602);
+
+  const oversizedToolDefinitions = structuredClone(TOOL_DEFINITIONS);
+  oversizedToolDefinitions[0].description += "x".repeat(LIMITS.maxToolCatalogBytes);
+  const oversizedCatalog = createMcpSession({ toolDefinitions: oversizedToolDefinitions }).handleMessage({
+    jsonrpc: "2.0", id: "catalog-limit", method: "tools/list", params: { _meta: meta }
+  });
+  assert.equal(oversizedCatalog.error.code, -32001);
+  assert.equal(oversizedCatalog.error.data.code, "RESULT_TOO_LARGE");
 
   const called = modern.handleMessage({
     jsonrpc: "2.0", id: 3, method: "tools/call",
@@ -192,8 +473,30 @@ test("modern MCP era answers discover, concise text plus structured results, and
   assert.equal(called.result.isError, false);
   assert.equal(called.result.structuredContent.normalized, "é");
   assert.equal(called.result._meta["io.modelcontextprotocol/serverInfo"].name, "text-integrity");
+  assert.equal(called.result._meta["text-integrity/publicResultContract"], PUBLIC_RESULT_SCHEMA_VERSION);
+  assert.equal(called.result._meta["text-integrity/resultSchemaUri"], RESULT_SCHEMA_RESOURCES.normalize.uri);
   assert.ok(!called.result.content[0].text.startsWith("{"));
   assert.ok(Buffer.byteLength(called.result.content[0].text, "utf8") < Buffer.byteLength(JSON.stringify(called.result.structuredContent), "utf8"));
+
+  const witnessed = modern.handleMessage({
+    jsonrpc: "2.0", id: "modern-witness", method: "tools/call",
+    params: {
+      _meta: meta,
+      name: "text_transcode",
+      arguments: {
+        sourceKind: "bytes", bytes: [0x61, 0xe1, 0x80, 0x41, 0x80], sourceEncoding: "utf-8",
+        targetEncoding: "utf-8", allowLossy: true, byteRepresentation: "hex", witnessMode: "full_required"
+      }
+    }
+  });
+  assert.equal(witnessed.result.resultType, "complete");
+  assert.equal(witnessed.result.isError, false);
+  assert.deepEqual(
+    witnessed.result.structuredContent.witness.segments
+      .filter((segment) => segment.kind === "replacement")
+      .map(({ sourceStart, sourceEnd }) => [sourceStart, sourceEnd]),
+    [[1, 3], [4, 5]]
+  );
 
   const unsupported = modern.handleMessage({
     jsonrpc: "2.0", id: 4, method: "tools/list",
@@ -210,6 +513,17 @@ test("modern MCP era answers discover, concise text plus structured results, and
   );
 });
 
+test("public executable contracts are deeply immutable", () => {
+  assertDeepFrozen(TOOL_DEFINITIONS, "TOOL_DEFINITIONS");
+  assertDeepFrozen(OUTPUT_SCHEMAS, "OUTPUT_SCHEMAS");
+  assertDeepFrozen(MCP_OUTPUT_SCHEMAS, "MCP_OUTPUT_SCHEMAS");
+  assertDeepFrozen(NAMESPACE_INPUT_SCHEMA, "NAMESPACE_INPUT_SCHEMA");
+  assertDeepFrozen(RESULT_SCHEMA_RESOURCES, "RESULT_SCHEMA_RESOURCES");
+  assert.throws(() => {
+    OUTPUT_SCHEMAS.normalize.oneOf[0].additionalProperties = true;
+  }, TypeError);
+});
+
 test("every direct output contract accepts current core results across optional branches", () => {
   const options = {
     usage: "sort", sensitivity: "variant", ignorePunctuation: false, numeric: false,
@@ -221,9 +535,9 @@ test("every direct output contract accepts current core results across optional 
   };
   const cases = [
     ["text_inspect", "inspect", { text: "\ud800" }],
-    ["text_normalize", "normalize", { text: "e\u0301", form: "NFC" }],
+    ["text_normalize", "normalize", { text: "①A\u0315\u0300", form: "NFKC", witnessMode: "full_required" }],
     ["text_compare", "compare", { left: "a", right: "b", locale: "en", options }],
-    ["text_transcode", "transcode", { sourceKind: "bytes", bytes: [0x61, 0xc3, 0x28], sourceEncoding: "utf-8", targetEncoding: "utf-8", allowLossy: true, byteRepresentation: "bytes" }],
+    ["text_transcode", "transcode", { sourceKind: "bytes", bytes: [0x61, 0xc3, 0x28], sourceEncoding: "utf-8", targetEncoding: "utf-8", allowLossy: true, byteRepresentation: "bytes", witnessMode: "full_required" }],
     ["text_transcode", "transcode", { sourceKind: "text", text: "A", targetEncoding: "utf-16le", allowLossy: false, byteRepresentation: "hex" }],
     ["text_transcode", "transcode", { sourceKind: "text", text: "A", targetEncoding: "utf-8", allowLossy: false, byteRepresentation: "base64" }],
     ["text_security_observe", "security", { text: "plain", mode: "free_text" }],
@@ -235,30 +549,76 @@ test("every direct output contract accepts current core results across optional 
         { kind: "identifier", startUtf16: 13, endUtf16: 19, scope: "file" }
       ]
     }],
-    ["text_explain_difference", "explain_difference", { left: "same", right: "same", locale: "en", options, confusableDirection: "LTR" }],
+    ["text_explain_difference", "explain_difference", { left: "same", right: "same", locale: "en", options, confusableDirection: "LTR", witnessMode: "full_required" }],
     ["text_index_map", "index", { text: "A😀\n", maxChunkUtf8Bytes: 5 }],
-    ["text_protocol_profile", "protocol_profile", { profile: "uts46_domain", action: "to_ascii", text: "faß.de", options: domainOptions }],
-    ["text_protocol_profile", "protocol_profile", { profile: "precis_username_case_mapped", action: "enforce", text: "User" }],
-    ["text_protocol_profile", "protocol_profile", { profile: "precis_username_case_preserved", action: "compare", text: "User", comparison: "User" }]
+    ["text_protocol_profile", "protocol_profile", { profile: "uts46_domain", action: "to_ascii", text: "faß.de", options: domainOptions, witnessMode: "full_required" }],
+    ["text_protocol_profile", "protocol_profile", {
+      profile: "uts46_domain", action: "to_unicode", text: "xn--fa-hia.de",
+      options: Object.fromEntries(Object.entries(domainOptions).filter(([key]) => key !== "verifyDNSLength")),
+      witnessMode: "summary"
+    }],
+    ["text_protocol_profile", "protocol_profile", { profile: "precis_username_case_mapped", action: "enforce", text: "Ｕser", witnessMode: "full_required" }],
+    ["text_protocol_profile", "protocol_profile", { profile: "precis_username_case_preserved", action: "compare", text: "User", comparison: "User", witnessMode: "summary" }]
   ];
   for (const [toolName, operation, args] of cases) {
-    const schema = TOOL_DEFINITIONS.find((tool) => tool.name === toolName).outputSchema;
+    const schema = OUTPUT_SCHEMAS[operation];
     const value = executeOperation(operation, args);
-    assert.equal(valueMatchesSchema(value, schema), true, `${toolName} output must match its published schema`);
+    assert.equal(valueMatchesSchema(value, schema), true, `${toolName} output must match its complete result schema`);
   }
+
+  const namespace = analyzeNamespaceIntegrity({
+    items: [
+      { id: "left", text: "é", scope: "one" },
+      { id: "right", text: "e\u0301", scope: "one" }
+    ],
+    relations: ["nfc"]
+  });
+  assert.equal(
+    valueMatchesSchema(namespace, OUTPUT_SCHEMAS.namespace_integrity),
+    true,
+    "namespace_integrity output must match its complete result schema"
+  );
+  const configuredNamespace = analyzeNamespaceIntegrity({
+    items: [
+      { id: "unicode", text: "faß.de", scope: "domains" },
+      { id: "ascii", text: "xn--fa-hia.de", scope: "domains" },
+      { id: "accent", text: "résumé", scope: "names" },
+      { id: "upper", text: "RESUME", scope: "names" }
+    ],
+    relations: [{
+      kind: "protocol", profile: "uts46_domain", action: "to_ascii", options: domainOptions
+    }, {
+      kind: "declared_collation", locale: "en", options: { ...options, sensitivity: "base" }
+    }]
+  });
+  assert.equal(
+    valueMatchesSchema(configuredNamespace, OUTPUT_SCHEMAS.namespace_integrity),
+    true,
+    "configured namespace relations must match the complete result schema"
+  );
 
   for (const tool of TOOL_DEFINITIONS) {
     const response = createMcpSession().handleMessage({
       jsonrpc: "2.0", id: tool.name, method: "tools/call",
       params: { _meta: { "io.modelcontextprotocol/protocolVersion": "2026-07-28" }, name: tool.name, arguments: { invented: true } }
     });
-    assert.equal(response.result.isError, true);
-    assert.equal(
-      valueMatchesSchema(response.result.structuredContent, tool.outputSchema),
-      true,
-      `${tool.name} structured errors must match its published output schema`
-    );
+    assert.equal(response.error.code, -32602, `${tool.name} must reject schema-invalid arguments at the protocol boundary`);
   }
+  const semanticError = createMcpSession().handleMessage({
+    jsonrpc: "2.0", id: "semantic-error", method: "tools/call",
+    params: {
+      _meta: { "io.modelcontextprotocol/protocolVersion": "2026-07-28" },
+      name: "text_normalize",
+      arguments: { text: "\ud800", form: "NFC" }
+    }
+  });
+  assert.equal(semanticError.result.isError, true);
+  assert.equal(semanticError.result.structuredContent.error.code, "INVALID_UNICODE");
+  assert.equal(
+    valueMatchesSchema(semanticError.result.structuredContent, TOOL_BY_NAME.get("text_normalize").outputSchema),
+    true,
+    "schema-valid semantic errors must match the published output schema"
+  );
 });
 
 test("MCP complete envelopes stay bounded at maximum input in both eras", () => {
@@ -328,6 +688,55 @@ test("live MCP serves a modern stateless client without any handshake", async ()
   assert.equal(messages[1].result.isError, false);
   assert.equal(messages[1].result.structuredContent.counts.codePoints, 2);
   assert.ok(!messages[1].result.content[0].text.startsWith("{"));
+});
+
+test("wire carriers reject malformed UTF-8 without hiding replacement and recover", async () => {
+  const malformedMcp = invalidUtf8Json(
+    '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"text_inspect","arguments":{"text":"',
+    '"}}}\n'
+  );
+  const validMcp = Buffer.from(`${JSON.stringify({
+    jsonrpc: "2.0", id: 2, method: "tools/call",
+    params: {
+      _meta: { "io.modelcontextprotocol/protocolVersion": "2026-07-28" },
+      name: "text_inspect", arguments: { text: "after" }
+    }
+  })}\n`);
+  const child = spawn(process.execPath, ["bin/text-integrity-mcp.js"], { cwd: ROOT, stdio: ["pipe", "pipe", "pipe"] });
+  let stdout = "";
+  child.stdout.setEncoding("utf8");
+  child.stdout.on("data", (chunk) => { stdout += chunk; });
+  child.stdin.end(Buffer.concat([malformedMcp, validMcp]));
+  const [code] = await once(child, "exit");
+  assert.equal(code, 0);
+  const messages = stdout.trim().split("\n").map(JSON.parse);
+  assert.equal(messages[0].error.code, -32700);
+  assert.equal(messages[1].result.structuredContent.detail.codePoints[0].character, "a");
+
+  const server = createUiServer();
+  server.listen(0, "127.0.0.1");
+  await once(server, "listening");
+  try {
+    const address = server.address();
+    const url = `http://127.0.0.1:${address.port}/api/run`;
+    const malformedResponse = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: invalidUtf8Json('{"operation":"inspect","arguments":{"text":"', '"}}')
+    });
+    assert.equal(malformedResponse.status, 400);
+    assert.equal((await malformedResponse.json()).error.code, "INVALID_INPUT");
+
+    const recoveredResponse = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ operation: "inspect", arguments: { text: "after" } })
+    });
+    assert.equal(recoveredResponse.status, 200);
+    assert.equal((await recoveredResponse.json()).counts.codePoints, 5);
+  } finally {
+    server.close();
+  }
 });
 
 test("all carriers accept a valid core request after worst-case JSON escaping", async () => {
@@ -540,23 +949,51 @@ test("local human surface stays minimal and uses the same bounded core", async (
   const pageText = await (await fetch(base)).text();
   assert.equal((pageText.match(/<option value=/gu) ?? []).length >= 8, true);
   assert.match(pageText, /Explain difference/u);
+  assert.match(pageText, /Complete trace/u);
   assert.doesNotMatch(pageText, /source span|agent metadata|risk score/iu);
   const appText = await (await fetch(`${base}/app.js`)).text();
   assert.match(appText, /AbortController/u);
   assert.match(appText, /requestSerial/u);
+  assert.match(appText, /operation\.addEventListener\("change", resetTask\)/u);
+  assert.match(appText, /form\.addEventListener\("input"/u);
+  assert.match(appText, /form\.addEventListener\("change"/u);
   assert.match(appText, /Byte \$\{index \+ 1\} is empty/u);
   assert.match(appText, /#security-direction/u);
+  assert.match(appText, /witnessMode/u);
+  assert.match(appText, /Fact boundaries/u);
   assert.doesNotMatch(appText, /confusableDirection:\s*"LTR"/u);
   assert.doesNotMatch(appText, /split\(","\)\.filter/u);
   const cssText = await (await fetch(`${base}/styles.css`)).text();
+  assert.match(cssText, /\[hidden\]\s*\{\s*display:\s*none !important;/u);
   assert.match(cssText, /\.text-value \{ white-space: pre-wrap/u);
 
   const normalized = await fetch(`${base}/api/run`, {
     method: "POST", headers: { "content-type": "application/json" },
-    body: JSON.stringify({ operation: "normalize", arguments: { text: "e\u0301", form: "NFC" } })
+    body: JSON.stringify({
+      operation: "normalize",
+      arguments: { text: "e\u0301", form: "NFC", witnessMode: "full_required" }
+    })
   });
   assert.equal(normalized.status, 200);
-  assert.equal((await normalized.json()).normalized, "é");
+  const normalizedValue = await normalized.json();
+  assert.equal(normalizedValue.normalized, "é");
+  assert.equal(normalizedValue.witness.compositionCount, 1);
+  const difference = await fetch(`${base}/api/run`, {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      operation: "explain_difference",
+      arguments: {
+        left: "e\u0301", right: "é", locale: "en", options: COLLATION_OPTIONS,
+        confusableDirection: "LTR", witnessMode: "full_required"
+      }
+    })
+  });
+  assert.equal(difference.status, 200);
+  const differenceValue = await difference.json();
+  assert.equal(differenceValue.witness.transformations.normalization.NFC.leftOutput, "é");
+  assert.equal(differenceValue.witness.alignment.codePoint.segments[0].kind, "replace");
+  assert.equal(differenceValue.witness.alignment.grapheme.segments[0].kind, "replace");
+  assert.equal(differenceValue.witness.factBoundaries.collation.environmentBound, true);
   const invalid = await fetch(`${base}/api/run`, {
     method: "POST", headers: { "content-type": "application/json" },
     body: JSON.stringify({ operation: "inspect", arguments: { text: "a".repeat(4097) } })

@@ -4,6 +4,14 @@ import { TextIntegrityError, errorPayload } from "../core/errors.js";
 import { LIMITS } from "../core/limits.js";
 import { summarizeResult } from "./summary.js";
 import { PRODUCT_NAME, VERSION } from "../version.js";
+import { parseUtf8Json } from "../transport-json.js";
+import { valueMatchesSchema } from "../reference/json-validation.js";
+import {
+  PUBLIC_RESULT_SCHEMA_VERSION,
+  RESULT_SCHEMA_RESOURCE_LIST,
+  resultSchemaResourceForOperation,
+  resultSchemaResourceForUri
+} from "../result-contract.js";
 
 const SERVER_INFO = Object.freeze({ name: PRODUCT_NAME, version: VERSION });
 
@@ -36,17 +44,24 @@ function legacySupportsStructuredContent(negotiatedVersion) {
   return LEGACY_PROTOCOL_VERSIONS.indexOf(negotiatedVersion) <= STRUCTURED_CONTENT_LEGACY_MIN;
 }
 
-function modernMeta() {
-  return { [SERVER_INFO_META_KEY]: SERVER_INFO };
+function modernMeta(operation = undefined) {
+  const schemaResource = operation === undefined ? null : resultSchemaResourceForOperation(operation);
+  return {
+    [SERVER_INFO_META_KEY]: SERVER_INFO,
+    ...(schemaResource === null ? {} : {
+      "text-integrity/publicResultContract": PUBLIC_RESULT_SCHEMA_VERSION,
+      "text-integrity/resultSchemaUri": schemaResource.uri
+    })
+  };
 }
 
-function toolResultModern(value, isError) {
+function toolResultModern(value, isError, operation) {
   return {
     resultType: "complete",
     content: [{ type: "text", text: summarizeResult(value) }],
     structuredContent: value,
     isError,
-    _meta: modernMeta()
+    _meta: modernMeta(operation)
   };
 }
 
@@ -61,20 +76,32 @@ function toolResultLegacy(value, isError, negotiatedVersion) {
 function callTool(message) {
   const tool = TOOL_BY_NAME.get(message.params?.name);
   if (!tool) {
-    return { value: errorPayload(new TextIntegrityError("UNKNOWN_TOOL", "The requested tool does not exist.")), isError: true };
+    return {
+      protocolError: { code: -32602, message: "Unknown tool" }
+    };
+  }
+  const arguments_ = message.params?.arguments ?? {};
+  if (!valueMatchesSchema(arguments_, tool.inputSchema)) {
+    return {
+      protocolError: {
+        code: -32602,
+        message: "Invalid tool arguments",
+        data: { tool: tool.name }
+      }
+    };
   }
   try {
-    return { value: executeOperation(tool.operation, message.params?.arguments ?? {}), isError: false };
+    return { value: executeOperation(tool.operation, arguments_), isError: false, operation: tool.operation };
   } catch (error) {
-    return { value: errorPayload(error), isError: true };
+    return { value: errorPayload(error), isError: true, operation: tool.operation };
   }
 }
 
-function listedTools() {
-  return TOOL_DEFINITIONS.map(({ operation: _operation, ...tool }) => tool);
+function listedTools(toolDefinitions) {
+  return toolDefinitions.map(({ operation: _operation, ...tool }) => tool);
 }
 
-export function createMcpSession() {
+export function createMcpSession({ toolDefinitions = TOOL_DEFINITIONS } = {}) {
   let initialized = false;
   let negotiatedLegacyVersion = LATEST_LEGACY_PROTOCOL_VERSION;
 
@@ -119,7 +146,10 @@ export function createMcpSession() {
         id,
         result: {
           protocolVersion: negotiatedLegacyVersion,
-          capabilities: { tools: { listChanged: false } },
+          capabilities: {
+            tools: { listChanged: false },
+            resources: { subscribe: false, listChanged: false }
+          },
           serverInfo: SERVER_INFO
         }
       }, id);
@@ -151,7 +181,10 @@ export function createMcpSession() {
         result: {
           resultType: "complete",
           supportedVersions: SUPPORTED_PROTOCOL_VERSIONS,
-          capabilities: { tools: { listChanged: false } },
+          capabilities: {
+            tools: { listChanged: false },
+            resources: { subscribe: false, listChanged: false }
+          },
           _meta: modernMeta(),
           ttlMs: DISCOVER_TTL_MS,
           cacheScope: "public"
@@ -164,7 +197,37 @@ export function createMcpSession() {
         id,
         result: {
           resultType: "complete",
-          tools: listedTools(),
+          tools: listedTools(toolDefinitions),
+          _meta: modernMeta(),
+          ttlMs: CATALOG_TTL_MS,
+          cacheScope: "public"
+        }
+      };
+    }
+    if (message.method === "resources/list") {
+      return {
+        jsonrpc: "2.0",
+        id,
+        result: {
+          resultType: "complete",
+          resources: RESULT_SCHEMA_RESOURCE_LIST,
+          _meta: modernMeta(),
+          ttlMs: CATALOG_TTL_MS,
+          cacheScope: "public"
+        }
+      };
+    }
+    if (message.method === "resources/read") {
+      const resource = resultSchemaResourceForUri(message.params?.uri);
+      if (resource === null) {
+        return { jsonrpc: "2.0", id, error: { code: -32602, message: "Unknown result schema resource" } };
+      }
+      return {
+        jsonrpc: "2.0",
+        id,
+        result: {
+          resultType: "complete",
+          contents: [{ uri: resource.uri, mimeType: resource.mimeType, text: JSON.stringify(resource.schema) }],
           _meta: modernMeta(),
           ttlMs: CATALOG_TTL_MS,
           cacheScope: "public"
@@ -172,8 +235,9 @@ export function createMcpSession() {
       };
     }
     if (message.method === "tools/call") {
-      const { value, isError } = callTool(message);
-      return { jsonrpc: "2.0", id, result: toolResultModern(value, isError) };
+      const { value, isError, operation, protocolError } = callTool(message);
+      if (protocolError !== undefined) return { jsonrpc: "2.0", id, error: protocolError };
+      return { jsonrpc: "2.0", id, result: toolResultModern(value, isError, operation) };
     }
     return { jsonrpc: "2.0", id, error: { code: -32601, message: "Method not found" } };
   }
@@ -181,10 +245,25 @@ export function createMcpSession() {
   function handleLegacyRequest(message, id) {
     if (message.method === "ping") return { jsonrpc: "2.0", id, result: {} };
     if (message.method === "tools/list") {
-      return { jsonrpc: "2.0", id, result: { tools: listedTools() } };
+      return { jsonrpc: "2.0", id, result: { tools: listedTools(toolDefinitions) } };
+    }
+    if (message.method === "resources/list") {
+      return { jsonrpc: "2.0", id, result: { resources: RESULT_SCHEMA_RESOURCE_LIST } };
+    }
+    if (message.method === "resources/read") {
+      const resource = resultSchemaResourceForUri(message.params?.uri);
+      if (resource === null) {
+        return { jsonrpc: "2.0", id, error: { code: -32602, message: "Unknown result schema resource" } };
+      }
+      return {
+        jsonrpc: "2.0",
+        id,
+        result: { contents: [{ uri: resource.uri, mimeType: resource.mimeType, text: JSON.stringify(resource.schema) }] }
+      };
     }
     if (message.method === "tools/call") {
-      const { value, isError } = callTool(message);
+      const { value, isError, protocolError } = callTool(message);
+      if (protocolError !== undefined) return { jsonrpc: "2.0", id, error: protocolError };
       return { jsonrpc: "2.0", id, result: toolResultLegacy(value, isError, negotiatedLegacyVersion) };
     }
     return { jsonrpc: "2.0", id, error: { code: -32601, message: "Method not found" } };
@@ -278,7 +357,7 @@ export function runMcpServer(input = process.stdin, output = process.stdout) {
   function handleLine(line) {
     let message;
     try {
-      message = JSON.parse(line.toString("utf8"));
+      message = parseUtf8Json(line);
     } catch {
       enqueueResponse({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "Parse error" } });
       return;

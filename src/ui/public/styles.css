@@ -61,7 +61,7 @@ textarea:focus, input:focus, select:focus, button:focus-visible {
   border-color: #286fae;
 }
 
-section[hidden], #result[hidden], label[hidden] { display: none; }
+[hidden] { display: none !important; }
 
 .grid {
   display: grid;

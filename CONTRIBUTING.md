@@ -1,9 +1,10 @@
 # Contributing
 
 Thanks for considering a contribution. This repository is a deterministic
-Unicode product: small, explicit, and heavily verified. Before changing
-behavior, read [`docs/PRODUCT_MODEL.md`](docs/PRODUCT_MODEL.md) and
-[`docs/REVIEW_CONTRACT.md`](docs/REVIEW_CONTRACT.md).
+Unicode product with explicit inputs and bounded results. Read
+[`docs/PRODUCT_MODEL.md`](docs/PRODUCT_MODEL.md) when a change would alter
+product meaning. Use [`docs/REVIEW_CONTRACT.md`](docs/REVIEW_CONTRACT.md) for
+review and handoff; it is not a pre-implementation checklist.
 
 ## Getting started
 
@@ -11,12 +12,11 @@ behavior, read [`docs/PRODUCT_MODEL.md`](docs/PRODUCT_MODEL.md) and
 git clone <repository>
 cd text-integrity
 npm ci
-npm run check
 ```
 
-`npm run check` must pass before any change is proposed. It reruns syntax
-checks, the full test suite including every pinned Unicode conformance corpus,
-compact-data reproducibility, and the package inventory.
+Before proposing or handing off a change, `npm run check` must pass. It reruns
+syntax checks, the full test suite including every pinned Unicode conformance
+corpus, compact-data reproducibility, and the package inventory.
 
 ## Ground rules
 

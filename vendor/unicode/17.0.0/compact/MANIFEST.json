@@ -1,13 +1,13 @@
 {
-  "formatVersion": 1,
+  "formatVersion": 4,
   "unicodeVersion": "17.0.0",
   "uts39Revision": 32,
-  "sourceManifestSha256": "1ffde2215f0cada8c74e656afdb0a92226c1b293f1ef68776bed2e583869b4a7",
+  "sourceManifestSha256": "1e0677ee007d4b9d280c7d65209c13cc5c7ce09443fb05fa7b39cbc6652988cf",
   "files": [
     {
       "path": "data.bin",
-      "bytes": 435628,
-      "sha256": "ef45c40139e72d47c1b1c2e5a623a4274ee830f19092ef13e8784c277180fc73"
+      "bytes": 571192,
+      "sha256": "7419b6b6af6f8184dc13c48a5ce5b10c20edd80f977d6769bc71214a9c06b564"
     }
   ],
   "generator": "scripts/build-unicode-data.mjs"

@@ -1,164 +1,165 @@
 # Text Integrity product model
 
-## Product and tasks
+## Product and task
 
-Text Integrity is one concrete provider product for software makers, support
-operators, localization work, and Agents that need deterministic facts about
-explicit text. It replaces repeated ad-hoc string reasoning with one bounded
-operation whose inputs, data versions, transformations, and limitations are
-visible.
+Text Integrity is a deterministic fact provider for people and software that
+need to inspect explicit text or bytes without asking a model to guess what the
+author meant. A human can paste a value into the local interface; a host that
+already has structured input can call the library, CLI, MCP server, or bounded
+reference WASM carrier directly.
 
-The human task is to paste text or bytes, select one of eight repeat-use tasks,
-and inspect the result. The Agent task is to invoke one direct typed tool for
-inspection, normalization, collation, transcoding, difference explanation,
-coordinate/chunk mapping, Unicode security/source diagnostics, or a named
-protocol-string profile.
+The product reports transformations, relations, coordinates, protocol results,
+Unicode-security properties, data identity, runtime identity, and declared
+limitations. Policy remains with the caller: Text Integrity does not decide
+whether a name is acceptable, a source is malicious, or a difference is
+intentional.
 
-## Shared semantics
+## Authority and shared semantics
 
-All behavior lives in `src/core/`. CLI, MCP, and HTTP/UI are adapters and do not
-reimplement Unicode algorithms. Every input is an inline string, byte array, or
-host-supplied span over an inline string. There is no path, URL, clipboard,
-workspace, parser, compiler, font, or network authority.
+All production semantics live in `src/core/`. Adapters own framing and
+presentation only. The independent Rust implementation and import-free WASM
+module are comparison implementations; they do not silently replace the core
+or promote their own results into correctness claims.
 
-The core combines:
+Inputs contain only inline strings, byte arrays, explicit options, and optional
+caller-provided spans over inline source. The product has no path, URL,
+clipboard, workspace, parser, compiler, font, model, or network authority.
 
-- a build-time compact interval-table image generated deterministically from
-  the pinned Unicode 17.0.0 UCD and UTS #39 revision 32 sources, SHA-256
-  verified on load and byte-reproducible from those sources;
-- Node's Unicode-17 normalization, grapheme, decoder, and locale runtime;
-- a vendored Unicode-17 build of `bidi-js` for UBA L2 plus explicit L3/L4;
-- pinned `tr46@6.0.0` data and algorithms for UTS #46 revision 35;
-- direct RFC 8264 derived-property and RFC 8265 profile evaluation.
+Normative Unicode behavior is fixed to the packaged Unicode 17.0.0 data and UTS
+#39 revision 32 sources. The compact runtime image is deterministically
+generated and digest-checked against those pinned inputs. Normalization,
+extended grapheme segmentation, default lowercase for PRECIS, UTF-8/UTF-16LE
+decoding, and the security primitives owned by the project do not delegate
+their semantics to mutable host string helpers. Locale collation remains an
+explicit Node/ICU environment measurement. UTS #46 uses the fixed `tr46` and
+Punycode dependency boundary named by the package.
 
-The package requires Node
-`>=22.22.1 <23 || >=24.20.0 <25 || >=26.8.1 <27` and checks
-`process.versions.unicode === "17.0"` before every operation; the full
-conformance suite has been run and passed on Node 22, 24, and 26. Runtime
-versions remain part of every result because ICU collation is versioned data
-rather than an eternal platform fact.
+Executable schemas and version constants own exact current shapes. In
+particular, the complete result ABI is
+`text-integrity.public-result-contract/2`; the MCP catalog uses a compact
+projection of the same result values so discovery remains bounded. Complete
+per-operation JSON Schemas are available from the library, CLI, and MCP static
+resources.
 
-## Operations and effects
+## Operations
 
-All eight operations are read-only and idempotent.
+The eight public operations are read-only and idempotent.
 
-1. `inspect` accepts even malformed JavaScript UTF-16 so an isolated surrogate
-   can be observed without fabricating UTF-8 bytes.
-2. `normalize` rejects malformed UTF-16, preserves the original, and keeps
-   canonical and compatibility equivalence separate.
-3. `compare` requires every supported collation option, including locale
-   matcher and collation type, and returns requested and resolved options.
-4. `transcode` accepts explicit text or bytes in the closed UTF-8/UTF-16LE set.
-   Strict processing is default; replacement is opt-in and always reports loss.
-   BOM, first invalid byte, and source re-encode equality make byte effects
-   inspectable. The caller selects exactly one byte representation
-   (`bytes`, `hex`, or `base64`); equivalent payload copies are not multiplied.
-5. `security` is a tagged family:
-   - `free_text` is descriptive only;
-   - `identifier` requires one named UAX #31/UTS #39 profile and optionally one
-     explicit comparison direction;
-   - `source` requires explicit source plus host-provided token/identifier spans
-     and scope labels.
-6. `explain_difference` composes exact, normalization, NFKC_Casefold,
-   coordinate, invisible/newline, collation, and identifier-confusable facts
-   into one deterministic task result. It does not infer why a human authored
-   the difference.
-7. `index` maps five coordinate systems and optionally chunks only at extended
-   grapheme boundaries.
-8. `protocol_profile` keeps UTS #46 and each PRECIS profile separately named.
-   Protocol processing is not presented as ordinary normalization.
+1. `inspect` observes code points, extended grapheme clusters, encoded sizes,
+   malformed UTF-16, and bounded detail.
+2. `normalize` applies NFC, NFD, NFKC, or NFKD without mutating the input. It
+   keeps canonical and compatibility relations separate and can return no
+   witness, a complete summary, or a fail-closed complete witness.
+3. `compare` performs explicitly configured locale collation and returns both
+   requested and runtime-resolved options and versions.
+4. `transcode` decodes or encodes the closed UTF-8/UTF-16LE set. Strict mode is
+   the default; replacement is opt-in and reported as loss. BOM presence, the
+   first invalid byte, round-trip facts, one selected byte representation, and
+   optional bounded witnesses remain visible.
+5. `security` is a tagged family: descriptive free-text observations; one named
+   identifier profile with optional confusable comparison; or diagnostics over
+   explicit source and caller-provided token/identifier spans and scopes.
+6. `explain_difference` composes exact representation, normalization,
+   NFKC_Casefold, coordinates, deterministic code-point/grapheme alignment,
+   invisible/newline facts, locale collation, and identifier-confusable facts.
+   It explains observable differences, not author intent.
+7. `index` maps UTF-8 byte, UTF-16 code-unit, code-point, extended-grapheme, and
+   line/column coordinates. Optional chunks end only at grapheme boundaries.
+8. `protocol_profile` keeps UTS #46 domain processing and the named RFC 8265
+   PRECIS profiles separate from ordinary normalization. Witnesses report only
+   stages the selected engine actually exposes.
 
-## Identifier and source boundaries
+A requested complete witness either returns every declared stage or segment or
+fails; summary mode retains complete counts and identities without pretending
+to be the expanded representation.
 
-The identifier profiles are:
+## Identifier, source, and namespace boundaries
 
-- `uax31_xid`: XID_Start followed by XID_Continue;
-- `uax31_nfkc_casefold`: NFKC_Casefold followed by XID syntax;
-- `uts39_general_security`: XID syntax plus UTS #39 allowed repertoire,
-  restriction-level, and mixed-number observations.
+Identifier profiles expose named UAX #31/UTS #39 predicates. Confusable
+comparison supports explicit LTR, RTL, and first-strong directions through the
+pinned Unicode-17 bidi/skeleton path. Internal skeleton strings are never
+returned as normalized text.
 
-Confusable comparison implements Unicode 17 `bidiSkeleton` for explicit LTR,
-RTL, or first-strong direction using full UBA reordering, L3 combining-mark
-reversal, and L4 mirroring. Default_Ignorable code points are removed at the
-normative internal-skeleton step. Skeleton strings are never returned as a
-normalization; relations, classes, resolved scripts, paragraph levels, and
-digests are returned.
+Source diagnostics are not a language parser. The caller owns the correctness
+of spans and scopes; Text Integrity maps those coordinates to Unicode facts and
+does not discover files, symbols, scopes, or maliciousness.
 
-Source diagnostics are intentionally not a language parser. The caller owns
-span and scope correctness. The operation only maps those spans to current
-Unicode facts: same-scope confusable identifiers, bidi/default-ignorable/format
-characters, and abnormal line endings. It returns no maliciousness, code
-correctness, or authorization decision.
+`analyzeNamespaceIntegrity` is a bounded direct-library collection operation,
+not a ninth MCP tool. It groups explicit IDs within explicit scopes under named
+exact, normalization, NFKC_Casefold, confusable, protocol, or declared-
+collation relations without returning an all-pairs matrix. It does not choose
+an application uniqueness policy. Non-collation key digests are identities,
+not anonymization; low-entropy values can be enumerated offline. Declared ICU
+collation remains environment-bound and never fabricates a sort key.
 
-## Protocol profiles
+## Reference and replay model
 
-`uts46_domain` supports explicit `to_ascii` and `to_unicode` actions and every
-available processing flag. `to_unicode` supplements `tr46@6.0.0` with the UTS
-#46 revision-35 X4_2 interior/empty-label compatibility check; a final root dot
-remains permitted.
+The `text-integrity/reference` entrypoint provides canonical JSON, tagged text
+materialization, behavior manifests, result projections, measurement records,
+replay, comparison, property observations, replay receipts, and package-sidecar
+verification. These functions are reference infrastructure, not additional
+text operations.
 
-PRECIS exposes case-mapped and case-preserved Username profiles and
-the OpaqueString profile. Derived properties, context rules, width/additional
-mapping, case mapping, NFC, directionality, and idempotence-checked enforcement are
-evaluated from the pinned Unicode data. Comparison means equality only after
-the same named profile is independently enforced on both explicit strings.
+`text-integrity.measurement-record/2` retains one explicit tagged request, the
+complete public success or deterministic error result, data and operation
+identity, reproducibility target, four digests, and fixed non-claims under its
+declared byte and graph limits. Serialized consumers enter through the bounded,
+duplicate-key-rejecting parser before structural validation.
+
+Replay reruns only the retained request against the current runtime and returns
+a digest-only drift observation. Offline comparison accepts two validated
+records and reports every changed identity category without copying request or
+result text. Cross-runtime expectation applies only to the same request under a
+cross-runtime-exact profile and depends on data plus semantic identity.
+Environment or complete-result equality is not runtime equivalence.
+
+The committed behavior manifest and replay receipt are reproducible comparison
+inputs. Package sidecars remain external records paired with exact tarball
+bytes. Unknown schema versions reject until an explicit version-aware adapter
+exists. None of these artifacts certifies correctness, conformance, release,
+rollback, privacy, or business acceptance.
+
+The independent Rust/native/WASM route consumes the same tagged request model
+and pinned data. Each operation or sub-operation is described only at the
+parity scope currently executed by `npm run check:independent`. ICU-dependent
+collation and any unimplemented complete consumer remain explicitly outside a
+cross-runtime-exact claim. Raw ABI versions, statuses, limits, module identity,
+and supported WASM operations are owned by `src/reference/wasm.js`,
+`wasm/MANIFEST.json`, and `native/README.md`, rather than duplicated here.
 
 ## Determinism and claim boundary
 
-The deterministic unit is:
+The reproducible unit is the operation, explicit arguments, package version,
+declared data identity, and relevant runtime identity. There is no sampling,
+model inference, probability, user history, ambient lookup, or hidden policy.
 
-`operation + explicit arguments + package version + declared runtime/data versions`.
+An identifier `conforms` result means only that the selected profile's
+predicates passed. A `not_confusable` result is bounded to the selected data,
+direction, and algorithm. A digest match is an identity observation. A passing
+test or independent comparison is a check of its named corpus and projection;
+none is a universal security, quality, or product-acceptance verdict.
 
-There is no model inference, randomness, network lookup, font-dependent visual
-judgment, user-history input, or global security score. An identifier-profile
-`conforms` value means only that named profile's deterministic predicates
-passed; it is not an application authorization or benignness claim. A
-`not_confusable` result is bounded to the named direction, Unicode data, and
-algorithm, not every possible rendering.
+## Agent and human delivery
 
-## Agent route and cost
+Structured callers should use the library or direct host route without an
+Agent turn. Natural-language callers should reach one of the eight MCP tools in
+one selection and one call; the complete selected schema must be sufficient
+without a preliminary discovery call. Stable errors and cumulative bounds make
+invalid calls recoverable without speculative retries.
 
-The public catalog is capped at eight direct tools. Each dominant task takes
-one call and requires no list/describe preflight. `text_explain_difference`
-exists specifically to avoid an Agent making several calls and synthesizing a
-Unicode conclusion itself. `text_index_map` makes offsets and context-budget
-chunks executable rather than conversational.
+The local web surface is a minimal professional measurement interface. It
+exposes the repeat-use human tasks while keeping protocol, Agent, engine, and
+reference-system mechanics out of the primary UI. Inputs and results are not
+persisted.
 
-Hosts that already hold structured arguments import the library entry and
-spend zero Agent turns; the CLI, MCP, and web carriers call the same core
-functions. The MCP transport serves both protocol eras from one process: the
-modern stateless `2026-07-28` revision (`server/discover`, per-request
-`_meta` versioning, `ttlMs`/`cacheScope` list caching, `resultType`) and the
-legacy `initialize` era. Modern tool results carry a concise deterministic
-text summary plus the complete structured result; legacy revisions keep the
-JSON-equivalent text behavior. `transcode` returns exactly one
-caller-selected byte representation. The measured envelope and catalog costs
-are recorded in `docs/PERFORMANCE_BASELINE.md`.
+## Layer classification and non-goals
 
-Limits apply to complete input and output envelopes. Detail is explicitly
-bounded; aggregate counts remain complete. A representation that cannot fit is
-rejected instead of partially serialized. No latency or token advantage is
-claimed beyond the measured runtime facts recorded in the baseline.
-
-## Layer classification
-
-- Provider core: this repository.
-- Tools: library entry, CLI, MCP, and local HTTP carriers.
-- Transport: the MCP stdio server owns framing only — bounded queues,
-  backpressure, deadlines, and cancellation — with no Unicode semantics.
-- Plugin: validated product-local MCP manifest; source-local only and not
-  installed or published by this repository.
-- Human surface: minimal local web UI.
-- Skill: absent; the direct catalog contains no unresolved routing method.
-- Procedure: absent; the operations do not define one settled professional
-  multi-stage workflow.
-- Capability Profile: absent; no second real provider establishes substitution.
-
-## Non-goals
+Text Integrity is one concrete provider. It does not claim a provider-neutral
+Capability Profile or Procedure, and it does not need an Agent facade around
+already structured work. A portable semantic standard requires a second real
+provider and a separate interoperability decision.
 
 Translation, language detection, proofreading, transliteration, regex
-execution, semantic similarity, arbitrary file/workspace scanning, parsing,
-compilation, rendering-specific visual judgment, and overall security
-classification remain outside this product. A future encoding, language
-profile, or security claim requires authoritative data, a current consumer,
-closed semantics, and executable conformance before it enters the core.
+execution, semantic similarity, rendering-specific visual judgment, repository
+scanning, application authorization, maliciousness classification, automatic
+repair planning, and author-intent inference remain outside the product.

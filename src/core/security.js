@@ -4,6 +4,8 @@ import { TextIntegrityError } from "./errors.js";
 import { LIMITS, assertCombinedTextBudget, assertTextBudget } from "./limits.js";
 import { runtimeInfo } from "./runtime.js";
 import { dataLookup, unicodeSecurityData } from "./unicode-security-data.js";
+import { normalizeUnicode17 } from "./normalization.js";
+import { compareUtf16CodeUnits } from "./string-order.js";
 import { assertKeys, requireEnum, requireInteger, requireObject, requireString } from "./validation.js";
 
 const SECURITY_MODES = Object.freeze(["free_text", "identifier"]);
@@ -51,7 +53,7 @@ function intersect(left, right) {
 
 function sortedCounts(counts) {
   return [...counts.entries()]
-    .sort(([left], [right]) => left.localeCompare(right))
+    .sort(([left], [right]) => compareUtf16CodeUnits(left, right))
     .map(([value, count]) => ({ value, count }));
 }
 
@@ -88,7 +90,7 @@ export function analyzeText(data, text, mode, detailLimit) {
     let identifierTypes;
     if (mode === "identifier") {
       identifierStatus = dataLookup(data.identifierAllowed, codePoint) === "Allowed" ? "Allowed" : "Restricted";
-      identifierTypes = dataLookup(data.identifierTypes, codePoint) ?? ["Not_Character"];
+      identifierTypes = [...(dataLookup(data.identifierTypes, codePoint) ?? ["Not_Character"])];
       statusCounts[identifierStatus] += 1;
       for (const type of identifierTypes) typeCounts.set(type, (typeCounts.get(type) ?? 0) + 1);
     }
@@ -139,23 +141,23 @@ export function nfkcCasefold(data, text) {
       ? data.nfkcCasefoldMappings.get(codePoint)
       : character;
   }
-  return result.normalize("NFC");
+  return normalizeUnicode17(result, "NFC", data);
 }
 
-function internalSkeleton(data, text) {
+export function uts39PostReorderSkeleton(data, text) {
   const mapped = [];
-  for (const character of text.normalize("NFD")) {
+  for (const character of normalizeUnicode17(text, "NFD", data)) {
     const codePoint = character.codePointAt(0);
     if (dataLookup(data.defaultIgnorable, codePoint) === true) continue;
     mapped.push(data.confusables.get(codePoint) ?? character);
   }
-  return mapped.join("").normalize("NFD");
+  return normalizeUnicode17(mapped.join(""), "NFD", data);
 }
 
 export function bidiSkeleton(data, text, direction) {
   const reordered = reorderForDisplay(data, text, direction);
   return {
-    value: internalSkeleton(data, reordered.text),
+    value: uts39PostReorderSkeleton(data, reordered.text),
     paragraphLevels: reordered.paragraphLevels
   };
 }

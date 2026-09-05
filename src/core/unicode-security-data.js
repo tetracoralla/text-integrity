@@ -6,13 +6,20 @@ import { assertPinnedUnicodeRuntime } from "./runtime.js";
 const DATA_ROOT = new URL("../../vendor/unicode/17.0.0/", import.meta.url);
 const COMPACT_MANIFEST_URL = new URL("compact/MANIFEST.json", DATA_ROOT);
 const COMPACT_DATA_URL = new URL("compact/data.bin", DATA_ROOT);
-const EXPECTED_MANIFEST_SHA256 = "1ffde2215f0cada8c74e656afdb0a92226c1b293f1ef68776bed2e583869b4a7";
-const EXPECTED_COMPACT_MANIFEST_SHA256 = "7f0c5e13c2df76d2836e7b9a2ec42042a3da8cbc4c72d6642b01dd643d3225a8";
+const EXPECTED_MANIFEST_SHA256 = "1e0677ee007d4b9d280c7d65209c13cc5c7ce09443fb05fa7b39cbc6652988cf";
+const EXPECTED_COMPACT_MANIFEST_SHA256 = "3c8a54c3d74be6b11ac6458c882d86d0564da031640f90b6a6354fef0dd001c0";
 const EXPECTED_UNICODE_VERSION = "17.0.0";
 const EXPECTED_UTS39_REVISION = 32;
-const COMPACT_FORMAT_VERSION = 1;
+const COMPACT_FORMAT_VERSION = 4;
 const COMPACT_MAGIC = 0x31495554;
-const PAIR_SECTIONS = new Set(["bidiMirroring", "confusables", "widthMappings"]);
+const PAIR_SECTIONS = new Set([
+  "bidiMirroring",
+  "confusables",
+  "widthMappings",
+  "lowercaseMappings",
+  "canonicalDecompositions",
+  "compatibilityDecompositions"
+]);
 const LIST_SECTIONS = new Set(["recommendedScripts"]);
 
 let cachedData;
@@ -47,6 +54,21 @@ function pairLookup(table, key) {
     if (key < table.data[base]) high = middle - 1;
     else if (key > table.data[base]) low = middle + 1;
     else return table.data[base + 1];
+  }
+  return undefined;
+}
+
+function triplePairLookup(table, first, second) {
+  let low = 0;
+  let high = table.count - 1;
+  while (low <= high) {
+    const middle = (low + high) >> 1;
+    const base = middle * 3;
+    const currentFirst = table.data[base];
+    const currentSecond = table.data[base + 1];
+    if (first < currentFirst || (first === currentFirst && second < currentSecond)) high = middle - 1;
+    else if (first > currentFirst || (first === currentFirst && second > currentSecond)) low = middle + 1;
+    else return table.data[base + 2];
   }
   return undefined;
 }
@@ -177,6 +199,10 @@ function parseCompactBlob(manifest, blob) {
     const table = { data: view.data, count: view.count };
     return { kind: "ranges", lookup: (codePoint) => { const ref = rangeLookup(table, codePoint); return ref === undefined ? undefined : strings[ref]; } };
   };
+  const compositionMap = (view) => {
+    const table = { data: view.data, count: view.count };
+    return { get: (first, second) => triplePairLookup(table, first, second) };
+  };
 
   const recommendedView = sectionView("recommendedScripts");
   const recommendedScripts = new Set();
@@ -194,6 +220,14 @@ function parseCompactBlob(manifest, blob) {
   }
 
   return {
+    identity: Object.freeze({
+      unicodeVersion: header.unicodeVersion,
+      uts39Revision: header.uts39Revision,
+      sourceManifestSha256: EXPECTED_MANIFEST_SHA256,
+      compactFormatVersion: COMPACT_FORMAT_VERSION,
+      compactManifestSha256: sha256(readFileSync(COMPACT_MANIFEST_URL)),
+      compactDataSha256: manifest.files[0].sha256
+    }),
     metadata: Object.freeze({
       unicodeVersion: header.unicodeVersion,
       uts39Revision: header.uts39Revision,
@@ -206,6 +240,11 @@ function parseCompactBlob(manifest, blob) {
     identifierTypes: multiRange(sectionView("identifierTypes")),
     confusables: mapInterface(stringPair(sectionView("confusables")).lookup),
     defaultIgnorable: boolRange(sectionView("defaultIgnorable")),
+    cased: boolRange(sectionView("cased")),
+    caseIgnorable: boolRange(sectionView("caseIgnorable")),
+    graphemeBreaks: stringRange(sectionView("graphemeBreaks")),
+    extendedPictographic: boolRange(sectionView("extendedPictographic")),
+    indicConjunctBreak: stringRange(sectionView("indicConjunctBreak")),
     xidStart: boolRange(sectionView("xidStart")),
     xidContinue: boolRange(sectionView("xidContinue")),
     bidiControl: boolRange(sectionView("bidiControl")),
@@ -218,8 +257,12 @@ function parseCompactBlob(manifest, blob) {
     bidiMirroring: mapInterface(intPair(sectionView("bidiMirroring")).lookup),
     nfkcCasefoldMappings: mapInterface(stringRangeMap(sectionView("nfkcCasefoldMappings")).lookup),
     combiningClasses: intRange(sectionView("combiningClasses")),
+    canonicalDecompositions: mapInterface(stringPair(sectionView("canonicalDecompositions")).lookup),
+    compatibilityDecompositions: mapInterface(stringPair(sectionView("compatibilityDecompositions")).lookup),
+    compositionMappings: compositionMap(sectionView("compositionMappings")),
     decimalValues: intRange(sectionView("decimalValues")),
     widthMappings: mapInterface(stringPair(sectionView("widthMappings")).lookup),
+    lowercaseMappings: mapInterface(stringPair(sectionView("lowercaseMappings")).lookup),
     joinControl: boolRange(sectionView("joinControl")),
     noncharacter: boolRange(sectionView("noncharacter")),
     unassigned: boolRange(sectionView("unassigned")),
@@ -248,6 +291,18 @@ export function unicodeSecurityData() {
 export function unicodeProtocolData() {
   assertPinnedUnicodeRuntime("Unicode 17 protocol-string profiles");
   return unicodeSecurityData();
+}
+
+export function unicodeNormalizationData() {
+  assertPinnedUnicodeRuntime("Unicode 17 normalization");
+  cachedData ??= buildData();
+  return cachedData;
+}
+
+export function unicodeDataIdentity() {
+  assertPinnedUnicodeRuntime("Unicode 17 data identity");
+  cachedData ??= buildData();
+  return cachedData.identity;
 }
 
 export function dataLookup(table, codePoint) {

@@ -7,6 +7,10 @@ import { explainDifference } from "./difference.js";
 import { applyProtocolProfile } from "./protocol.js";
 import { diagnoseSource } from "./source-diagnostics.js";
 import { indexText } from "./text-position.js";
+import { buildTranscodeWitness } from "./transcode-witness.js";
+import { decodeByteSegments, decodedText, decodeTextSegments } from "./transcode-codec.js";
+import { normalizeUnicode17, normalizeUnicode17WithWitness } from "./normalization.js";
+import { segmentGraphemesUnicode17 } from "./grapheme.js";
 import {
   assertKeys,
   requireBoolean,
@@ -19,12 +23,13 @@ import {
 const NORMALIZATION_FORMS = Object.freeze(["NFC", "NFD", "NFKC", "NFKD"]);
 const ENCODINGS = Object.freeze(["utf-8", "utf-16le"]);
 const BYTE_REPRESENTATIONS = Object.freeze(["bytes", "hex", "base64"]);
+const WITNESS_MODES = Object.freeze(["none", "summary", "full_required"]);
 
 function requireEncoding(value, field) {
   if (typeof value !== "string" || !ENCODINGS.includes(value)) {
     throw new TextIntegrityError("UNSUPPORTED_ENCODING", `${field} is not supported.`, {
       field,
-      requested: value,
+      requestedType: value === null ? "null" : Array.isArray(value) ? "array" : typeof value,
       supported: ENCODINGS
     });
   }
@@ -63,8 +68,7 @@ function inspect(args) {
 
   const graphemes = [];
   let graphemeCount = 0;
-  const segmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
-  for (const part of segmenter.segment(value)) {
+  for (const part of segmentGraphemesUnicode17(value)) {
     if (graphemes.length < detailLimit) {
       graphemes.push({ indexCodeUnit: part.index, text: part.segment });
     }
@@ -113,12 +117,18 @@ function assertWellFormed(value, field) {
 
 function normalize(args) {
   requireObject(args);
-  assertKeys(args, ["text", "form"], ["text", "form"]);
+  assertKeys(args, ["text", "form", "witnessMode"], ["text", "form"]);
   const value = requireString(args.text, "text");
   assertTextBudget(value, "text");
   assertWellFormed(value, "text");
   const form = requireEnum(args.form, "form", NORMALIZATION_FORMS);
-  const normalized = value.normalize(form);
+  const witnessMode = Object.hasOwn(args, "witnessMode")
+    ? requireEnum(args.witnessMode, "witnessMode", WITNESS_MODES)
+    : "none";
+  const transformation = witnessMode === "none"
+    ? { normalized: normalizeUnicode17(value, form) }
+    : normalizeUnicode17WithWitness(value, form, witnessMode);
+  const { normalized } = transformation;
 
   return {
     status: "ok",
@@ -127,12 +137,13 @@ function normalize(args) {
     original: value,
     normalized,
     changed: value !== normalized,
-    canonicalEquivalent: value.normalize("NFD") === normalized.normalize("NFD"),
-    compatibilityEquivalent: value.normalize("NFKD") === normalized.normalize("NFKD"),
+    canonicalEquivalent: normalizeUnicode17(value, "NFD") === normalizeUnicode17(normalized, "NFD"),
+    compatibilityEquivalent: normalizeUnicode17(value, "NFKD") === normalizeUnicode17(normalized, "NFKD"),
     bytes: {
       originalUtf8: Buffer.byteLength(value, "utf8"),
       normalizedUtf8: Buffer.byteLength(normalized, "utf8")
     },
+    ...(transformation.witness === undefined ? {} : { witness: transformation.witness }),
     runtime: runtimeInfo()
   };
 }
@@ -165,65 +176,24 @@ function requireBytes(value) {
   return Uint8Array.from(value);
 }
 
-function firstInvalidByte(bytes, encoding) {
-  if (encoding === "utf-16le") {
-    if (bytes.length % 2 !== 0) return bytes.length - 1;
-    for (let index = 0; index < bytes.length; index += 2) {
-      const unit = bytes[index] | (bytes[index + 1] << 8);
-      if (unit >= 0xd800 && unit <= 0xdbff) {
-        if (index + 3 >= bytes.length) return index;
-        const next = bytes[index + 2] | (bytes[index + 3] << 8);
-        if (next < 0xdc00 || next > 0xdfff) return index;
-        index += 2;
-      } else if (unit >= 0xdc00 && unit <= 0xdfff) {
-        return index;
-      }
-    }
-    return null;
-  }
-  const continuation = (value) => value >= 0x80 && value <= 0xbf;
-  for (let index = 0; index < bytes.length;) {
-    const first = bytes[index];
-    if (first <= 0x7f) { index += 1; continue; }
-    let length;
-    if (first >= 0xc2 && first <= 0xdf) length = 2;
-    else if (first >= 0xe0 && first <= 0xef) length = 3;
-    else if (first >= 0xf0 && first <= 0xf4) length = 4;
-    else return index;
-    if (index + length > bytes.length) return index;
-    const second = bytes[index + 1];
-    if (!continuation(second)) return index;
-    if ((first === 0xe0 && second < 0xa0) || (first === 0xed && second > 0x9f)
-      || (first === 0xf0 && second < 0x90) || (first === 0xf4 && second > 0x8f)) return index;
-    for (let offset = 2; offset < length; offset += 1) if (!continuation(bytes[index + offset])) return index;
-    index += length;
-  }
-  return null;
-}
-
 function decodeBytes(bytes, encoding, allowLossy) {
-  try {
-    return {
-      text: new TextDecoder(encoding, { fatal: true, ignoreBOM: true }).decode(bytes),
-      lossy: false,
-      firstInvalidByte: null,
-      warnings: []
-    };
-  } catch {
-    const invalidByte = firstInvalidByte(bytes, encoding);
-    if (!allowLossy) {
-      throw new TextIntegrityError("DECODE_FAILED", `bytes are not valid ${encoding}.`, {
-        encoding,
-        firstInvalidByte: invalidByte
-      });
-    }
-    return {
-      text: new TextDecoder(encoding, { fatal: false, ignoreBOM: true }).decode(bytes),
-      lossy: true,
-      firstInvalidByte: invalidByte,
-      warnings: ["Invalid source byte sequences were replaced with U+FFFD during decoding."]
-    };
+  const segments = decodeByteSegments(bytes, encoding);
+  const invalidByte = segments.find((segment) => segment.kind === "replacement")?.sourceStart ?? null;
+  if (invalidByte !== null && !allowLossy) {
+    throw new TextIntegrityError("DECODE_FAILED", `bytes are not valid ${encoding}.`, {
+      encoding,
+      firstInvalidByte: invalidByte
+    });
   }
+  return {
+    text: decodedText(segments),
+    segments,
+    lossy: invalidByte !== null,
+    firstInvalidByte: invalidByte,
+    warnings: invalidByte === null
+      ? []
+      : ["Invalid source byte sequences were replaced with U+FFFD during decoding."]
+  };
 }
 
 function bomKind(bytes, encoding) {
@@ -246,32 +216,41 @@ function transcode(args) {
   const targetEncoding = requireEncoding(args.targetEncoding, "targetEncoding");
   const allowLossy = requireBoolean(args.allowLossy, "allowLossy");
   const byteRepresentation = requireEnum(args.byteRepresentation, "byteRepresentation", BYTE_REPRESENTATIONS);
+  const witnessMode = Object.hasOwn(args, "witnessMode")
+    ? requireEnum(args.witnessMode, "witnessMode", WITNESS_MODES)
+    : "none";
   let text;
   let source;
+  let sourceText;
+  let sourceBytes;
+  let sourceEncoding;
+  let sourceSegments;
   let lossy = false;
   let warnings = [];
 
   if (sourceKind === "text") {
-    assertKeys(args, ["sourceKind", "text", "targetEncoding", "allowLossy", "byteRepresentation"], [
+    assertKeys(args, ["sourceKind", "text", "targetEncoding", "allowLossy", "byteRepresentation", "witnessMode"], [
       "sourceKind",
       "text",
       "targetEncoding",
       "allowLossy",
       "byteRepresentation"
     ]);
-    text = requireString(args.text, "text");
-    assertTextBudget(text, "text");
-    if (!text.isWellFormed()) {
+    sourceText = requireString(args.text, "text");
+    assertTextBudget(sourceText, "text");
+    sourceSegments = decodeTextSegments(sourceText);
+    const inputWellFormed = sourceSegments.every((segment) => segment.kind === "scalar");
+    if (!inputWellFormed) {
       if (!allowLossy) {
         throw new TextIntegrityError("INVALID_UNICODE", "text contains an unpaired UTF-16 surrogate.", { field: "text" });
       }
-      text = text.toWellFormed();
       lossy = true;
       warnings.push("Unpaired UTF-16 surrogates were replaced with U+FFFD before encoding.");
     }
-    source = { kind: "text", inputWellFormed: args.text.isWellFormed() };
+    text = decodedText(sourceSegments);
+    source = { kind: "text", inputWellFormed };
   } else {
-    assertKeys(args, ["sourceKind", "bytes", "sourceEncoding", "targetEncoding", "allowLossy", "byteRepresentation"], [
+    assertKeys(args, ["sourceKind", "bytes", "sourceEncoding", "targetEncoding", "allowLossy", "byteRepresentation", "witnessMode"], [
       "sourceKind",
       "bytes",
       "sourceEncoding",
@@ -279,24 +258,33 @@ function transcode(args) {
       "allowLossy",
       "byteRepresentation"
     ]);
-    const sourceEncoding = requireEncoding(args.sourceEncoding, "sourceEncoding");
-    const bytes = requireBytes(args.bytes);
-    const decoded = decodeBytes(bytes, sourceEncoding, allowLossy);
+    sourceEncoding = requireEncoding(args.sourceEncoding, "sourceEncoding");
+    sourceBytes = requireBytes(args.bytes);
+    const decoded = decodeBytes(sourceBytes, sourceEncoding, allowLossy);
     text = decoded.text;
+    sourceSegments = decoded.segments;
     lossy = decoded.lossy;
     warnings = decoded.warnings;
     source = {
       kind: "bytes",
       encoding: sourceEncoding,
-      byteLength: bytes.length,
-      bom: bomKind(bytes, sourceEncoding),
+      byteLength: sourceBytes.length,
+      bom: bomKind(sourceBytes, sourceEncoding),
       firstInvalidByte: decoded.firstInvalidByte,
       decodedThenReencodedEqual: !decoded.lossy
-        && Buffer.from(encodeText(text, sourceEncoding)).equals(Buffer.from(bytes))
+        && Buffer.from(encodeText(text, sourceEncoding)).equals(Buffer.from(sourceBytes))
     };
   }
 
   const encoded = encodeText(text, targetEncoding);
+  const witness = witnessMode === "none" ? undefined : buildTranscodeWitness({
+    mode: witnessMode,
+    sourceKind,
+    sourceSegments,
+    targetEncoding,
+    decodedText: text,
+    bom: source.kind === "bytes" ? source.bom : null
+  });
   return {
     status: "ok",
     operation: "transcode",
@@ -310,6 +298,7 @@ function transcode(args) {
     byteLength: encoded.length,
     lossy,
     warnings,
+    ...(witness === undefined ? {} : { witness }),
     runtime: runtimeInfo()
   };
 }
@@ -344,3 +333,4 @@ export const SUPPORTED_OPERATIONS = Object.freeze(Object.keys(EXECUTORS));
 export const SUPPORTED_ENCODINGS = ENCODINGS;
 export const SUPPORTED_NORMALIZATION_FORMS = NORMALIZATION_FORMS;
 export const SUPPORTED_BYTE_REPRESENTATIONS = BYTE_REPRESENTATIONS;
+export const SUPPORTED_WITNESS_MODES = WITNESS_MODES;

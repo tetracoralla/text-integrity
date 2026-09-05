@@ -1,6 +1,7 @@
 import { TextIntegrityError } from "./errors.js";
 import { LIMITS, assertTextBudget } from "./limits.js";
 import { runtimeInfo } from "./runtime.js";
+import { normalizeUnicode17 } from "./normalization.js";
 import {
   assertKeys,
   requireBoolean,
@@ -96,8 +97,8 @@ export function compareWithCollator(left, right, request) {
     relation: order < 0 ? "before" : order > 0 ? "after" : "equal",
     collatesEqual: order === 0,
     codeUnitEqual: left === right,
-    canonicalEquivalent: left.normalize("NFD") === right.normalize("NFD"),
-    compatibilityEquivalent: left.normalize("NFKD") === right.normalize("NFKD"),
+    canonicalEquivalent: normalizeUnicode17(left, "NFD") === normalizeUnicode17(right, "NFD"),
+    compatibilityEquivalent: normalizeUnicode17(left, "NFKD") === normalizeUnicode17(right, "NFKD"),
     runtime: runtimeInfo()
   };
 }

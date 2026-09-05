@@ -2,8 +2,14 @@ import { readFileSync } from "node:fs";
 import { executeOperation, SUPPORTED_OPERATIONS } from "./core/operations.js";
 import { LIMITS } from "./core/limits.js";
 import { TextIntegrityError, errorPayload } from "./core/errors.js";
+import { parseUtf8Json } from "./transport-json.js";
 import { TOOL_DEFINITIONS } from "./contracts.js";
 import { VERSION } from "./version.js";
+import {
+  PUBLIC_RESULT_SCHEMA_VERSION,
+  RESULT_SCHEMA_RESOURCE_LIST,
+  resultSchemaResourceForOperation
+} from "./result-contract.js";
 const HELP = `text-integrity ${VERSION}
 
 Usage:
@@ -11,6 +17,7 @@ Usage:
   text-integrity <operation> --name=value
   text-integrity --json < request.json
   text-integrity --schema
+  text-integrity --schema-full <operation>
 
 Operations: inspect, normalize, compare, transcode, security,
             explain_difference, index, protocol_profile
@@ -104,11 +111,14 @@ export function cliRequest(argv) {
     return { operation, args: { text: required(flags, "text"), ...optionalInteger(flags, "detail-limit", "detailLimit") } };
   }
   if (operation === "normalize") {
-    onlyFlags(flags, ["text", "form"]);
-    return { operation, args: { text: required(flags, "text"), form: required(flags, "form") } };
+    onlyFlags(flags, ["text", "form", "witness-mode"]);
+    return { operation, args: {
+      text: required(flags, "text"), form: required(flags, "form"),
+      ...(Object.hasOwn(flags, "witness-mode") ? { witnessMode: flags["witness-mode"] } : {})
+    } };
   }
   if (operation === "compare" || operation === "explain_difference") {
-    const extra = operation === "explain_difference" ? ["confusable-direction", "detail-limit"] : [];
+    const extra = operation === "explain_difference" ? ["confusable-direction", "detail-limit", "witness-mode"] : [];
     onlyFlags(flags, [...COLLATION_FLAGS, ...extra]);
     return {
       operation,
@@ -117,7 +127,8 @@ export function cliRequest(argv) {
         options: collation(flags),
         ...(operation === "explain_difference" ? {
           confusableDirection: required(flags, "confusable-direction"),
-          ...optionalInteger(flags, "detail-limit", "detailLimit")
+          ...optionalInteger(flags, "detail-limit", "detailLimit"),
+          ...(Object.hasOwn(flags, "witness-mode") ? { witnessMode: flags["witness-mode"] } : {})
         } : {})
       }
     };
@@ -154,13 +165,14 @@ export function cliRequest(argv) {
     const common = {
       sourceKind, targetEncoding: required(flags, "target-encoding"),
       allowLossy: booleanFlag(required(flags, "allow-lossy"), "allow-lossy"),
-      byteRepresentation: required(flags, "byte-representation")
+      byteRepresentation: required(flags, "byte-representation"),
+      ...(Object.hasOwn(flags, "witness-mode") ? { witnessMode: flags["witness-mode"] } : {})
     };
     if (sourceKind === "bytes") {
-      onlyFlags(flags, ["source-kind", "bytes", "source-encoding", "target-encoding", "allow-lossy", "byte-representation"]);
+      onlyFlags(flags, ["source-kind", "bytes", "source-encoding", "target-encoding", "allow-lossy", "byte-representation", "witness-mode"]);
       return { operation, args: { ...common, bytes: parseBytes(required(flags, "bytes")), sourceEncoding: required(flags, "source-encoding") } };
     }
-    onlyFlags(flags, ["source-kind", "text", "target-encoding", "allow-lossy", "byte-representation"]);
+    onlyFlags(flags, ["source-kind", "text", "target-encoding", "allow-lossy", "byte-representation", "witness-mode"]);
     return { operation, args: { ...common, text: required(flags, "text") } };
   }
   if (operation === "index") {
@@ -171,11 +183,12 @@ export function cliRequest(argv) {
     } };
   }
   if (operation === "protocol_profile") {
-    onlyFlags(flags, ["profile", "action", "text", "comparison", "options"]);
+    onlyFlags(flags, ["profile", "action", "text", "comparison", "options", "witness-mode"]);
     return { operation, args: {
       profile: required(flags, "profile"), action: required(flags, "action"), text: required(flags, "text"),
       ...(Object.hasOwn(flags, "comparison") ? { comparison: flags.comparison } : {}),
-      ...(Object.hasOwn(flags, "options") ? { options: parseJson(flags.options, "options") } : {})
+      ...(Object.hasOwn(flags, "options") ? { options: parseJson(flags.options, "options") } : {}),
+      ...(Object.hasOwn(flags, "witness-mode") ? { witnessMode: flags["witness-mode"] } : {})
     } };
   }
   return { operation, args: flags };
@@ -187,7 +200,7 @@ function rawJsonRequest() {
     throw new TextIntegrityError("REQUEST_TOO_LARGE", `CLI JSON input exceeds ${LIMITS.maxCliInputBytes} bytes.`);
   }
   let value;
-  try { value = JSON.parse(input.toString("utf8")); }
+  try { value = parseUtf8Json(input); }
   catch { throw new TextIntegrityError("INVALID_INPUT", "CLI input must be valid JSON."); }
   if (value === null || typeof value !== "object" || Array.isArray(value)
     || Object.keys(value).length !== 2 || !Object.hasOwn(value, "operation") || !Object.hasOwn(value, "arguments")) {
@@ -200,7 +213,25 @@ export function runCli(argv) {
   if (argv.length === 1 && argv[0] === "--help") { process.stdout.write(HELP); return 0; }
   if (argv.length === 1 && argv[0] === "--version") { process.stdout.write(`${VERSION}\n`); return 0; }
   if (argv.length === 1 && argv[0] === "--schema") {
-    process.stdout.write(`${JSON.stringify({ version: VERSION, tools: TOOL_DEFINITIONS.map(({ operation, name, inputSchema, outputSchema }) => ({ operation, tool: name, inputSchema, outputSchema })) })}\n`);
+    process.stdout.write(`${JSON.stringify({
+      version: VERSION,
+      publicResultContract: PUBLIC_RESULT_SCHEMA_VERSION,
+      strictOutputSchemaResources: RESULT_SCHEMA_RESOURCE_LIST.map(({ operation, uri }) => ({ operation, uri })),
+      tools: TOOL_DEFINITIONS.map(({ operation, name, inputSchema, outputSchema }) => ({ operation, tool: name, inputSchema, outputSchema }))
+    })}\n`);
+    return 0;
+  }
+  if (argv.length === 2 && argv[0] === "--schema-full") {
+    const resource = resultSchemaResourceForOperation(argv[1]);
+    if (resource === null) {
+      process.stderr.write(`${JSON.stringify(errorPayload(new TextIntegrityError(
+        "UNKNOWN_OPERATION",
+        "No strict result schema exists for the requested operation.",
+        { allowed: RESULT_SCHEMA_RESOURCE_LIST.map(({ operation }) => operation) }
+      )))}\n`);
+      return 2;
+    }
+    process.stdout.write(`${JSON.stringify(resource.schema)}\n`);
     return 0;
   }
   try {

@@ -7,27 +7,39 @@
 //   node scripts/bench.mjs --json   emit machine-readable JSON only
 //   node scripts/bench.mjs --slo    fail (exit 1) when a release SLO is violated
 //
-// SLO values are derived from the recorded baseline in
-// docs/PERFORMANCE_BASELINE.md with explicit headroom; they are regression
-// fences, not product acceptance.
+// SLO values and their measurement scope are documented in
+// docs/PERFORMANCE_CONTRACT.md. They are regression fences, not product
+// acceptance.
 
 import { spawn, spawnSync } from "node:child_process";
 import { EventEmitter, once } from "node:events";
 import { PassThrough } from "node:stream";
-import { executeOperation, LIMITS } from "../src/library.js";
+import { analyzeNamespaceIntegrity, executeOperation, LIMITS } from "../src/library.js";
 import { createMcpSession, runMcpServer } from "../src/mcp/server.js";
+import {
+  compareMeasurementRecords,
+  createMeasurementRecord
+} from "../src/reference/behavior.js";
 import { VERSION } from "../src/version.js";
 
 const ROOT = new URL("../", import.meta.url);
 const BIN = ["bin/text-integrity-mcp.js"];
 const META = { "io.modelcontextprotocol/protocolVersion": "2026-07-28" };
-const SAMPLES = { cold: 10, security: 20000, difference: 5000, steady: 1_000_000, burst: 1000, slowConsumer: 5000 };
+const SAMPLES = {
+  cold: 10,
+  security: 20000,
+  difference: 5000,
+  alignment: 10,
+  measurementComparison: 100,
+  namespace: 200,
+  steady: 1_000_000,
+  burst: 1000,
+  slowConsumer: 5000
+};
 
-// Release fences derived from docs/PERFORMANCE_BASELINE.md with explicit
-// headroom for slower CI runners; they are regression fences, not product
-// acceptance. Throughput floors are set well below the recorded baseline
-// (not above it) so they catch real regressions without flaking on slow
-// machines.
+// Release fences with deliberate headroom for slower CI runners. Throughput
+// floors are intentionally wide enough to catch material regressions without
+// treating one machine's historical measurement as a portable promise.
 const SLO = {
   coldSecurityMedianMs: 75,
   coldRssMb: 96,
@@ -115,10 +127,103 @@ function warmCalls() {
     executeOperation("explain_difference", differenceArgs);
     difference.push(performance.now() - start);
   }
+  const alignmentSummary = [];
+  const alignmentArgs = {
+    ...differenceArgs,
+    left: "a".repeat(LIMITS.maxTextBytes),
+    right: "b".repeat(LIMITS.maxTextBytes),
+    detailLimit: 0,
+    witnessMode: "summary"
+  };
+  executeOperation("explain_difference", alignmentArgs);
+  for (let index = 0; index < SAMPLES.alignment; index += 1) {
+    const start = performance.now();
+    executeOperation("explain_difference", alignmentArgs);
+    alignmentSummary.push(performance.now() - start);
+  }
+  const measurementRecord = createMeasurementRecord({
+    operation: "inspect",
+    arguments: {
+      text: { $text: { kind: "unicode_scalar_string", value: "A".repeat(LIMITS.maxTextBytes) } },
+      detailLimit: 0
+    }
+  });
+  const measurementComparison = [];
+  const measurementComparisonResult = compareMeasurementRecords(
+    measurementRecord,
+    measurementRecord
+  );
+  for (let index = 0; index < SAMPLES.measurementComparison; index += 1) {
+    const start = performance.now();
+    compareMeasurementRecords(measurementRecord, measurementRecord);
+    measurementComparison.push(performance.now() - start);
+  }
+  const namespace = [];
+  const namespaceArgs = {
+    items: Array.from({ length: LIMITS.maxNamespaceItems }, (_, index) => ({
+      id: `item-${index}`,
+      text: `name-${index % 128}`,
+      scope: `scope-${index % 4}`
+    })),
+    relations: ["exact", "nfc", "nfkc", "nfkc_casefold", "uts39_confusable"],
+    confusableDirection: "LTR"
+  };
+  const namespaceResult = analyzeNamespaceIntegrity(namespaceArgs);
+  for (let index = 0; index < SAMPLES.namespace; index += 1) {
+    const start = performance.now();
+    analyzeNamespaceIntegrity(namespaceArgs);
+    namespace.push(performance.now() - start);
+  }
+  const configuredNamespace = [];
+  const configuredNamespaceArgs = {
+    items: Array.from({ length: LIMITS.maxNamespaceItems }, (_, index) => ({
+      id: `configured-${index}`,
+      text: `${index % 2 === 0 ? "NAME" : "name"}-${index % 128}.example`,
+      scope: `scope-${index % 4}`
+    })),
+    relations: [{
+      kind: "protocol",
+      profile: "uts46_domain",
+      action: "to_ascii",
+      options: {
+        checkBidi: true, checkHyphens: true, checkJoiners: true, ignoreInvalidPunycode: false,
+        transitionalProcessing: false, useSTD3ASCIIRules: true, verifyDNSLength: true
+      }
+    }, {
+      kind: "declared_collation",
+      locale: "en",
+      options: {
+        usage: "sort", sensitivity: "base", ignorePunctuation: false, numeric: false,
+        caseFirst: "false", localeMatcher: "best fit", collation: "default"
+      }
+    }]
+  };
+  const configuredNamespaceResult = analyzeNamespaceIntegrity(configuredNamespaceArgs);
+  for (let index = 0; index < SAMPLES.namespace; index += 1) {
+    const start = performance.now();
+    analyzeNamespaceIntegrity(configuredNamespaceArgs);
+    configuredNamespace.push(performance.now() - start);
+  }
   return {
     securityIdentifier: stats(security),
     securityFreeText: stats(freeText),
-    explainDifference: stats(difference)
+    explainDifference: stats(difference),
+    differenceAlignmentSummaryMax: stats(alignmentSummary),
+    measurementComparisonMaxInspect: {
+      ...stats(measurementComparison),
+      recordBytes: Buffer.byteLength(JSON.stringify(measurementRecord), "utf8"),
+      resultBytes: Buffer.byteLength(JSON.stringify(measurementComparisonResult), "utf8")
+    },
+    namespaceIntegrity512: {
+      ...stats(namespace),
+      resultBytes: Buffer.byteLength(JSON.stringify(namespaceResult), "utf8"),
+      collisionGroups: namespaceResult.summary.collisionGroupCount
+    },
+    configuredNamespaceIntegrity512: {
+      ...stats(configuredNamespace),
+      resultBytes: Buffer.byteLength(JSON.stringify(configuredNamespaceResult), "utf8"),
+      collisionGroups: configuredNamespaceResult.summary.collisionGroupCount
+    }
   };
 }
 
@@ -339,6 +444,10 @@ if (asJson) {
     `warm security identifier (n=${warm.securityIdentifier.n}): median ${warm.securityIdentifier.medianMs.toFixed(3)} ms, p99 ${warm.securityIdentifier.p99Ms.toFixed(3)} ms, max ${warm.securityIdentifier.maxMs.toFixed(3)} ms`,
     `warm security free_text (n=${warm.securityFreeText.n}): median ${warm.securityFreeText.medianMs.toFixed(3)} ms, p99 ${warm.securityFreeText.p99Ms.toFixed(3)} ms`,
     `warm explain_difference (n=${warm.explainDifference.n}): median ${warm.explainDifference.medianMs.toFixed(3)} ms, p99 ${warm.explainDifference.p99Ms.toFixed(3)} ms`,
+    `max-input difference alignment summary (n=${warm.differenceAlignmentSummaryMax.n}): median ${warm.differenceAlignmentSummaryMax.medianMs.toFixed(3)} ms, p99 ${warm.differenceAlignmentSummaryMax.p99Ms.toFixed(3)} ms`,
+    `max-input inspect measurement comparison (n=${warm.measurementComparisonMaxInspect.n}): median ${warm.measurementComparisonMaxInspect.medianMs.toFixed(3)} ms, p99 ${warm.measurementComparisonMaxInspect.p99Ms.toFixed(3)} ms, record ${warm.measurementComparisonMaxInspect.recordBytes} B, result ${warm.measurementComparisonMaxInspect.resultBytes} B`,
+    `warm namespace integrity, 512 items × 5 relations (n=${warm.namespaceIntegrity512.n}): median ${warm.namespaceIntegrity512.medianMs.toFixed(3)} ms, p99 ${warm.namespaceIntegrity512.p99Ms.toFixed(3)} ms, result ${warm.namespaceIntegrity512.resultBytes} B`,
+    `warm configured namespace, 512 items × protocol/collation (n=${warm.configuredNamespaceIntegrity512.n}): median ${warm.configuredNamespaceIntegrity512.medianMs.toFixed(3)} ms, p99 ${warm.configuredNamespaceIntegrity512.p99Ms.toFixed(3)} ms, result ${warm.configuredNamespaceIntegrity512.resultBytes} B`,
     `steady state: ${steady.steadyCalls.toLocaleString("en-US")} free_text calls in ${steady.steadySeconds.toFixed(2)} s (${steady.steadyCallsPerSecond.toLocaleString("en-US")}/s), RSS growth ${steady.steadyRssGrowthKb} KB`,
     `stdio burst: ${burstResult.burstResponses}/${burstResult.burstRequests} responses in ${burstResult.burstMs.toFixed(0)} ms`,
     `slow consumer: paused RSS ${slow.slowConsumerPausedRssKb} KB, recovered ${slow.slowConsumerResponsesRecovered} responses, exit ${slow.slowConsumerExitCode}`,

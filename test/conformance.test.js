@@ -5,6 +5,10 @@ import { gunzipSync } from "node:zlib";
 import { readFileSync } from "node:fs";
 import tr46 from "tr46";
 import { bidiConformanceEngine } from "../src/core/bidi.js";
+import { normalizeUnicode17 } from "../src/core/normalization.js";
+import { lowercaseUnicode17 } from "../src/core/unicode-case.js";
+import { segmentGraphemesUnicode17 } from "../src/core/grapheme.js";
+import { decodeByteSegments, decodedText } from "../src/core/transcode-codec.js";
 
 const ROOT = new URL("../", import.meta.url);
 const DATA_ROOT = new URL("../vendor/unicode/17.0.0/", import.meta.url);
@@ -38,31 +42,65 @@ test("all pinned conformance corpora match their immutable manifest", () => {
   for (const entry of manifest.files) corpus(entry.path.split("/").at(-1).replace(".txt.gz", ""));
 });
 
-test("runtime normalization passes every Unicode 17 NormalizationTest case", () => {
+test("the pinned normalization core passes every Unicode 17 NormalizationTest case", () => {
   let count = 0;
   for (const sourceLine of corpus("NormalizationTest").split(/\r?\n/u)) {
     const line = sourceLine.split("#", 1)[0].trim();
     if (line === "" || line.startsWith("@")) continue;
     const [c1, c2, c3, c4, c5] = line.split(";").slice(0, 5).map(fromHexList);
     for (const value of [c1, c2, c3]) {
-      assert.equal(value.normalize("NFC"), c2);
-      assert.equal(value.normalize("NFD"), c3);
+      assert.equal(normalizeUnicode17(value, "NFC"), c2);
+      assert.equal(normalizeUnicode17(value, "NFD"), c3);
     }
-    assert.equal(c4.normalize("NFC"), c4);
-    assert.equal(c5.normalize("NFC"), c4);
-    assert.equal(c4.normalize("NFD"), c5);
-    assert.equal(c5.normalize("NFD"), c5);
+    assert.equal(normalizeUnicode17(c4, "NFC"), c4);
+    assert.equal(normalizeUnicode17(c5, "NFC"), c4);
+    assert.equal(normalizeUnicode17(c4, "NFD"), c5);
+    assert.equal(normalizeUnicode17(c5, "NFD"), c5);
     for (const value of [c1, c2, c3, c4, c5]) {
-      assert.equal(value.normalize("NFKC"), c4);
-      assert.equal(value.normalize("NFKD"), c5);
+      assert.equal(normalizeUnicode17(value, "NFKC"), c4);
+      assert.equal(normalizeUnicode17(value, "NFKD"), c5);
     }
     count += 1;
   }
   assert.equal(count > 19000, true);
 });
 
-test("runtime grapheme segmentation passes every Unicode 17 GraphemeBreakTest case", () => {
-  const segmenter = new Intl.Segmenter("und", { granularity: "grapheme" });
+function pinnedDefaultLowercaseMappings() {
+  const mappings = new Map();
+  const unicodeData = readFileSync(new URL("ucd/UnicodeData.txt", DATA_ROOT), "utf8");
+  for (const line of unicodeData.split(/\r?\n/u)) {
+    if (line === "") continue;
+    const fields = line.split(";");
+    if (fields[13] !== "") {
+      mappings.set(Number.parseInt(fields[0], 16), String.fromCodePoint(Number.parseInt(fields[13], 16)));
+    }
+  }
+  const specialCasing = readFileSync(new URL("ucd/SpecialCasing.txt", DATA_ROOT), "utf8");
+  for (const sourceLine of specialCasing.split(/\r?\n/u)) {
+    const line = sourceLine.split("#", 1)[0].trim();
+    if (line === "") continue;
+    const fields = line.split(";").map((field) => field.trim());
+    if (fields[4] !== "") continue;
+    mappings.set(Number.parseInt(fields[0], 16), fromHexList(fields[1]));
+  }
+  return mappings;
+}
+
+test("the pinned lowercase core reproduces every Unicode 17 default mapping and Final_Sigma context", () => {
+  let changed = 0;
+  for (const [codePoint, expected] of pinnedDefaultLowercaseMappings()) {
+    const source = String.fromCodePoint(codePoint);
+    assert.equal(lowercaseUnicode17(source), expected, `lowercase mismatch for U+${codePoint.toString(16).toUpperCase()}`);
+    if (source !== expected) changed += 1;
+  }
+  assert.ok(changed > 1400);
+  assert.equal(lowercaseUnicode17("\u039F\u03A3"), "\u03BF\u03C2");
+  assert.equal(lowercaseUnicode17("\u039F\u03A3\u0391"), "\u03BF\u03C3\u03B1");
+  assert.equal(lowercaseUnicode17("A\u0301\u03A3"), "a\u0301\u03C2");
+  assert.equal(lowercaseUnicode17("A\u03A3\u0301A"), "a\u03C3\u0301a");
+});
+
+test("the pinned grapheme core passes every Unicode 17 GraphemeBreakTest case", () => {
   let count = 0;
   for (const sourceLine of corpus("GraphemeBreakTest").split(/\r?\n/u)) {
     const line = sourceLine.split("#", 1)[0].trim();
@@ -80,10 +118,47 @@ test("runtime grapheme segmentation passes every Unicode 17 GraphemeBreakTest ca
     }
     if (current !== "") expected.push(current);
     const text = expected.join("");
-    assert.deepEqual([...segmenter.segment(text)].map((item) => item.segment), expected);
+    assert.deepEqual(segmentGraphemesUnicode17(text).map((item) => item.segment), expected);
     count += 1;
   }
   assert.equal(count > 700, true);
+});
+
+test("the closed byte decoder matches the supported WHATWG runtime adapter", () => {
+  const decoders = Object.fromEntries(["utf-8", "utf-16le"].map((encoding) => [encoding, {
+    lossy: new TextDecoder(encoding, { fatal: false, ignoreBOM: true }),
+    fatal: new TextDecoder(encoding, { fatal: true, ignoreBOM: true })
+  }]));
+  const check = (values, encoding) => {
+    const bytes = Uint8Array.from(values);
+    const segments = decodeByteSegments(bytes, encoding);
+    const actual = decodedText(segments);
+    const invalid = segments.some((segment) => segment.kind === "replacement");
+    assert.equal(actual, decoders[encoding].lossy.decode(bytes));
+    let fatalFailed = false;
+    try {
+      assert.equal(decoders[encoding].fatal.decode(bytes), actual);
+    } catch {
+      fatalFailed = true;
+    }
+    assert.equal(fatalFailed, invalid);
+  };
+
+  for (const encoding of ["utf-8", "utf-16le"]) {
+    for (let first = 0; first <= 0xff; first += 1) check([first], encoding);
+    for (let value = 0; value <= 0xffff; value += 1) check([value >>> 8, value & 0xff], encoding);
+  }
+
+  let state = 0x54495854;
+  for (let index = 0; index < 4096; index += 1) {
+    const length = index % 9;
+    const bytes = [];
+    for (let offset = 0; offset < length; offset += 1) {
+      state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+      bytes.push(state & 0xff);
+    }
+    check(bytes, index % 2 === 0 ? "utf-8" : "utf-16le");
+  }
 });
 
 function decodeIdna(value, fallback) {
@@ -135,7 +210,7 @@ test("tr46@6 passes every well-formed Unicode 17 IdnaTestV2 case with enabled ch
     assert.equal(actualT, hasEnabledError(asciiTStatuses, { verifyDNSLength: true }) ? null : asciiT);
     count += 1;
   }
-  assert.equal(count > 6000, true);
+  assert.equal(count, 6389);
 });
 
 const TYPE_CHARACTER = Object.freeze({

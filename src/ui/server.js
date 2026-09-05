@@ -5,11 +5,13 @@ import path from "node:path";
 import { executeOperation } from "../core/operations.js";
 import { TextIntegrityError, errorPayload } from "../core/errors.js";
 import { LIMITS } from "../core/limits.js";
+import { parseUtf8Json } from "../transport-json.js";
 
 const UI_DIRECTORY = fileURLToPath(new URL("./public/", import.meta.url));
 const STATIC_FILES = new Map([
   ["/", ["index.html", "text/html; charset=utf-8"]],
   ["/app.js", ["app.js", "text/javascript; charset=utf-8"]],
+  ["/transcode-source-drafts.js", ["transcode-source-drafts.js", "text/javascript; charset=utf-8"]],
   ["/styles.css", ["styles.css", "text/css; charset=utf-8"]]
 ]);
 const MAX_BODY_BYTES = LIMITS.maxCliInputBytes;
@@ -35,9 +37,9 @@ async function readJsonBody(request) {
     chunks.push(chunk);
   }
   try {
-    return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+    return parseUtf8Json(Buffer.concat(chunks));
   } catch {
-    throw new TextIntegrityError("INVALID_INPUT", "Request body must be valid JSON.");
+    throw new TextIntegrityError("INVALID_INPUT", "Request body must be valid UTF-8 JSON.");
   }
 }
 
