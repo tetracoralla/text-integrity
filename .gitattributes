@@ -2,3 +2,9 @@
 # vendor/unicode/17.0.0/MANIFEST.json.
 vendor/unicode/17.0.0/ucd/SpecialCasing.txt -whitespace
 vendor/unicode/17.0.0/ucd/emoji/emoji-data.txt -whitespace
+
+# Keep packaged source bytes stable when Git runs on Windows. Vendored upstream
+# data retains the exact stored bytes (some upstream files have their own EOLs).
+* text=auto eol=lf
+vendor/** -text
+*.wasm binary

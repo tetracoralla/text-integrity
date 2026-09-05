@@ -234,7 +234,7 @@ test("collation comparisons report complete bounded probe and observation drift"
   assert.deepEqual(identical.comparisonChanges, []);
 
   const runtimeChanged = structuredClone(calibration);
-  runtimeChanged.environment.node = "24.20.0";
+  runtimeChanged.environment.node = `${calibration.environment.node}-changed`;
   runtimeChanged.observationSha256 = "a".repeat(64);
   const runtimeComparison = compareCollationCalibrations(calibration, runtimeChanged);
   assert.equal(runtimeComparison.runtimeIdentityChanged, true);
