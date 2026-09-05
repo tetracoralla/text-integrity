@@ -79,6 +79,7 @@ function moveProjectionField(source, target, path) {
   let sourceParent = source;
   for (const key of path.slice(0, -1)) {
     if (sourceParent === null || typeof sourceParent !== "object" || !Object.hasOwn(sourceParent, key)) return;
+    sourceParent[key] = { ...sourceParent[key] };
     sourceParent = sourceParent[key];
   }
   const leaf = path.at(-1);
@@ -97,8 +98,10 @@ function moveProjectionField(source, target, path) {
 // between measured text semantics and truthful implementation metadata. The
 // input is never mutated: callers may safely retain or serialize the complete
 // result after asking for either projection.
-export function splitResultProjections(value) {
-  const semantic = structuredClone(value);
+function budgetProjections(value) {
+  // Copy only paths that lose metadata. Budgeting never exposes these shared
+  // read-only leaves, so cloning the complete text result is unnecessary.
+  const semantic = { ...value };
   const environment = {};
   moveProjectionField(semantic, environment, ["runtime"]);
   if (semantic.operation === "security") {
@@ -118,8 +121,12 @@ export function splitResultProjections(value) {
   return { semantic, environment };
 }
 
+export function splitResultProjections(value) {
+  return structuredClone(budgetProjections(value));
+}
+
 export function enforceResultBudget(value) {
-  const { semantic, environment } = splitResultProjections(value);
+  const { semantic, environment } = budgetProjections(value);
   const semanticBytes = Buffer.byteLength(JSON.stringify(semantic), "utf8");
   const metadataEnvelopeBytes = Buffer.byteLength(JSON.stringify(environment), "utf8");
   if (metadataEnvelopeBytes > RESULT_METADATA_RESERVATION_BYTES) {

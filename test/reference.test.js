@@ -144,10 +144,20 @@ test("collation calibration fingerprints the bounded ICU observation matrix", ()
   assert.equal(calibration.configurationCount, 15);
   assert.equal(calibration.comparisonCount, 45);
   assert.equal(calibration.probeSetSha256, "42f126f05d03846e252081939c643ec5d0db4cec481f0b65afc5f8f9775a627c");
-  assert.equal(calibration.observationSha256, "441e181cac4f7bc4ecac566b627b97b4d604d0561ed2ce72212be2282dd9f55b");
   assert.deepEqual(calibration.environment, {
-    node: "22.22.1", icu: "78.2", unicode: "17.0", cldr: "48.0"
+    node: process.versions.node, icu: process.versions.icu ?? null,
+    unicode: process.versions.unicode ?? null, cldr: process.versions.cldr ?? null
   });
+  assert.equal(calibration.observationSha256, canonicalDigest({
+    environment: calibration.environment, configurations: calibration.configurations
+  }));
+  // A calibration identifies its actual ICU environment, including patch
+  // versions. The pinned probe set and each consumer's observations are checked
+  // separately; they are not a universal runtime fingerprint.
+  const anotherEnvironment = { ...calibration.environment, node: "different-runtime" };
+  assert.notEqual(calibration.observationSha256, canonicalDigest({
+    environment: anotherEnvironment, configurations: calibration.configurations
+  }));
   assert.deepEqual(
     [...new Set(calibration.configurations.map(({ requestedOptions }) => requestedOptions.sensitivity))].sort(),
     ["accent", "base", "case", "variant"]
@@ -1244,7 +1254,23 @@ test("the committed manifest replays from the canonical corpus", () => {
     generated.contracts.measurementRecord,
     "text-integrity.measurement-record/2"
   );
-  assert.deepEqual(generated, committedManifest);
+  if (canonicalDigest(generated.environment) === canonicalDigest(committedManifest.environment)) {
+    assert.deepEqual(generated, committedManifest);
+  } else {
+    const comparison = compareBehaviorManifests(committedManifest, generated);
+    assert.deepEqual(generated.corpus, committedManifest.corpus);
+    assert.deepEqual(generated.product, committedManifest.product);
+    assert.equal(comparison.dataIdentityChanged, false);
+    assert.equal(comparison.engineChanges.uts46Changed, false);
+    assert.equal(comparison.verificationMetadataChanged, false);
+    for (const change of comparison.changes) {
+      assert.ok(["semantic_changed", "environment_metadata_changed"].includes(change.kind));
+      if (change.kind === "semantic_changed") {
+        const item = generated.cases.find(({ id }) => id === change.id);
+        assert.equal(item.reproducibilityTarget, "environment_bound", change.id);
+      }
+    }
+  }
   assert.equal(generated.corpus.caseCount, corpus.cases.length);
   assert.deepEqual(generated.data, {
     unicodeVersion: "17.0.0",
