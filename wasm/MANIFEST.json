@@ -1,6 +1,7 @@
 {
   "schemaVersion": "text-integrity.reference-wasm/3",
   "rustToolchain": "1.89.0",
+  "buildHost": "x86_64-unknown-linux-gnu",
   "rustc": "rustc 1.89.0 (29483883e 2025-08-04)",
   "target": "wasm32-unknown-unknown",
   "sourceSha256": "670153ae019629d379c3c26b4839e445208c094639505dc9a27932e91437ff31",
@@ -28,8 +29,8 @@
   },
   "wasm": {
     "path": "text_integrity_reference.wasm",
-    "bytes": 1623574,
-    "sha256": "ec11657e0a8f72cc1260690e99095eda087d536c92bd1269176e3230d0417c76",
+    "bytes": 1624161,
+    "sha256": "2e6e00a440f872d3e0b3a82d6dacd637797346a4362ed58a5ea474c49aca2ac7",
     "imports": [],
     "exports": [
       {

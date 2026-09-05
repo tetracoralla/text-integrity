@@ -19,6 +19,7 @@ const BUILT_WASM = path.join(
   "text_integrity_reference.wasm"
 );
 const TOOLCHAIN = "1.89.0";
+const BUILD_HOST = "x86_64-unknown-linux-gnu";
 const mode = process.argv[2] ?? "--check";
 if (!new Set(["--check", "--write"]).has(mode)) {
   process.stderr.write("usage: node scripts/build-independent-wasm.mjs [--check|--write]\n");
@@ -42,6 +43,12 @@ const environment = {
   ].join("\x1f")
 };
 delete environment.RUSTFLAGS;
+const compiler = spawnSync("rustc", ["--verbose", "--version"], { cwd: ROOT, env: environment, encoding: "utf8" });
+const buildHost = compiler.stdout?.match(/^host: (.+)$/m)?.[1];
+if (compiler.status !== 0 || buildHost !== BUILD_HOST) {
+  process.stderr.write(`Release WASM byte reproduction requires Rust ${TOOLCHAIN} on ${BUILD_HOST}; observed ${buildHost ?? "unavailable"}. Use the Linux release environment. Native/WASM semantic checks remain available on other hosts.\n`);
+  process.exit(2);
+}
 const build = spawnSync(
   "cargo",
   ["build", "--manifest-path", path.join(NATIVE_ROOT, "Cargo.toml"), "--locked", "--release", "--target", "wasm32-unknown-unknown"],
@@ -97,6 +104,7 @@ if (rawAbi.version !== 2
 const manifest = {
   schemaVersion: "text-integrity.reference-wasm/3",
   rustToolchain: TOOLCHAIN,
+  buildHost: BUILD_HOST,
   rustc: rustc.stdout.trim(),
   target: "wasm32-unknown-unknown",
   sourceSha256: nativeSourceDigest(NATIVE_ROOT),

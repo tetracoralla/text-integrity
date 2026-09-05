@@ -75,8 +75,13 @@ budget.
 - The verifier does not establish release readiness, installed Agent routing,
   public substitutability, application policy, or business acceptance.
 
-Reproducible WASM packaging uses Rust 1.89.0 and remaps the Cargo home and
-repository paths to fixed virtual roots. This removes machine-specific panic
-locations from the stripped module; the packaged bytes and manifest must match
-a rebuild on Linux as well as the maintainer build. Ambient Rust compiler flags
-do not alter this packaging recipe.
+Release WASM byte reproduction uses Rust 1.89.0 on the compiler host
+`x86_64-unknown-linux-gnu`, as recorded in `wasm/MANIFEST.json`. The build remaps
+Cargo home and repository paths to fixed virtual roots and ignores ambient
+compiler flags. Linux CI rebuilds and compares the complete module and manifest.
+A matching Rust version on a different compiler host is not a byte-identity
+guarantee: macOS and Linux builds produced different code sections despite
+matching semantic results. `wasm:write` and `wasm:check` therefore require the
+named Linux environment. `node scripts/verify-independent-runtime.mjs` performs
+native/WASM semantic checks on other development hosts. This build restriction
+does not restrict the operating systems supported by the shipped WASM module.
