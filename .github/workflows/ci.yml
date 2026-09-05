@@ -52,4 +52,11 @@ jobs:
       - run: rustup toolchain install 1.89.0 --profile minimal --component rustfmt --target wasm32-unknown-unknown
       - run: npm ci
       - run: npm run check:independent
+      - name: Retain failed reproducibility output
+        if: failure()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: wasm-reproducibility-output
+          path: native/target/wasm32-unknown-unknown/release/text_integrity_reference.wasm
+          retention-days: 3
       - run: npm run sbom:check
